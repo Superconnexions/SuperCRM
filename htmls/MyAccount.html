@@ -1,0 +1,641 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+            <link rel="stylesheet" type="text/css" href="css/animate.css" />
+            <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+            <link rel="stylesheet" type="text/css" href="css/style2.css" />
+            <link rel="stylesheet" type="text/css" href="css/responsive.css" />
+            <link rel="icon" href="images/favicon.png" type="image/gif" sizes="10x16">
+            <title>My Account - SupperCMR Dashboard</title>
+        </head>
+        <body>
+
+            <!-- sidebar Box -->
+            <button class="btn-side" onclick="openNav()"><i class="fa fa-angle-double-up" aria-hidden="true"></i> Side Panel</button>
+            <div class="sidenav-wrapper sidenav main-chat" id="chat-side">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <div class="sidenav-block">
+                    <a href="#" class="sidenav-logo">
+                        <img src="images/logo.png" alt="logo">
+                    </a>
+                    <div class="sidenav-list-blk">
+                        <div class="sidenav-list">
+                            <ul>
+                                <li><a href="CreateCustomer.html"><img src="images/icons/plus-icon1.png" alt="icons"> Create Customer</a></li>
+                                <li><a href="MyCustomer.html"><img src="images/icons/nat-img-02-a.png" style="width:26px;filter: brightness(10);" alt="icons"> My Customer</a></li>
+                                <!-- <li><a href="uloads.html"><img src="images/icons/sld-aic-01.png" alt="icons">Reports</a></li> -->
+                                <!-- <li><a href="messages.html"><img src="images/icons/sld-aic-04.png" alt="icons">Messages</a></li> -->
+                                
+                                <li class="active"><a href="MyAccount.html"><img src="images/icons/sld-aic-06.png" alt="icons"> My Account</a></li>
+                                <!-- <li><a href="support.html"><img src="images/icons/sld-aic-07.png" alt="icons"> Support</a></li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End sidebar Box -->
+
+            <div class="main main-dashboard-wrpper membership-main membership-overview-wrp">
+                <!-- Top Box -->
+                <section class="top-sec">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-xl-4"> 
+                                <div class="top-breadcrumb"> 
+                                    <ul class="breadcrumb">
+                                        <li class="breadcrumb-item active"><a href="#">My Account</a></li>
+                                    </ul>
+                                </div>    
+                            </div>
+
+                            <div class="col-md-12 col-lg-12 col-xl-8">
+                                <div class="top-info">                                                                      
+                                    <!--<div class="top-notication">
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-notify dropdown-toggle" data-toggle="dropdown">
+                                                <img src="images/icons/notfy-icon.png" alt="icon">
+                                                <sub class="icon-dot"></sub>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                 <a class="dropdown-item" href="#">3 Pending Message</a>
+                                                    <a class="dropdown-item" href="#">2 Feedback</a>
+                                                    <a class="dropdown-item" href="#">Return p</a>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                  
+                                    <div class="top-user">
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown">
+                                                <img src="images/profile1.jpg" alt="icon">
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                 <a class="dropdown-item" href="#">MR xxx</a>
+                                                    <a class="dropdown-item" href="#">Silver Employee</a>
+                                                    <a class="dropdown-item" href="#">Log out</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Top Box End -->
+
+                <!-- Header -->
+                <nav class="navbar navbar-expand-md" data-wow-duration="1s" data-wow-delay="0.20s">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="index.html"><img src="images/logo.png" alt="LOGO"></a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                            <span class="navbar-toggler-icon"></span>
+                            <span class="navbar-toggler-icon"></span>
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                            <ul class="navbar-nav nav nav-tabs">
+                              <!--   <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#commission">Home</a>
+                                </li>  -->
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#account">Profile</a>
+                                </li>
+                                <!--<li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#email">Email</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#password">Password</a>
+                                </li>--> 
+                               <!--  <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#billing">Billing</a>
+                                </li> -->
+                                
+
+                            </ul>
+                        </div>  
+                    </div>
+                </nav>
+                <!-- Header End -->
+
+                <div class="main-wrapper new-dash-cls dash-account-cls">
+                    <div class="container-fluid">
+                        <div class="cmr-dash">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12">
+                                    <div class="cmr-dash-account">
+                                        <form>
+                                            <div class="tab-content">
+                                                <div id="account" class="tab-pane in active">
+                                                    <div class="account-form-cls">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <!--<h4>ACCOUNT INFORMATION</h4>-->
+                                                                <!--<h4 style="text-transform:initial;"> Email :<span style="color:royalblue;"> example@email.com </span></h4>-->
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <h4>ACCOUNT INFORMATION</h4>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <p> Email :<span style="color:royalblue;"> example@email.com </span></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>First Name</label>
+                                                                                <input type="text" class="form-control" placeholder="Tomas">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Last Name</label>
+                                                                                <input type="text" class="form-control" placeholder="Lenda">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row marginTop3p">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Phone No:</label>
+                                                                                <input type="text" class="form-control" placeholder="88123456789">
+
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Mobile No:</label>
+                                                                                <input type="text" class="form-control" placeholder="0123456789">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row marginTop3p">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>House No:</label>
+                                                                                <input type="text" class="form-control" placeholder="7/A">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Road Name</label>
+                                                                                <input type="text" class="form-control" placeholder="123 Baker Street">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row marginTop3p">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Post Code</label>
+                                                                                <input type="text" class="form-control" placeholder="NW1 6XE">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>City</label>
+                                                                                <input type="text" class="form-control" placeholder="LONDON">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row marginTop3p">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Country</label>
+                                                                                <input type="text" class="form-control" placeholder="UK">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                               
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <!--<h4 style="text-transform:initial;"> Email :<span style="color:royalblue;"> example@email.com </span></h4>-->
+                                                                <!--<h2></h2>-->
+                                                                <h4>BANK INFORMATION</h4>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Name of Account</label>
+                                                                                <input type="text" class="form-control" placeholder="Tomas">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Name of Bank</label>
+                                                                                <input type="text" class="form-control" placeholder="HSBC BANK PLC">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row marginTop3p">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Account No 8 Digit</label>
+                                                                                <input type="text" class="form-control" placeholder="0845 6064321">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Sort Code (6 digit logged)</label>
+                                                                                <input type="text" class="form-control" placeholder="SE1 9DZ">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="account-info-upload" style="display:none;">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <h4>Profile Picture</h4>
+                                                                <div class="form-group">
+                                                                    <div class="upload-img-cls">
+                                                                        <div id="preview"></div>
+                                                                        <div class="no-bg">
+                                                                            <label style="display: block;">Upload Photo
+                                                                                <input id="browse" type="file" multiple="">
+                                                                            </label>128KB Maximum image size.
+                                                                        </div>
+                                                                    </div>
+                                                                </div>                                                        
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <a href="#" class="update-btn">Update Profile</a>
+                                                </div>
+                                                <div id="email" class="tab-pane fade">
+                                                    <div class="account-form-cls">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <h4>Change Email</h4>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group">
+                                                                                <label>Current Email</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group">
+                                                                                <label>New Email</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group">
+                                                                                <label>Confirm Email</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <a href="#" class="update-btn">Update Email</a>
+                                                </div>
+                                                <div id="password" class="tab-pane fade">
+                                                    <div class="account-form-cls">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <h4>Change Password</h4>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group">
+                                                                                <label>Current Password</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group">
+                                                                                <label>New Password</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-3">
+                                                                            <div class="form-group">
+                                                                                <label>Confirm Password</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <a href="#" class="update-btn">Update Password</a>
+                                                </div>
+                                                <div id="billing" class="tab-pane fade">
+                                                    <div class="account-form-cls">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <h4>Billing</h4>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Billing Address</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>State/Province</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Billing City</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Zip/Postal Code</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>First Name</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Last Name</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <h4>CARD INFORMATION</h4>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Card Type</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Card Number </label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>Expiration</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-6">
+                                                                            <div class="form-group">
+                                                                                <label>CCV Code</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group-blk">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <a href="#" class="update-btn">Update Billing</a>
+                                                    </div>
+                                                </div>
+                                             
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-3" style="display:none;">            
+                                    <div class="mw-events">
+                         <div class="" id="ord-04">
+                                                <div class="mw-services-blk src-larg-blk" style="height: fit-content;">
+                                                    <div class="mw-src-top">
+                                                        <h4><strong>MOMENTUM </strong> BONUS <sub><img src="images/icons/nat-img-07.png" alt="icon"></sub></h4>
+
+                                                        <div class="src-btn">
+                                                            <div class="dropdown">
+                                                                <button type="button" class="btn btn-notify dropdown-toggle" data-toggle="dropdown">
+                                                                    <img src="images/icons/nat-img-06.png" alt="icon">
+                                                                </button>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item" href="#">Link 1</a>
+                                                                    <a class="dropdown-item" href="#">Link 2</a>
+                                                                    <a class="dropdown-item" href="#">Link 3</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="bonus-blk">
+                                                        <div class="price-chart">
+                                                            <h4>Total Bonuses</h4>
+
+                                                            <div class="pr-chart-blk">
+                                                                <div class="pr-chart-img">
+                                                                    <img src="images/icons/nat-img-09.png" alt="icon">
+                                                                </div>
+                                                                <span>bonus money recEIved</span>
+                                                            </div>
+
+                                                            <h5>58 REMAINING</h5>
+                                                        </div>
+                                                        <div class="bonus-list-blk">
+                                                            <ul class="bonus-days-list">
+                                                                <li>30<br>days</li>
+                                                                <li>60<br>days</li>
+                                                                <li>90<br>days</li>
+                                                            </ul>
+                                                            <div class="bonus-list-img">
+                                                                <img src="images/icons/nat-img-08.png" alt="img">
+                                                            </div>
+                                                            <ul class="bonus-list-price">
+                                                                <li class="active"><strong><sub>$</sub>150</strong> <span>earned</span></li>
+                                                                <li><strong><sub>$</sub>450</strong></li>
+                                                                <li><strong><sub>$</sub>900</strong></li>
+                                                            </ul>
+                                                        </div>
+                                                        <p>Enroll 150 Qualified Customers in 30 days and earn a $500 extra.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+         
+           <div class="col-md-12" style="margin-top: 2%;">
+                     <div class="footer">
+                            <p>©2025-2026 Supper CMR. All rights reserved.</p>
+                    </div>
+            </div>
+
+        <script type="text/javascript" src="js/jquery.min.js"></script> 
+        <script type="text/javascript" src="js/popper.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/wow.min.js"></script>
+        <script type="text/javascript">
+                //wow animation js
+            new WOW().init();
+
+                //sidebar
+            function openNav() {
+              document.getElementById("chat-side").style.width = "320px";
+          }
+
+          function closeNav() {
+              document.getElementById("chat-side").style.width = "0";
+          }
+
+                //image upload
+          window.URL = window.URL || window.webkitURL;
+          var elBrowse = document.getElementById("browse"),
+          elPreview = document.getElementById("preview"),
+                  useBlob = false && window.URL; // Set to `true` to use Blob instead of Data-URL
+
+                // 2.
+                  function readImage(file) {
+                  // Create a new FileReader instance
+                  // https://developer.mozilla.org/en/docs/Web/API/FileReader
+                      var reader = new FileReader();
+
+                  // Once a file is successfully readed:
+                      reader.addEventListener("load", function () {
+                    // At this point `reader.result` contains already the Base64 Data-URL
+                    // and we've could immediately show an image using
+                    // `elPreview.insertAdjacentHTML("beforeend", "<img src='"+ reader.result +"'>");`
+                    // But we want to get that image's width and height px values!
+                    // Since the File Object does not hold the size of an image
+                    // we need to create a new image and assign it's src, so when
+                    // the image is loaded we can calculate it's width and height:
+                        var image = new Image();
+                        image.addEventListener("load", function () {
+                      // Concatenate our HTML image info
+                          var imageInfo =
+                          file.name +
+                        " " + // get the value of `name` from the `file` Obj
+                        image.width +
+                        "×" + // But get the width from our `image`
+                        image.height +
+                        " " +
+                        file.type +
+                        " " +
+                        Math.round(file.size / 1024) +
+                        "KB";
+
+                      // Finally append our created image and the HTML info string to our `#preview`
+                        elPreview.appendChild(this);
+                        elPreview.insertAdjacentHTML("beforeend", imageInfo + "<br>");
+
+                      // If we set the variable `useBlob` to true:
+                      // (Data-URLs can end up being really large
+                      // `src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA...........etc`
+                      // Blobs are usually faster and the image src will hold a shorter blob name
+                      // src="blob:http%3A//example.com/2a303acf-c34c-4d0a-85d4-2136eef7d723"
+                        if (useBlob) {
+                        // Free some memory for optimal performance
+                            window.URL.revokeObjectURL(image.src);
+                        }
+                    });
+
+                        image.src = useBlob ? window.URL.createObjectURL(file) : reader.result;
+                    });
+
+                  // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+                      reader.readAsDataURL(file);
+                  }
+
+                // 1.
+                // Once the user selects all the files to upload
+                // that will trigger a `change` event on the `#browse` input
+                  elBrowse.addEventListener("change", function () {
+                  // Let's store the FileList Array into a variable:
+                  // https://developer.mozilla.org/en-US/docs/Web/API/FileList
+                      var files = this.files;
+                  // Let's create an empty `errors` String to collect eventual errors into:
+                      var errors = "";
+
+                      if (!files) {
+                        errors += "File upload not supported by your browser.";
+                    }
+
+                  // Check for `files` (FileList) support and if contains at least one file:
+                    if (files && files[0]) {
+                    // Iterate over every File object in the FileList array
+                        for (var i = 0; i < files.length; i++) {
+                      // Let's refer to the current File as a `file` variable
+                      // https://developer.mozilla.org/en-US/docs/Web/API/File
+                          var file = files[i];
+
+                      // Test the `file.name` for a valid image extension:
+                      // (pipe `|` delimit more image extensions)
+                      // The regex can also be expressed like: /\.(png|jpe?g|gif)$/i
+                          if (/\.(png|jpeg|jpg|gif)$/i.test(file.name)) {
+                        // SUCCESS! It's an image!
+                        // Send our image `file` to our `readImage` function!
+                            readImage(file);
+                        } else {
+                            errors += file.name + " Unsupported Image extension\n";
+                        }
+                    }
+                }
+
+                  // Notify the user for any errors (i.e: try uploading a .txt file)
+                if (errors) {
+                    alert(errors);
+                }
+            });
+
+        </script>
+        </body>
+        </html>
