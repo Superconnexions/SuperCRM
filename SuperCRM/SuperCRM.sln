@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCRM.Domain", "SuperCRM.Domain\SuperCRM.Domain.csproj", "{91A0A6A3-8B74-48EC-8381-E6FEB68F326F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCRM.Application", "SuperCRM.Application\SuperCRM.Application.csproj", "{D0BB7625-17E5-4A47-8A01-89D2C62D2DFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCRM.Persistence", "SuperCRM.Persistence\SuperCRM.Persistence.csproj", "{EB7F713F-E19D-4625-AED7-CCBB150D6349}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCRM.Infrastructure", "SuperCRM.Infrastructure\SuperCRM.Infrastructure.csproj", "{2C4F86CD-0D87-4AB1-9E04-C2B9B8E911E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCRM.Shared", "SuperCRM.Shared\SuperCRM.Shared.csproj", "{7CA8CB73-BD93-42F9-924C-A301AAAEAB5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCRM.Web", "SuperCRM.Web\SuperCRM.Web.csproj", "{019E0344-C3B6-4B3E-99D0-F5595D6A8365}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91A0A6A3-8B74-48EC-8381-E6FEB68F326F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91A0A6A3-8B74-48EC-8381-E6FEB68F326F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91A0A6A3-8B74-48EC-8381-E6FEB68F326F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91A0A6A3-8B74-48EC-8381-E6FEB68F326F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0BB7625-17E5-4A47-8A01-89D2C62D2DFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0BB7625-17E5-4A47-8A01-89D2C62D2DFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0BB7625-17E5-4A47-8A01-89D2C62D2DFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0BB7625-17E5-4A47-8A01-89D2C62D2DFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB7F713F-E19D-4625-AED7-CCBB150D6349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB7F713F-E19D-4625-AED7-CCBB150D6349}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB7F713F-E19D-4625-AED7-CCBB150D6349}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB7F713F-E19D-4625-AED7-CCBB150D6349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C4F86CD-0D87-4AB1-9E04-C2B9B8E911E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C4F86CD-0D87-4AB1-9E04-C2B9B8E911E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C4F86CD-0D87-4AB1-9E04-C2B9B8E911E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C4F86CD-0D87-4AB1-9E04-C2B9B8E911E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA8CB73-BD93-42F9-924C-A301AAAEAB5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA8CB73-BD93-42F9-924C-A301AAAEAB5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA8CB73-BD93-42F9-924C-A301AAAEAB5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA8CB73-BD93-42F9-924C-A301AAAEAB5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{019E0344-C3B6-4B3E-99D0-F5595D6A8365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{019E0344-C3B6-4B3E-99D0-F5595D6A8365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{019E0344-C3B6-4B3E-99D0-F5595D6A8365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{019E0344-C3B6-4B3E-99D0-F5595D6A8365}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CE0FEF7-6FD0-4216-8A25-AE38CAAA6C39}
+	EndGlobalSection
+EndGlobal

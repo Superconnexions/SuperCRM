@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SuperCRM.Application\SuperCRM.Application.csproj" />
+    <ProjectReference Include="..\SuperCRM.Persistence\SuperCRM.Persistence.csproj" />
+    <ProjectReference Include="..\SuperCRM.Shared\SuperCRM.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logging\" />
+  </ItemGroup>
+
+</Project>
