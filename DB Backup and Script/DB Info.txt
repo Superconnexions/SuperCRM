@@ -1,0 +1,4 @@
+Name: SQL Server 2019
+Edition: Microsoft SQL Server Developer (64-bit)
+Version: 16.0.1000.6
+Change the connection string in SuperCRM\SuperCRM\SuperCRM.Web\appsettings.json
