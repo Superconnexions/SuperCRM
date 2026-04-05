@@ -1,0 +1,47 @@
+﻿@model IEnumerable<SuperCRM.Web.ViewModels.AdminUsers.AdminUserListItemViewModel>
+
+@{
+    ViewData["Title"] = "Admin Users";
+}
+
+<h2>Admin Users</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create Admin User</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>User Name</th>
+            <th>Role</th>
+            <th>Active</th>
+            <th>Created At (UTC)</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Email</td>
+                <td>@item.UserName</td>
+                <td>@item.RoleName</td>
+                <td>@(item.IsActive ? "Yes" : "No")</td>
+                <td>@item.CreatedAt</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-warning">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

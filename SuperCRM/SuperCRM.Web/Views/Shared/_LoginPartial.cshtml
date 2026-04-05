@@ -9,8 +9,13 @@
     {
         @if (User.IsInRole(AppRoles.SuperAdmin))
         {
+
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">SuperAdmin Dashboard</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="AdminUsers" asp-action="Index">Admin Users</a>
             </li>
 
             <li class="nav-item dropdown">
