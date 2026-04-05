@@ -1,0 +1,34 @@
+﻿@model SuperCRM.Web.ViewModels.ProductVariantTypes.ProductVariantTypeCreateEditViewModel
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div class="mb-3">
+    <label asp-for="TypeCode" class="form-label"></label>
+    @if (Model.IsEditMode)
+    {
+        <input asp-for="TypeCode" class="form-control" readonly />
+    }
+    else
+    {
+        <input asp-for="TypeCode" class="form-control" />
+    }
+    <span asp-validation-for="TypeCode" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="TypeValue" class="form-label"></label>
+    <input asp-for="TypeValue" class="form-control" />
+    <span asp-validation-for="TypeValue" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="DisplayOrder" class="form-label"></label>
+    <input asp-for="DisplayOrder" class="form-control" />
+    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+</div>
+
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+</div>
+<span asp-validation-for="IsActive" class="text-danger"></span>

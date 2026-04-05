@@ -18,6 +18,7 @@ namespace SuperCRM.Persistence.DbContexts
         }
 
         public DbSet<Provider> Providers => Set<Provider>();
+        public DbSet<ProductVariantType> ProductVariantTypes => Set<ProductVariantType>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -66,6 +67,42 @@ namespace SuperCRM.Persistence.DbContexts
                       .WithMany()
                       .HasForeignKey(e => e.UpdatedByUserId)
                       .HasConstraintName("FK_Providers_UpdatedBy");
+            });
+
+            // ProductVariantType
+
+            builder.Entity<ProductVariantType>(entity =>
+            {
+                entity.ToTable("ProductVariantTypes");
+
+                entity.HasKey(e => e.TypeCode);
+
+                entity.Property(e => e.TypeCode)
+                      .HasMaxLength(50)
+                      .IsRequired()
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.TypeValue)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(e => e.DisplayOrder)
+                      .IsRequired();
+
+                entity.Property(e => e.IsActive)
+                      .IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2")
+                      .IsRequired();
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_ProductVariantTypes_UpdatedBy");
             });
         }
     }

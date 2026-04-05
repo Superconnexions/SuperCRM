@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SuperCRM.Application.Interfaces.Persistence;
+using SuperCRM.Application.Interfaces.Services;
+using SuperCRM.Application.Services;
 using SuperCRM.Infrastructure.Services;
 
 //using SuperCRM.Infrastructure.Services;
 using SuperCRM.Persistence.Dapper;
 using SuperCRM.Persistence.DbContexts;
 using SuperCRM.Persistence.Identity;
+using SuperCRM.Persistence.Repositories;
 using SuperCRM.Shared;
 //using SuperCRM.Shared;
 
@@ -51,6 +55,17 @@ builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
 
 // Register seed service
 builder.Services.AddScoped<IdentitySeedService>();
+
+// Start Register Services
+
+// Register ProductVarintType Service
+builder.Services.AddScoped<IProductVariantTypeRepository, ProductVariantTypeRepository>();
+builder.Services.AddScoped<IProductVariantTypeService, ProductVariantTypeService>();
+// END ProductVarintType Service
+
+
+
+/// END Register services
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

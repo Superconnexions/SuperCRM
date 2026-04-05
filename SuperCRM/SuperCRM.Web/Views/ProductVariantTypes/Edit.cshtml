@@ -1,0 +1,17 @@
+﻿@model SuperCRM.Web.ViewModels.ProductVariantTypes.ProductVariantTypeCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Product Variant Type";
+}
+
+<h2>Edit Product Variant Type</h2>
+
+<form asp-action="Edit" method="post">
+    <partial name="_Form" model="Model" />
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
