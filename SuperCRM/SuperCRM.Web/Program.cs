@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SuperCRM.Application.Interfaces.Persistence;
+using SuperCRM.Application.Interfaces.Security;
 using SuperCRM.Application.Interfaces.Services;
 using SuperCRM.Application.Services;
 using SuperCRM.Infrastructure.Services;
@@ -63,6 +64,11 @@ builder.Services.AddScoped<IProductVariantTypeRepository, ProductVariantTypeRepo
 builder.Services.AddScoped<IProductVariantTypeService, ProductVariantTypeService>();
 // END ProductVarintType Service
 
+// Register Agent Registration dependencies:
+builder.Services.AddScoped<IAgentRegistrationRepository, AgentRegistrationRepository>();
+builder.Services.AddScoped<IApplicationUserAccountService, ApplicationUserAccountService>();
+builder.Services.AddScoped<IAgentRegistrationService, AgentRegistrationService>();
+// END Registration Services
 
 
 /// END Register services

@@ -20,6 +20,12 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<Provider> Providers => Set<Provider>();
         public DbSet<ProductVariantType> ProductVariantTypes => Set<ProductVariantType>();
 
+        // For Agent Registration-----------
+        public DbSet<Agent> Agents => Set<Agent>();
+        public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+        public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+        // END Agent Registration
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -104,6 +110,9 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasForeignKey(e => e.UpdatedByUserId)
                       .HasConstraintName("FK_ProductVariantTypes_UpdatedBy");
             });
+
+            // Added for Agent Registration------
+            builder.ApplyConfigurationsFromAssembly(typeof(SuperCrmDbContext).Assembly);
         }
     }
 }

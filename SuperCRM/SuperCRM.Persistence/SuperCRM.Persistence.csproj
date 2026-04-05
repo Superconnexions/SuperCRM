@@ -9,10 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SuperCRM.Application\SuperCRM.Application.csproj" />
     <ProjectReference Include="..\SuperCRM.Domain\SuperCRM.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Configurations\" />
+    <ProjectReference Include="..\SuperCRM.Shared\SuperCRM.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

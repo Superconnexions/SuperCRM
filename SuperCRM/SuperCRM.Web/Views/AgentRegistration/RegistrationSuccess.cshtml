@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Registration Success";
+}
+
+<h2>Registration Submitted Successfully</h2>
+
+<div class="alert alert-success">
+    Your Agent registration has been completed successfully.
+</div>
+
+@if (ViewBag.AgentCode != null)
+{
+    <p><strong>Your Agent Code:</strong> @ViewBag.AgentCode</p>
+}
+
+<p>
+    You can now log in with your registered credentials.
+    Operational access may remain restricted until admin approval is completed.
+</p>
+
+<p>
+    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Go to Login</a>
+</p>

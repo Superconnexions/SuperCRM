@@ -1,0 +1,24 @@
+﻿@model SuperCRM.Web.ViewModels.Agents.AgentDashboardViewModel
+
+@{
+    ViewData["Title"] = "Agent Dashboard";
+}
+
+<h2>Agent Dashboard</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Agent Code:</strong> @Model.AgentCode</p>
+        <p><strong>Registration Status:</strong> @Model.RegistrationStatusText</p>
+        <p><strong>Approved:</strong> @(Model.IsApproved ? "Yes" : "No")</p>
+        <p><strong>Commission Eligible:</strong> @(Model.IsCommissionEligible ? "Yes" : "No")</p>
+        <p><strong>Joined At:</strong> @(Model.JoinedAt.HasValue? Model.JoinedAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</p>
+    </div>
+</div>
+
+@if (!Model.IsApproved)
+{
+    <div class="alert alert-warning mt-3">
+        Your registration is pending approval. Order creation and commission workflows should remain restricted until approval is completed.
+    </div>
+}
