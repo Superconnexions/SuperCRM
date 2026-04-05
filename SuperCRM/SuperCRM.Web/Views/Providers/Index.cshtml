@@ -1,0 +1,42 @@
+﻿@model IEnumerable<SuperCRM.Web.ViewModels.Providers.ProviderListItemViewModel>
+
+@{
+    ViewData["Title"] = "Providers";
+}
+
+<h2>Providers</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Provider</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Provider Name</th>
+            <th>Contact Email</th>
+            <th>Contact Phone</th>
+            <th>Active</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProviderName</td>
+                <td>@item.ContactEmail</td>
+                <td>@item.ContactPhone</td>
+                <td>@(item.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ProviderId" class="btn btn-sm btn-warning">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

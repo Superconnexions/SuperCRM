@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SuperCRM.Domain.Entities;
 using SuperCRM.Persistence.Identity;
+using SuperCRM.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,8 @@ namespace SuperCRM.Persistence.DbContexts
         {
         }
 
+        public DbSet<Provider> Providers => Set<Provider>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -27,6 +31,42 @@ namespace SuperCRM.Persistence.DbContexts
             builder.Entity<Microsoft.AspNetCore.Identity.IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins");
             builder.Entity<Microsoft.AspNetCore.Identity.IdentityUserToken<Guid>>().ToTable("AspNetUserTokens");
             builder.Entity<Microsoft.AspNetCore.Identity.IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims");
+
+            // Provdier table
+
+            builder.Entity<Provider>(entity =>
+            {
+                entity.ToTable("Providers");
+
+                entity.HasKey(e => e.ProviderId);
+
+                entity.Property(e => e.ProviderId)
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.ProviderName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(e => e.ContactEmail)
+                      .HasMaxLength(150);
+
+                entity.Property(e => e.ContactPhone)
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.Property(e => e.IsActive)
+                      .IsRequired();
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_Providers_UpdatedBy");
+            });
         }
     }
 }

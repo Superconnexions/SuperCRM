@@ -1,0 +1,24 @@
+﻿@model SuperCRM.Web.ViewModels.Providers.ProviderCreateEditViewModel
+
+<div class="mb-3">
+    <label asp-for="ProviderName" class="form-label"></label>
+    <input asp-for="ProviderName" class="form-control" />
+    <span asp-validation-for="ProviderName" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ContactEmail" class="form-label"></label>
+    <input asp-for="ContactEmail" class="form-control" />
+    <span asp-validation-for="ContactEmail" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ContactPhone" class="form-label"></label>
+    <input asp-for="ContactPhone" class="form-control" />
+    <span asp-validation-for="ContactPhone" class="text-danger"></span>
+</div>
+
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+</div>
