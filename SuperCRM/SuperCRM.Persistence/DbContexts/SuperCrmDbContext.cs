@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SuperCRM.Domain.Entities;
-using SuperCRM.Persistence.Identity;
 using SuperCRM.Domain.Entities;
+using SuperCRM.Persistence.Identity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,10 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
         // END Agent Registration
+
+        public DbSet<Country> Countries => Set<Country>();
+        public DbSet<Region> Regions => Set<Region>();
+        public DbSet<City> Cities => Set<City>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -111,6 +116,83 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasConstraintName("FK_ProductVariantTypes_UpdatedBy");
             });
 
+            builder.Entity<UserProfile>(entity =>
+            {
+                entity.ToTable("UserProfiles");
+
+                entity.HasKey(e => e.UserId);
+
+                entity.Property(e => e.FirstName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.LastName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.City).HasMaxLength(100);
+                entity.Property(e => e.PhoneNo).HasMaxLength(50);
+                entity.Property(e => e.MobileNo).HasMaxLength(50);
+
+                entity.HasOne<ApplicationUser>()
+                      .WithOne()
+                      .HasForeignKey<UserProfile>(e => e.UserId)
+                      .HasConstraintName("FK_UserProfiles_User");
+
+                entity.HasOne<Country>()
+                      .WithMany()
+                      .HasForeignKey(e => e.CountryId)
+                      .HasConstraintName("FK_UserProfiles_Country");
+
+                entity.HasOne<Region>()
+                      .WithMany()
+                      .HasForeignKey(e => e.RegionId)
+                      .HasConstraintName("FK_UserProfiles_Region");
+
+                entity.HasOne<City>()
+                      .WithMany()
+                      .HasForeignKey(e => e.CityId)
+                      .HasConstraintName("FK_UserProfiles_City");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_UserProfiles_UpdatedBy");
+            });
+
+
+            builder.Entity<UserAddress>(entity =>
+            {
+                entity.ToTable("UserAddresses");
+
+                entity.HasKey(e => e.UserAddressId);
+
+                entity.Property(e => e.HouseNo).HasMaxLength(100);
+                entity.Property(e => e.RoadName).HasMaxLength(150);
+                entity.Property(e => e.AddressLine1).HasMaxLength(200);
+                entity.Property(e => e.AddressLine2).HasMaxLength(200);
+                entity.Property(e => e.City).HasMaxLength(100);
+                entity.Property(e => e.PostCode).HasMaxLength(20);
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .HasConstraintName("FK_UserAddresses_User");
+
+                entity.HasOne<Country>()
+                      .WithMany()
+                      .HasForeignKey(e => e.CountryId)
+                      .HasConstraintName("FK_UserAddresses_Country");
+
+                entity.HasOne<Region>()
+                      .WithMany()
+                      .HasForeignKey(e => e.RegionId)
+                      .HasConstraintName("FK_UserAddresses_Region");
+
+                entity.HasOne<City>()
+                      .WithMany()
+                      .HasForeignKey(e => e.CityId)
+                      .HasConstraintName("FK_UserAddresses_City");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_UserAddresses_UpdatedBy");
+            });
             // Added for Agent Registration------
             builder.ApplyConfigurationsFromAssembly(typeof(SuperCrmDbContext).Assembly);
         }

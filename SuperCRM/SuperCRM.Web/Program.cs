@@ -80,6 +80,8 @@ builder.Services.AddScoped<IApplicationUserAccountService, ApplicationUserAccoun
 builder.Services.AddScoped<IAgentRegistrationService, AgentRegistrationService>();
 // END Registration Services
 
+builder.Services.AddScoped<IGeoLookupRepository, GeoLookupRepository>();
+builder.Services.AddScoped<IGeoLookupService, GeoLookupService>();
 
 /// END Register services
 

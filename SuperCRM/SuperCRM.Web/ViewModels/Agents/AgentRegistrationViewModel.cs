@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace SuperCRM.Web.ViewModels.Agents
+namespace SuperCRM.Web.ViewModels.AgentRegistration
 {
     /// <summary>
-    /// Public form model for agent self-registration.
-    /// This model is bound in the Web layer and then mapped to an Application DTO.
+    /// UI ViewModel for Agent self-registration page.
+    /// Keeps UI-specific concerns in Web layer:
+    /// - input validation
+    /// - dropdown collections
+    /// - confirm password
     /// </summary>
     public class AgentRegistrationViewModel
     {
@@ -51,15 +55,35 @@ namespace SuperCRM.Web.ViewModels.Agents
         [Display(Name = "Road Name")]
         public string? RoadName { get; set; }
 
-        [StringLength(100)]
-        [Display(Name = "City")]
-        public string? City { get; set; }
+        [StringLength(200)]
+        [Display(Name = "Address Line 1")]
+        public string? AddressLine1 { get; set; }
+
+        [StringLength(200)]
+        [Display(Name = "Address Line 2")]
+        public string? AddressLine2 { get; set; }
 
         [StringLength(20)]
         [Display(Name = "Post Code")]
         public string? PostCode { get; set; }
 
-        [Display(Name = "Country Id")]
+        [Required]
+        [Display(Name = "Country")]
         public int? CountryId { get; set; }
+
+        [Required]
+        [Display(Name = "Region")]
+        public int? RegionId { get; set; }
+
+        [Required]
+        [Display(Name = "City")]
+        public int? CityId { get; set; }
+
+        /// <summary>
+        /// Dropdown data sources.
+        /// </summary>
+        public List<SelectListItem> Countries { get; set; } = new();
+        public List<SelectListItem> Regions { get; set; } = new();
+        public List<SelectListItem> Cities { get; set; } = new();
     }
 }
