@@ -23,6 +23,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<SuperCrmDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+//// Added for Scafolding-------
+//builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+//    {
+//        options.SignIn.RequireConfirmedAccount = false;
+//    })
+//    .AddRoles<ApplicationRole>()
+//    .AddEntityFrameworkStores<SuperCrmDbContext>();
+
+//// END addde scafolding
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services
