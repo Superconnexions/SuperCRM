@@ -1,0 +1,248 @@
+@model SuperCRM.Web.ViewModels.Products.ProductCreateEditViewModel
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label asp-for="SalesUnitId" class="form-label"></label>
+        <select asp-for="SalesUnitId" asp-items="Model.SalesUnitOptions" class="form-select">
+            <option value="">-- Select Sales Unit --</option>
+        </select>
+        <span asp-validation-for="SalesUnitId" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="ProductCode" class="form-label"></label>
+        <input asp-for="ProductCode" class="form-control" />
+        <span asp-validation-for="ProductCode" class="text-danger"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="ProductType" class="form-label"></label>
+        <select asp-for="ProductType" asp-items="Model.ProductTypeOptions" class="form-select"></select>
+        <span asp-validation-for="ProductType" class="text-danger"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="CustomerType" class="form-label"></label>
+        <select asp-for="CustomerType" asp-items="Model.CustomerTypeOptions" class="form-select">
+            <option value="">-- Optional --</option>
+        </select>
+        <span asp-validation-for="CustomerType" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductName" class="form-label"></label>
+        <input asp-for="ProductName" class="form-control" />
+        <span asp-validation-for="ProductName" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductDisplayName" class="form-label"></label>
+        <input asp-for="ProductDisplayName" class="form-control" />
+        <span asp-validation-for="ProductDisplayName" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ProductDescription" class="form-label"></label>
+    <textarea asp-for="ProductDescription" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="ProductDescription" class="text-danger"></span>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="BasePriceType" class="form-label"></label>
+        <select asp-for="BasePriceType" asp-items="Model.BasePriceTypeOptions" class="form-select"></select>
+        <span asp-validation-for="BasePriceType" class="text-danger"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="BasePrice" class="form-label"></label>
+        <input asp-for="BasePrice" class="form-control" />
+        <span asp-validation-for="BasePrice" class="text-danger"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="CurrencyCode" class="form-label"></label>
+        <input asp-for="CurrencyCode" class="form-control" />
+        <span asp-validation-for="CurrencyCode" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="DownPaymentAmount" class="form-label"></label>
+        <input asp-for="DownPaymentAmount" class="form-control" />
+        <span asp-validation-for="DownPaymentAmount" class="text-danger"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="DisplayOrder" class="form-label"></label>
+        <input asp-for="DisplayOrder" class="form-control" />
+        <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsThirdPartyProduct" class="form-check-input" />
+        <label asp-for="IsThirdPartyProduct" class="form-check-label"></label>
+    </div>
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="InstallmentApplicable" class="form-check-input" />
+        <label asp-for="InstallmentApplicable" class="form-check-label"></label>
+    </div>
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsRequiredBankInformation" class="form-check-input" />
+        <label asp-for="IsRequiredBankInformation" class="form-check-label"></label>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsProviderDeliveryProduct" class="form-check-input" />
+        <label asp-for="IsProviderDeliveryProduct" class="form-check-label"></label>
+    </div>
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsPriceEditable" class="form-check-input" />
+        <label asp-for="IsPriceEditable" class="form-check-label"></label>
+    </div>
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsPortalVisible" class="form-check-input" />
+        <label asp-for="IsPortalVisible" class="form-check-label"></label>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsPortalOrderEnabled" class="form-check-input" />
+        <label asp-for="IsPortalOrderEnabled" class="form-check-label"></label>
+    </div>
+    <div class="col-md-4 form-check mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ProductDisplayNotes" class="form-label"></label>
+    <textarea asp-for="ProductDisplayNotes" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="ProductDisplayNotes" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="PaymentNotes" class="form-label"></label>
+    <textarea asp-for="PaymentNotes" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="PaymentNotes" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Remarks" class="form-label"></label>
+    <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="Remarks" class="text-danger"></span>
+</div>
+
+<hr />
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="mb-0">Product Images</h4>
+    <button type="button" id="add-image-row" class="btn btn-sm btn-outline-primary">Add Image Row</button>
+</div>
+
+<div id="product-image-rows">
+@for (var i = 0; i < Model.Images.Count; i++)
+{
+    <div class="card mb-3 product-image-row">
+        <div class="card-body">
+            <input asp-for="Images[@i].ProductImageId" type="hidden" />
+            <input asp-for="Images[@i].ExistingImageUrl" type="hidden" />
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Current Image</label>
+                    @if (!string.IsNullOrWhiteSpace(Model.Images[i].ExistingImageUrl))
+                    {
+                        <div class="mb-2">
+                            <img src="@Model.Images[i].ExistingImageUrl" alt="Product Image" style="max-width:150px; max-height:100px;" />
+                        </div>
+                        <div><small>@Model.Images[i].ExistingImageUrl</small></div>
+                    }
+                    else
+                    {
+                        <div><small>No image selected yet.</small></div>
+                    }
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Images[@i].UploadFile" class="form-label"></label>
+                    <input asp-for="Images[@i].UploadFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                    <span asp-validation-for="Images[@i].UploadFile" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label asp-for="Images[@i].DisplayOrder" class="form-label"></label>
+                    <input asp-for="Images[@i].DisplayOrder" class="form-control" />
+                    <span asp-validation-for="Images[@i].DisplayOrder" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-check mt-4">
+                        <input asp-for="Images[@i].IsPrimary" class="form-check-input product-image-primary" />
+                        <label asp-for="Images[@i].IsPrimary" class="form-check-label"></label>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input asp-for="Images[@i].RemoveImage" class="form-check-input" />
+                        <label asp-for="Images[@i].RemoveImage" class="form-check-label"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+</div>
+
+<script type="text/template" id="product-image-row-template">
+<div class="card mb-3 product-image-row">
+    <div class="card-body">
+        <input name="Images[__index__].ProductImageId" type="hidden" value="" />
+        <input name="Images[__index__].ExistingImageUrl" type="hidden" value="" />
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Current Image</label>
+                <div><small>No image selected yet.</small></div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label" for="Images___index___UploadFile">Image File</label>
+                <input name="Images[__index__].UploadFile" id="Images___index___UploadFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif,.webp" />
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label class="form-label" for="Images___index___DisplayOrder">Display Order</label>
+                <input name="Images[__index__].DisplayOrder" id="Images___index___DisplayOrder" class="form-control" value="0" />
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-check mt-4">
+                    <input name="Images[__index__].IsPrimary" id="Images___index___IsPrimary" class="form-check-input product-image-primary" type="checkbox" value="true" />
+                    <input name="Images[__index__].IsPrimary" type="hidden" value="false" />
+                    <label class="form-check-label" for="Images___index___IsPrimary">Primary</label>
+                </div>
+                <div class="form-check mt-2">
+                    <input name="Images[__index__].RemoveImage" id="Images___index___RemoveImage" class="form-check-input" type="checkbox" value="true" />
+                    <input name="Images[__index__].RemoveImage" type="hidden" value="false" />
+                    <label class="form-check-label" for="Images___index___RemoveImage">Remove</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+

@@ -18,14 +18,25 @@ namespace SuperCRM.Persistence.DbContexts
         {
         }
 
+        // Start Master Setup -----------
         public DbSet<Provider> Providers => Set<Provider>();
         public DbSet<ProductVariantType> ProductVariantTypes => Set<ProductVariantType>();
+        public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
+        public DbSet<SalesUnit> SalesUnits => Set<SalesUnit>();
+
+        // END Mater Setup 
 
         // For Agent Registration-----------
         public DbSet<Agent> Agents => Set<Agent>();
         public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
         public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
         // END Agent Registration
+
+        // Start Product Management -----------
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+
+        // END Product Management
 
         public DbSet<Country> Countries => Set<Country>();
         public DbSet<Region> Regions => Set<Region>();
@@ -116,6 +127,90 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasConstraintName("FK_ProductVariantTypes_UpdatedBy");
             });
 
+            // Start ProductCategory
+
+            builder.Entity<ProductCategory>(entity =>
+            {
+                entity.ToTable("ProductCategories");
+
+                entity.HasKey(e => e.CategoryId);
+
+                entity.Property(e => e.CategoryId)
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.CategoryCode)
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.CategoryName)
+                      .HasMaxLength(150)
+                      .IsRequired();
+
+                entity.Property(e => e.CategoryImageUrl)
+                      .HasMaxLength(500);
+
+                entity.Property(e => e.DisplayNotes)
+                      .HasMaxLength(500);
+
+                entity.Property(e => e.DisplayOrder)
+                      .IsRequired();
+
+                entity.Property(e => e.IsActive)
+                      .IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2")
+                      .IsRequired();
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_ProductCategories_UpdatedBy");
+            });
+
+
+            // Master ProductCategory
+
+
+            // Strt SalesUnit
+
+            builder.Entity<SalesUnit>(entity =>
+            {
+                entity.ToTable("SalesUnits");
+
+                entity.HasKey(e => e.SalesUnitId);
+
+                entity.Property(e => e.SalesUnitId)
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.UnitCode)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.UnitName)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(e => e.IsActive)
+                      .IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2")
+                      .IsRequired();
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_SalesUnits_UpdatedBy");
+            });
+            // END Master SalesUnit
+
+
             builder.Entity<UserProfile>(entity =>
             {
                 entity.ToTable("UserProfiles");
@@ -193,7 +288,124 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasForeignKey(e => e.UpdatedByUserId)
                       .HasConstraintName("FK_UserAddresses_UpdatedBy");
             });
-            // Added for Agent Registration------
+            // END Added for Agent Registration------
+
+            // Start Product Management
+
+            builder.Entity<Product>(entity =>
+            {
+                entity.ToTable("Products");
+
+                entity.HasKey(e => e.ProductId);
+
+                entity.Property(e => e.ProductId)
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.ProductCode)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.ProductName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(e => e.ProductDisplayName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(e => e.ProductType)
+                      .HasConversion<byte>()
+                      .IsRequired();
+
+                entity.Property(e => e.CustomerType)
+                      .HasConversion<byte?>();
+
+                entity.Property(e => e.ProductDescription)
+                      .HasMaxLength(1000);
+
+                entity.Property(e => e.CurrencyCode)
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(e => e.BasePriceType)
+                      .HasConversion<byte>()
+                      .IsRequired();
+
+                entity.Property(e => e.BasePrice)
+                      .HasColumnType("decimal(18,2)")
+                      .IsRequired();
+
+                entity.Property(e => e.DownPaymentAmount)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.ProductDisplayNotes)
+                      .HasMaxLength(1000);
+
+                entity.Property(e => e.PaymentNotes)
+                      .HasMaxLength(1000);
+
+                entity.Property(e => e.Remarks)
+                      .HasMaxLength(1000);
+
+                entity.Property(e => e.SalesUnitCode)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2")
+                      .IsRequired();
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.HasOne(e => e.Category)
+                      .WithMany()
+                      .HasForeignKey(e => e.CategoryId)
+                      .HasConstraintName("FK_Products_Category");
+
+                entity.HasOne(e => e.SalesUnit)
+                      .WithMany()
+                      .HasForeignKey(e => e.SalesUnitId)
+                      .HasConstraintName("FK_Products_SalesUnit");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_Products_UpdatedBy");
+
+                entity.HasMany(e => e.ProductImages)
+                      .WithOne(e => e.Product)
+                      .HasForeignKey(e => e.ProductId)
+                      .HasConstraintName("FK_ProductImages_Product");
+
+                entity.HasIndex(e => e.SalesUnitId)
+                      .HasDatabaseName("IX_Products_SalesUnitId");
+
+                entity.HasIndex(e => e.ProductCode)
+                      .IsUnique()
+                      .HasDatabaseName("UQ_Products_ProductCode");
+            });
+
+            builder.Entity<ProductImage>(entity =>
+            {
+                entity.ToTable("ProductImages");
+
+                entity.HasKey(e => e.ProductImageId);
+
+                entity.Property(e => e.ProductImageId)
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.ImageUrl)
+                      .HasMaxLength(500);
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2")
+                      .IsRequired();
+            });
+
+            // END Product Management
+
+
             builder.ApplyConfigurationsFromAssembly(typeof(SuperCrmDbContext).Assembly);
         }
     }

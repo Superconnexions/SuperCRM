@@ -1,0 +1,18 @@
+@model SuperCRM.Web.ViewModels.SalesUnits.SalesUnitCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Sales Unit";
+}
+
+<h2>Edit Sales Unit</h2>
+
+<form asp-action="Edit" method="post">
+    <input asp-for="SalesUnitId" type="hidden" />
+    <partial name="_Form" model="Model" />
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

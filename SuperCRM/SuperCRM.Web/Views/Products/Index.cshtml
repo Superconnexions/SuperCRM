@@ -1,0 +1,53 @@
+@model IEnumerable<SuperCRM.Web.ViewModels.Products.ProductListItemViewModel>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h2>Products</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Product</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Product Code</th>
+            <th>Product Name</th>
+            <th>Display Name</th>
+            <th>Category</th>
+            <th>Sales Unit</th>
+            <th>Base Price Type</th>
+            <th>Base Price</th>
+            <th>Images</th>
+            <th>Active</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ProductCode</td>
+            <td>@item.ProductName</td>
+            <td>@item.ProductDisplayName</td>
+            <td>@item.CategoryName</td>
+            <td>@item.SalesUnitCode</td>
+            <td>@item.BasePriceType</td>
+            <td>@item.CurrencyCode @item.BasePrice</td>
+            <td>@item.ImageCount</td>
+            <td>@(item.IsActive ? "Yes" : "No")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProductId" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
