@@ -55,3 +55,4 @@ nunit-*.xml
 /NonCommitedDoc
 /SuperCRM/.vs
 /SuperCRM/SuperCRM.Web/Properties
+/SuperCRM/SuperCRM.Web/wwwroot/uploads/products
