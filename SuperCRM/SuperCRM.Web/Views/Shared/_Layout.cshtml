@@ -4,9 +4,44 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SuperCRM </title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" type="text/css" href="../custom/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="../custom/css/animate.css" />   
+     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../custom/css/style2.css" />
+    <link rel="stylesheet" type="text/css" href="../custom/css/responsive.css" />
+    <link rel="icon" href="../custom/images/favicon.png" type="image/gif" sizes="10x16">
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SuperCRM.Web.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Style", required: false)
+    <style>
+            body {
+                margin-top:-5%;
+            }
+            .loginMain {
+                padding-top:3%;
+            }
+            .container-fluid {
+                margin-top: 5%;
+            }
+            .space-30 {
+             height:30px;
+            }
+             .dropdown-menu {
+            display: none; 
+            z-index: 9999 !important; 
+        }
+
+            .dropdown-menu.show {
+                display: block !important; 
+            }
+
+        #dropdownMenuButtonProfile:focus {
+            box-shadow:none;
+         }
+    </style>
+
 </head>
 <body>
     <header>
@@ -43,8 +78,48 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+   @*  <script type="text/javascript" src="../custom/js/popper.min.js"></script> *@
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+   
+    <script type="text/javascript" src="../custom/js/wow.min.js"></script>
+     
+    <script type="text/javascript">
+        //wow animation js
+    new WOW().init();
+
+        //sidebar
+    function openNav() {
+      document.getElementById("chat-side").style.width = "320px";
+  }
+
+  function closeNav() {
+      document.getElementById("chat-side").style.width = "0";
+    }    
+     // $("#dropdownMenuButtonProfile").click(function(){            
+     //      $("#dropdownMenuProfile").show();
+     //    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <script>
+$(document).ready(function(){
+    // ১. বাটনে ক্লিক করলে ড্রপডাউন টগল হবে
+    $("#dropdownMenuButtonProfile").on("click", function(e){
+        $("#dropdownMenuProfile").fadeToggle(100); // আপনি শুধু .toggle() বা .slideToggle() ও ব্যবহার করতে পারেন
+        e.stopPropagation(); // বাটনে ক্লিক করলে যেন উইন্ডো ক্লিক ইভেন্ট ট্রিগার না হয়
+    });
+
+    // ২. মেনুর বাইরে কোথাও ক্লিক করলে যেন মেনু বন্ধ হয়ে যায়
+    $(document).on("click", function(e){
+        if (!$(e.target).closest("#dropdownMenuProfile").length) {
+            $("#dropdownMenuProfile").hide();
+        }
+    });
+});
+</script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

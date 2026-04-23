@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SuperCRM.Persistence.Identity
+@using SuperCRM.Shared
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!-- Top Bar -->
+<section class="top-sec">
+    <div class="container-fluid">
+       @*  @if (!Model.IsApproved)
+        {
+            <div class="alert alert-warning mt-3">
+                Your registration is pending approval. Order creation and commission workflows should remain restricted until approval is completed.
+            </div>
+        } *@
+        <div class="row">
+            <div class="col-md-12 col-lg-12 col-xl-4">
+                <div class="top-breadcrumb">
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item active"><a href="#">SupperCMR Admin Dashbord</a></li>
+                    </ul>
+                    <!-- Button trigger modal -->
+                    <!--<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                            Launch demo modal
+                                        </button>-->
+
+
+                </div>
+            </div>
+
+            <div class="col-md-12 col-lg-12 col-xl-8">
+                <div class="top-info">
+
+                    <!--<div class="top-notication">
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-notify dropdown-toggle" data-toggle="dropdown">
+                                                    <img src="images/icons/notfy-icon.png" alt="icon">
+                                                    <sub class="icon-dot"></sub>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="#">3 Pending Message</a>
+                                                    <a class="dropdown-item" href="#">2 Feedback</a>
+                                                    <a class="dropdown-item" href="#">Return</a>
+                                                </div>
+                                            </div>
+                                        </div>-->
+
+                    <div class="top-user">
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-user dropdown-toggle" id="dropdownMenuButtonProfile" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src="/custom/images/profile1.jpg" alt="icon">
+                            </button>
+                            <div class="dropdown-menu" id="dropdownMenuProfile" aria-labelledby="dropdownMenuButtonProfile">
+                                <a class="dropdown-item" href="#">@User.Identity?.Name!</a>
+                                <a class="dropdown-item" href="#">User Roll: XYZ</a>
+                                <p></p>
+                                <form asp-controller="Home" asp-action="Logout" method="post" class="form-inline" style="padding-left:20px;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="nav-link btn btn-link ">Logout</button>
+                                @*     <a type="submit" class="dropdown-item" href="/Home/Logout">Log out</a> *@
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Top Bar End -->
