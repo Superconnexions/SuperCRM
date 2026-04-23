@@ -1,96 +1,187 @@
-﻿@model SuperCRM.Web.ViewModels.Agents.AgentRegistrationViewModel
+﻿@model SuperCRM.Web.ViewModels.AgentRegistration.AgentRegistrationViewModel
 
 @{
     ViewData["Title"] = "Agent Registration";
 }
 
-<h2>Agent Registration</h2>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10 col-lg-9">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3 class="mb-0">Agent Registration</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Register" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-<p class="text-muted">
-    Submit the registration form below. The account will be created immediately, but business approval may still be required before full operational use.
-</p>
+                    <h5 class="mb-3">Login Information</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
 
-<form asp-action="Register" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
 
-        <div class="col-md-6 mb-3">
-            <label asp-for="Password" class="form-label"></label>
-            <input asp-for="Password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
+                    <hr />
+
+                    <h5 class="mb-3">Personal Information</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+                            <label asp-for="PhoneNo" class="form-label"></label>
+                            <input asp-for="PhoneNo" class="form-control" />
+                            <span asp-validation-for="PhoneNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+                            <label asp-for="MobileNo" class="form-label"></label>
+                            <input asp-for="MobileNo" class="form-control" />
+                            <span asp-validation-for="MobileNo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h5 class="mb-3">Address Information</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="CountryId" class="form-label"></label>
+                            <select asp-for="CountryId" asp-items="Model.Countries" class="form-select" id="CountryId">
+                                <option value="">-- Select Country --</option>
+                            </select>
+                            <span asp-validation-for="CountryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="RegionId" class="form-label"></label>
+                            <select asp-for="RegionId" asp-items="Model.Regions" class="form-select" id="RegionId">
+                                <option value="">-- Select Region --</option>
+                            </select>
+                            <span asp-validation-for="RegionId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="CityId" class="form-label"></label>
+                            <select asp-for="CityId" asp-items="Model.Cities" class="form-select" id="CityId">
+                                <option value="">-- Select City --</option>
+                            </select>
+                            <span asp-validation-for="CityId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="HouseNo" class="form-label"></label>
+                            <input asp-for="HouseNo" class="form-control" />
+                            <span asp-validation-for="HouseNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="RoadName" class="form-label"></label>
+                            <input asp-for="RoadName" class="form-control" />
+                            <span asp-validation-for="RoadName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="PostCode" class="form-label"></label>
+                            <input asp-for="PostCode" class="form-control" />
+                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="AddressLine1" class="form-label"></label>
+                            <input asp-for="AddressLine1" class="form-control" />
+                            <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="AddressLine2" class="form-label"></label>
+                            <input asp-for="AddressLine2" class="form-control" />
+                            <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Login</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="ConfirmPassword" class="form-label"></label>
-            <input asp-for="ConfirmPassword" class="form-control" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <label asp-for="MobileNo" class="form-label"></label>
-            <input asp-for="MobileNo" class="form-control" />
-            <span asp-validation-for="MobileNo" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" />
-            <span asp-validation-for="LastName" class="text-danger"></span>
-        </div>
-    </div>
-
-    <fieldset class="border rounded p-3 mt-2">
-        <legend class="float-none w-auto px-2 fs-6">Address</legend>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="HouseNo" class="form-label"></label>
-                <input asp-for="HouseNo" class="form-control" />
-                <span asp-validation-for="HouseNo" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="RoadName" class="form-label"></label>
-                <input asp-for="RoadName" class="form-control" />
-                <span asp-validation-for="RoadName" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="City" class="form-label"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="PostCode" class="form-label"></label>
-                <input asp-for="PostCode" class="form-control" />
-                <span asp-validation-for="PostCode" class="text-danger"></span>
-            </div>
-        </div>
-    </fieldset>
-
-    <button type="submit" class="btn btn-primary">Submit Registration</button>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const countrySelect = document.getElementById('CountryId');
+            const regionSelect = document.getElementById('RegionId');
+            const citySelect = document.getElementById('CityId');
+
+            async function loadRegions(countryId) {
+                regionSelect.innerHTML = '<option value="">-- Select Region --</option>';
+                citySelect.innerHTML = '<option value="">-- Select City --</option>';
+
+                if (!countryId) return;
+
+                const response = await fetch(`/AgentRegistration/GetRegions?countryId=${countryId}`);
+                const data = await response.json();
+
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.text = item.name;
+                    regionSelect.appendChild(option);
+                });
+            }
+
+            async function loadCities(regionId) {
+                citySelect.innerHTML = '<option value="">-- Select City --</option>';
+
+                if (!regionId) return;
+
+                const response = await fetch(`/AgentRegistration/GetCities?regionId=${regionId}`);
+                const data = await response.json();
+
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.text = item.name;
+                    citySelect.appendChild(option);
+                });
+            }
+
+            countrySelect.addEventListener('change', async function () {
+                await loadRegions(this.value);
+            });
+
+            regionSelect.addEventListener('change', async function () {
+                await loadCities(this.value);
+            });
+        });
+    </script>
 }

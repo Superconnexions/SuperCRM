@@ -56,3 +56,4 @@ nunit-*.xml
 /SuperCRM/.vs
 /SuperCRM/SuperCRM.Web/Properties
 SuperCRM/global.json
+/SuperCRM/SuperCRM.Web/wwwroot/uploads/products

@@ -1,0 +1,44 @@
+@model IEnumerable<SuperCRM.Web.ViewModels.ProductCategories.ProductCategoryListItemViewModel>
+
+@{
+    ViewData["Title"] = "Product Categories";
+}
+
+<h2>Product Categories</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Product Category</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Category Code</th>
+            <th>Category Name</th>
+            <th>Image URL</th>
+            <th>Display Order</th>
+            <th>Active</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.CategoryCode</td>
+            <td>@item.CategoryName</td>
+            <td>@item.CategoryImageUrl</td>
+            <td>@item.DisplayOrder</td>
+            <td>@(item.IsActive ? "Yes" : "No")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

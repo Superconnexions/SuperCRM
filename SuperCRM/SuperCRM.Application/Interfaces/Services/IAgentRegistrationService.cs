@@ -1,4 +1,5 @@
-﻿using SuperCRM.Application.DTOs.Agents;
+﻿using SuperCRM.Application.DTOs.AgentRegistration;
+using SuperCRM.Application.DTOs.Agents;
 
 namespace SuperCRM.Application.Interfaces.Services
 {
@@ -7,7 +8,19 @@ namespace SuperCRM.Application.Interfaces.Services
     /// </summary>
     public interface IAgentRegistrationService
     {
-        Task<AgentRegistrationResultDto> RegisterAsync(AgentRegistrationRequestDto request, CancellationToken cancellationToken = default);
-        Task<AgentDashboardDto?> GetDashboardAsync(Guid userId, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Registers a new agent through the public registration flow.
+        /// Creates Identity user, UserProfile, UserAddress, and Agent records.
+        /// </summary>
+        Task<AgentRegistrationResultDto> RegisterAsync(
+            AgentRegistrationRequestDto request,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Loads the Agent dashboard read model for the logged-in user.
+        /// </summary>
+        Task<AgentDashboardDto?> GetDashboardAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default);
     }
 }

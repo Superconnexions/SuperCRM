@@ -1,0 +1,40 @@
+@model IEnumerable<SuperCRM.Web.ViewModels.SalesUnits.SalesUnitListItemViewModel>
+
+@{
+    ViewData["Title"] = "Sales Units";
+}
+
+<h2>Sales Units</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add Sales Unit</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Unit Code</th>
+            <th>Unit Name</th>
+            <th>Active</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.UnitCode</td>
+            <td>@item.UnitName</td>
+            <td>@(item.IsActive ? "Yes" : "No")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.SalesUnitId" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -67,12 +67,25 @@ builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
 // Register seed service
 builder.Services.AddScoped<IdentitySeedService>();
 
-// Start Register Services
+// Start Register Services for Master Setup
 
 // Register ProductVarintType Service
 builder.Services.AddScoped<IProductVariantTypeRepository, ProductVariantTypeRepository>();
 builder.Services.AddScoped<IProductVariantTypeService, ProductVariantTypeService>();
 // END ProductVarintType Service
+
+// Register ProductCategory Service
+
+builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
+
+// END ProductCategory Service
+
+// Register SalesUnit Service
+builder.Services.AddScoped<ISalesUnitRepository, SalesUnitRepository>();
+builder.Services.AddScoped<ISalesUnitService, SalesUnitService>();
+// END SalesUnit Service
+
 
 // Register Agent Registration dependencies:
 builder.Services.AddScoped<IAgentRegistrationRepository, AgentRegistrationRepository>();
@@ -80,6 +93,18 @@ builder.Services.AddScoped<IApplicationUserAccountService, ApplicationUserAccoun
 builder.Services.AddScoped<IAgentRegistrationService, AgentRegistrationService>();
 // END Registration Services
 
+builder.Services.AddScoped<IGeoLookupRepository, GeoLookupRepository>();
+builder.Services.AddScoped<IGeoLookupService, GeoLookupService>();
+
+// Start Register services for Product Management
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+// Register ProductImage dependencies. May be not using right now
+builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
+builder.Services.AddScoped<IProductImageService, ProductImageService>();
+//.Services.AddScoped<IProductLookupService, ProductLookupService>();
+// END Product Management
 
 /// END Register services
 
