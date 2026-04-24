@@ -43,6 +43,7 @@ namespace SuperCRM.Web.Controllers
                 BasePrice = x.BasePrice,
                 CurrencyCode = x.CurrencyCode,
                 ImageCount = x.Images.Count,
+                ProductType = x.ProductType,
                 IsActive = x.IsActive
             }).ToList();
 

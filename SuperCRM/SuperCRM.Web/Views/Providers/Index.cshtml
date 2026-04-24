@@ -21,6 +21,8 @@
             <th>Provider Name</th>
             <th>Contact Email</th>
             <th>Contact Phone</th>
+            <th>Provider URL</th>
+            <th>Address</th>
             <th>Active</th>
             <th style="width:120px;">Action</th>
         </tr>
@@ -32,6 +34,15 @@
                 <td>@item.ProviderName</td>
                 <td>@item.ContactEmail</td>
                 <td>@item.ContactPhone</td>
+                <td>
+                    
+                    
+                    @if (!string.IsNullOrWhiteSpace(item.ProviderUrl))
+                    {
+                        <a href="@item.ProviderUrl" target="_blank">Open</a>
+                    }
+                 </td>
+                <td>@item.ProviderAddress</td>
                 <td>@(item.IsActive ? "Yes" : "No")</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ProviderId" class="btn btn-sm btn-warning">Edit</a>

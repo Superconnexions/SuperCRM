@@ -1,0 +1,40 @@
+@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductBaseCommissionDeleteViewModel
+
+@{
+    ViewData["Title"] = "Delete Product Base Commission";
+}
+
+<h1>Delete Product Base Commission</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this commission? This will perform soft delete by setting IsActive = false.
+</div>
+
+<div class="mb-3">
+    <strong>Product:</strong> @Model.ProductName (@Model.ProductCode)
+</div>
+<div class="mb-3">
+    <strong>Commission Type:</strong> @Model.CommissionTypeText
+</div>
+<div class="mb-3">
+    <strong>Fixed Amount:</strong> @Model.FixedAmount
+</div>
+<div class="mb-3">
+    <strong>Percentage:</strong> @Model.Percentage
+</div>
+<div class="mb-3">
+    <strong>Effective From:</strong> @Model.EffectiveFrom?.ToString("yyyy-MM-dd HH:mm")
+</div>
+<div class="mb-3">
+    <strong>Effective To:</strong> @Model.EffectiveTo?.ToString("yyyy-MM-dd HH:mm")
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="ProductBaseCommissionId" />
+    <div class="mb-3">
+        <label asp-for="Note" class="form-label"></label>
+        <textarea asp-for="Note" class="form-control" rows="3" placeholder="Optional delete note"></textarea>
+    </div>
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>

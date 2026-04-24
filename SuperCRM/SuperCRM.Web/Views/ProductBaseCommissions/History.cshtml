@@ -1,0 +1,50 @@
+@model List<SuperCRM.Application.DTOs.ProductBaseCommissions.ProductBaseCommissionHistoryDto>
+
+@{
+    ViewData["Title"] = "Commission History";
+}
+
+<h1>Commission History</h1>
+
+<p>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Changed At</th>
+            <th>Product</th>
+            <th>Old Type</th>
+            <th>Old Fixed</th>
+            <th>Old %</th>
+            <th>New Type</th>
+            <th>New Fixed</th>
+            <th>New %</th>
+            <th>Note</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ChangedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.ProductName (@item.ProductCode)</td>
+                <td>@item.OldCommissionType</td>
+                <td>@item.OldFixedAmount</td>
+                <td>@item.OldPercentage</td>
+                <td>@item.NewCommissionType</td>
+                <td>@item.NewFixedAmount</td>
+                <td>@item.NewPercentage</td>
+                <td>@item.Note</td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr><td colspan="9" class="text-center">No history found.</td></tr>
+    }
+    </tbody>
+</table>

@@ -16,5 +16,8 @@ namespace SuperCRM.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
         public Guid? UpdatedByUserId { get; set; }
         public bool IsActive { get; set; }
+
+        public string? ProviderUrl { get; set; }
+        public string? ProviderAddress { get; set; }
     }
 }

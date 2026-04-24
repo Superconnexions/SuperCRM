@@ -1,0 +1,36 @@
+@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductBaseCommissionCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Product Base Commission";
+}
+
+<h1>Edit Product Base Commission</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ProductBaseCommissionId" />
+    <partial name="_Form" model="Model" />
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const commissionType = document.getElementById('CommissionType');
+            const fixedAmountGroup = document.getElementById('fixedAmountGroup');
+            const percentageGroup = document.getElementById('percentageGroup');
+
+            function toggleCommissionFields() {
+                const selectedValue = commissionType ? commissionType.value : '';
+                fixedAmountGroup.style.display = selectedValue === '1' ? '' : 'none';
+                percentageGroup.style.display = selectedValue === '2' ? '' : 'none';
+            }
+
+            if (commissionType) {
+                commissionType.addEventListener('change', toggleCommissionFields);
+                toggleCommissionFields();
+            }
+        });
+    </script>
+}

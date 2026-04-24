@@ -31,6 +31,8 @@ public class ProvidersController : Controller
                 ProviderName = x.ProviderName,
                 ContactEmail = x.ContactEmail,
                 ContactPhone = x.ContactPhone,
+                ProviderUrl = x.ProviderUrl,
+                ProviderAddress = x.ProviderAddress,
                 IsActive = x.IsActive
             })
             .ToListAsync();
@@ -61,6 +63,10 @@ public class ProvidersController : Controller
             ProviderName = model.ProviderName.Trim(),
             ContactEmail = string.IsNullOrWhiteSpace(model.ContactEmail) ? null : model.ContactEmail.Trim(),
             ContactPhone = string.IsNullOrWhiteSpace(model.ContactPhone) ? null : model.ContactPhone.Trim(),
+
+            ProviderUrl = string.IsNullOrWhiteSpace(model.ProviderUrl) ? null : model.ProviderUrl.Trim(),
+            ProviderAddress = string.IsNullOrWhiteSpace(model.ProviderAddress) ? null : model.ProviderAddress.Trim(),
+
             IsActive = model.IsActive,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = null,
@@ -86,6 +92,8 @@ public class ProvidersController : Controller
             ProviderName = entity.ProviderName,
             ContactEmail = entity.ContactEmail,
             ContactPhone = entity.ContactPhone,
+            ProviderUrl = entity.ProviderUrl,
+            ProviderAddress = entity.ProviderAddress,
             IsActive = entity.IsActive
         };
 
@@ -111,6 +119,11 @@ public class ProvidersController : Controller
         entity.ProviderName = model.ProviderName.Trim();
         entity.ContactEmail = string.IsNullOrWhiteSpace(model.ContactEmail) ? null : model.ContactEmail.Trim();
         entity.ContactPhone = string.IsNullOrWhiteSpace(model.ContactPhone) ? null : model.ContactPhone.Trim();
+
+
+        entity.ProviderUrl = string.IsNullOrWhiteSpace(model.ProviderUrl) ? null : model.ProviderUrl.Trim();
+        entity.ProviderAddress = string.IsNullOrWhiteSpace(model.ProviderAddress) ? null : model.ProviderAddress.Trim();
+
         entity.IsActive = model.IsActive;
         entity.UpdatedAt = DateTime.UtcNow;
         entity.UpdatedByUserId = string.IsNullOrWhiteSpace(userId) ? null : Guid.Parse(userId);

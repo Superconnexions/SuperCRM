@@ -1,0 +1,84 @@
+@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductBaseCommissionIndexViewModel
+
+@{
+    ViewData["Title"] = "Product Base Commission";
+}
+
+<h1>Product Base Commission</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-4">
+        <label asp-for="ProductKeyword" class="form-label"></label>
+        <input asp-for="ProductKeyword" class="form-control" placeholder="Product code or product name" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="EffectiveFrom" class="form-label"></label>
+        <input asp-for="EffectiveFrom" type="date" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="EffectiveTo" class="form-label"></label>
+        <input asp-for="EffectiveTo" type="date" class="form-control" />
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <div class="form-check">
+            <input asp-for="IncludeInactive" class="form-check-input" />
+            <label asp-for="IncludeInactive" class="form-check-label"></label>
+        </div>
+    </div>
+    <div class="col-md-2 d-flex align-items-end gap-2">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Product Code</th>
+            <th>Product Name</th>
+            <th>Commission Type</th>
+            <th>Fixed Amount</th>
+            <th>Percentage</th>
+            <th>Effective From</th>
+            <th>Effective To</th>
+            <th>Is Active</th>
+            <th style="width:220px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model.Items.Any())
+    {
+        foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.ProductCode</td>
+                <td>@item.ProductName</td>
+                <td>@item.CommissionType</td>
+                <td>@item.FixedAmount</td>
+                <td>@item.Percentage</td>
+                <td>@item.EffectiveFrom?.ToString("yyyy-MM-dd")</td>
+                <td>@item.EffectiveTo?.ToString("yyyy-MM-dd")</td>
+                <td>@item.IsActive</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ProductBaseCommissionId" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.ProductBaseCommissionId" class="btn btn-sm btn-danger">Delete</a>
+                    <a asp-action="History" asp-route-id="@item.ProductBaseCommissionId" class="btn btn-sm btn-info">History</a>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr><td colspan="9" class="text-center">No records found.</td></tr>
+    }
+    </tbody>
+</table>

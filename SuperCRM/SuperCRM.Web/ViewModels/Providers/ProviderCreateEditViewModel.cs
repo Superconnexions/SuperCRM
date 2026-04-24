@@ -22,4 +22,15 @@ public class ProviderCreateEditViewModel
 
     [Display(Name = "Active")]
     public bool IsActive { get; set; } = true;
+
+    [Display(Name = "Provider URL")]
+    [StringLength(500)]
+    [Url(ErrorMessage = "Please enter a valid URL.")]
+    public string? ProviderUrl { get; set; }
+
+    [Display(Name = "Provider Address")]
+    [StringLength(200)]
+    public string? ProviderAddress { get; set; }
+
+
 }

@@ -7,4 +7,7 @@ public class ProviderListItemViewModel
     public string? ContactEmail { get; set; }
     public string? ContactPhone { get; set; }
     public bool IsActive { get; set; }
+
+    public string? ProviderUrl { get; set; }
+    public string? ProviderAddress { get; set; }
 }

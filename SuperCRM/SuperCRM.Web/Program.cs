@@ -74,6 +74,10 @@ builder.Services.AddScoped<IProductVariantTypeRepository, ProductVariantTypeRepo
 builder.Services.AddScoped<IProductVariantTypeService, ProductVariantTypeService>();
 // END ProductVarintType Service
 
+// ProductVariant Service
+builder.Services.AddScoped<IProductVariantRepository, ProductVariantRepository>();
+builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
+
 // Register ProductCategory Service
 
 builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
@@ -99,6 +103,20 @@ builder.Services.AddScoped<IGeoLookupService, GeoLookupService>();
 // Start Register services for Product Management
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+// Start Provider Product
+
+builder.Services.AddScoped<IProviderProductRepository, ProviderProductRepository>();
+builder.Services.AddScoped<IProviderProductService, ProviderProductService>();
+
+// END Provider Product
+
+// Register ProductBaseCommission dependencies
+
+builder.Services.AddScoped<IProductBaseCommissionRepository, ProductBaseCommissionRepository>();
+builder.Services.AddScoped<IProductBaseCommissionService, ProductBaseCommissionService>();
+
+// END  ProductBaseCommission dependencies
 
 // Register ProductImage dependencies. May be not using right now
 builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();

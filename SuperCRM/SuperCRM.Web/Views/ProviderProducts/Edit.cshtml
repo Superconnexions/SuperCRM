@@ -1,0 +1,56 @@
+@model SuperCRM.Web.ViewModels.ProviderProducts.ProviderProductCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Provider Product";
+}
+
+<h1>Edit Provider Product</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ProviderProductId" />
+
+    <partial name="_Form" model="Model" />
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const productSelect = document.getElementById('ProductId');
+            const productCodeInput = document.getElementById('ProductCode');
+            const productNameInput = document.getElementById('ProductName');
+
+            function bindProductText() {
+                if (!productSelect) return;
+
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const text = selectedOption ? selectedOption.text.trim() : '';
+
+                if (!text || text === '-- Select Product --') {
+                    productCodeInput.value = '';
+                    productNameInput.value = '';
+                    return;
+                }
+
+                const match = text.match(/^(.*)\s\((.*)\)$/);
+
+                if (match) {
+                    productNameInput.value = match[1].trim();
+                    productCodeInput.value = match[2].trim();
+                } else {
+                    productNameInput.value = text;
+                    productCodeInput.value = '';
+                }
+            }
+
+            if (productSelect) {
+                productSelect.addEventListener('change', bindProductText);
+                bindProductText();
+            }
+        });
+    </script>
+}

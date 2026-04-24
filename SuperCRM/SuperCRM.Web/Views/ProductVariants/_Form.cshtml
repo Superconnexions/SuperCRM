@@ -1,0 +1,57 @@
+@model SuperCRM.Web.ViewModels.ProductVariants.ProductVariantCreateEditViewModel
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductId" class="form-label"></label>
+        <select asp-for="ProductId" asp-items="Model.ProductOptions" class="form-select">
+            <option value="">-- Select Product --</option>
+        </select>
+        <span asp-validation-for="ProductId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label asp-for="VariantTypeCode" class="form-label"></label>
+        <select asp-for="VariantTypeCode" asp-items="Model.VariantTypeOptions" class="form-select">
+            <option value="">-- Select Variant Type --</option>
+        </select>
+        <span asp-validation-for="VariantTypeCode" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="VariantCode" class="form-label"></label>
+        <input asp-for="VariantCode" class="form-control" />
+        <span asp-validation-for="VariantCode" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="VariantName" class="form-label"></label>
+        <input asp-for="VariantName" class="form-control" />
+        <span asp-validation-for="VariantName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="DisplayStyle" class="form-label"></label>
+        <select asp-for="DisplayStyle" asp-items="Model.DisplayStyleOptions" class="form-select">
+            <option value="">-- Please Select --</option>
+        </select>
+        <span asp-validation-for="DisplayStyle" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="col-md-4 mb-3">
+    <label asp-for="DisplayOrder" class="form-label"></label>
+    <input asp-for="DisplayOrder" class="form-control" />
+    <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="BasePrice" class="form-label"></label>
+        <input asp-for="BasePrice" class="form-control" />
+        <span asp-validation-for="BasePrice" class="text-danger"></span>
+    </div>
+</div>

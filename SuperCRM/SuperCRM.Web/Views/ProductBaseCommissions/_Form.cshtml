@@ -1,0 +1,49 @@
+@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductBaseCommissionCreateEditViewModel
+@using SuperCRM.Domain.Enums
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="mb-3">
+    <label asp-for="ProductId" class="form-label"></label>
+    <select asp-for="ProductId" asp-items="Model.ProductOptions" class="form-select">
+        <option value="">-- Select Product --</option>
+    </select>
+    <span asp-validation-for="ProductId" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="CommissionType" class="form-label"></label>
+    <select asp-for="CommissionType" class="form-select" id="CommissionType"
+            asp-items="Html.GetEnumSelectList<CommissionType>()"></select>
+    <span asp-validation-for="CommissionType" class="text-danger"></span>
+</div>
+
+<div class="mb-3" id="fixedAmountGroup">
+    <label asp-for="FixedAmount" class="form-label"></label>
+    <input asp-for="FixedAmount" class="form-control" />
+    <span asp-validation-for="FixedAmount" class="text-danger"></span>
+</div>
+
+<div class="mb-3" id="percentageGroup">
+    <label asp-for="Percentage" class="form-label"></label>
+    <input asp-for="Percentage" class="form-control" />
+    <span asp-validation-for="Percentage" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="EffectiveFrom" class="form-label"></label>
+    <input asp-for="EffectiveFrom" type="datetime-local" class="form-control" />
+    <span asp-validation-for="EffectiveFrom" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="EffectiveTo" class="form-label"></label>
+    <input asp-for="EffectiveTo" type="datetime-local" class="form-control" />
+    <span asp-validation-for="EffectiveTo" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Note" class="form-label"></label>
+    <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="Note" class="text-danger"></span>
+</div>
