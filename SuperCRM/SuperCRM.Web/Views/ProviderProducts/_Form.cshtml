@@ -1,0 +1,31 @@
+@model SuperCRM.Web.ViewModels.ProviderProducts.ProviderProductCreateEditViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+<div class="mb-3">
+    <label asp-for="ProductId" class="form-label"></label>
+    <select asp-for="ProductId" asp-items="Model.ProductOptions" class="form-select" id="ProductId">
+        <option value="">-- Select Product --</option>
+    </select>
+    <span asp-validation-for="ProductId" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ProductCode" class="form-label"></label>
+    <input asp-for="ProductCode" class="form-control" id="ProductCode" readonly />
+</div>
+
+<div class="mb-3">
+    <label asp-for="ProductName" class="form-label"></label>
+    <input asp-for="ProductName" class="form-control" id="ProductName" readonly />
+</div>
+
+
+<div class="mb-3">
+    <label asp-for="ProviderId" class="form-label"></label>
+    <select asp-for="ProviderId" asp-items="Model.ProviderOptions" class="form-select">
+        <option value="">-- Select Provider --</option>
+    </select>
+    <span asp-validation-for="ProviderId" class="text-danger"></span>
+</div>

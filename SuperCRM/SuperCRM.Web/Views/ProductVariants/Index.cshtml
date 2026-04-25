@@ -1,0 +1,56 @@
+@model List<SuperCRM.Web.ViewModels.ProductVariants.ProductVariantListItemViewModel>
+
+@{
+    ViewData["Title"] = "Product Variants";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Product Variants</h2>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Variant Code</th>
+            <th>Variant Type</th>
+            <th>Variant Name</th>
+            <th>Display Style</th>
+            <th>Display Order</th>
+            <th>Base Price</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProductCode - @item.ProductName</td>
+                <td>@item.VariantCode</td>
+                <td>@item.VariantTypeName</td>
+                <td>@item.VariantName</td>
+                <td>@item.DisplayStyleName</td>
+                <td>@item.DisplayOrder</td>
+                <td>@(item.BasePrice.HasValue ? item.BasePrice.Value.ToString("0.00") : string.Empty)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ProductVariantId" class="btn btn-sm btn-warning">Edit</a>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="8" class="text-center">No records found.</td>
+        </tr>
+    }
+    </tbody>
+</table>

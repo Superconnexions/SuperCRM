@@ -1,3 +1,5 @@
+using SuperCRM.Domain.Enums;
+
 namespace SuperCRM.Web.ViewModels.Products
 {
     /// <summary>
@@ -16,5 +18,8 @@ namespace SuperCRM.Web.ViewModels.Products
         public string CurrencyCode { get; set; } = string.Empty;
         public int ImageCount { get; set; }
         public bool IsActive { get; set; }
+
+        public ProductType ProductType { get; set; }
+        public string ProductTypeName => ProductType.ToString();
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SuperCRM.Domain.Entities;
-using SuperCRM.Domain.Entities;
+//using SuperCRM.Domain.Entities;
 using SuperCRM.Persistence.Identity;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,11 +37,17 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<Product> Products => Set<Product>();
         public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
+        public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+        public DbSet<ProviderProduct> ProviderProducts { get; set; }
+
         // END Product Management
 
         public DbSet<Country> Countries => Set<Country>();
         public DbSet<Region> Regions => Set<Region>();
         public DbSet<City> Cities => Set<City>();
+
+        public DbSet<ProductBaseCommission> ProductBaseCommissions { get; set; }
+        public DbSet<ProductBaseCommissionHistory> ProductBaseCommissionHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -76,6 +83,13 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(e => e.ContactPhone)
                       .HasMaxLength(50);
 
+                entity.Property(e => e.ProviderUrl)
+                      .HasMaxLength(100);
+
+
+                entity.Property(e => e.ProviderAddress)
+                      .HasMaxLength(200);
+
                 entity.Property(e => e.CreatedAt)
                       .HasColumnType("datetime2");
 
@@ -91,6 +105,107 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasConstraintName("FK_Providers_UpdatedBy");
             });
 
+
+            // Start ProductVariant
+
+            builder.Entity<ProductVariant>(entity =>
+            {
+                entity.ToTable("ProductVariants");
+
+                entity.HasKey(e => e.ProductVariantId);
+
+                entity.Property(e => e.ProductVariantId)
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.VariantCode)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.VariantTypeCode)
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.VariantName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                //entity.Property(e => e.DisplayStyle)
+                //      .IsRequired();
+
+                entity.Property(e => e.DisplayStyle)
+                      .HasConversion<byte>()
+                      .IsRequired();
+
+                entity.Property(e => e.DisplayOrder)
+                      .IsRequired();
+
+                entity.Property(e => e.BasePrice)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("datetime2")
+                      .IsRequired();
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("datetime2");
+
+                entity.HasOne(e => e.Product)
+                      .WithMany()
+                      .HasForeignKey(e => e.ProductId)
+                      .HasConstraintName("FK_ProductVariants_Product");
+
+                entity.HasOne(e => e.VariantType)
+                      .WithMany()
+                      .HasForeignKey(e => e.VariantTypeCode)
+                      .HasPrincipalKey(e => e.TypeCode)
+                      .HasConstraintName("FK_ProductVariants_VariantType");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_ProductVariants_UpdatedBy");
+
+                entity.HasIndex(e => new { e.ProductId, e.VariantCode })
+                      .IsUnique()
+                      .HasDatabaseName("UQ_ProductVariants_Product_VariantCode");
+            });
+
+            // END ProductVariant
+
+            // Start ProviderProduct
+
+            builder.Entity<ProviderProduct>(entity =>
+            {
+                entity.ToTable("ProviderProducts");
+                entity.HasKey(x => x.ProviderProductId);
+
+                entity.Property(x => x.ProductCode)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.ProductName)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(x => x.CreatedAt)
+                    .HasColumnType("datetime2")
+                    .IsRequired();
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasColumnType("datetime2");
+
+                entity.HasOne(x => x.Provider)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProviderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            // END ProviderProduct
+
             // ProductVariantType
 
             builder.Entity<ProductVariantType>(entity =>
@@ -98,6 +213,7 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.ToTable("ProductVariantTypes");
 
                 entity.HasKey(e => e.TypeCode);
+                
 
                 entity.Property(e => e.TypeCode)
                       .HasMaxLength(50)
@@ -209,6 +325,124 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasConstraintName("FK_SalesUnits_UpdatedBy");
             });
             // END Master SalesUnit
+
+
+            // Start Commission Setup
+
+            builder.Entity<ProductBaseCommission>(entity =>
+            {
+                entity.ToTable("ProductBaseCommission");
+                entity.HasKey(x => x.ProductBaseCommissionId);
+
+                entity.Property(x => x.ProductBaseCommissionId).ValueGeneratedNever();
+                entity.Property(x => x.ProductId).IsRequired();
+                entity.Property(x => x.CommissionType).HasConversion<byte>().IsRequired();
+                entity.Property(x => x.FixedAmount).HasColumnType("decimal(18,2)");
+                entity.Property(x => x.Percentage).HasColumnType("decimal(9,4)");
+                entity.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
+                entity.Property(x => x.EffectiveFrom).HasColumnType("datetime2");
+                entity.Property(x => x.EffectiveTo).HasColumnType("datetime2");
+                entity.Property(x => x.CreatedAt).HasColumnType("datetime2").IsRequired();
+                entity.Property(x => x.CreatedByUserId).IsRequired();
+                entity.Property(x => x.UpdatedAt).HasColumnType("datetime2");
+                entity.Property(x => x.UpdatedByUserId);
+
+                entity.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .HasConstraintName("FK_ProductBaseCommission_Product")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                //entity.HasOne(x => x.CreatedByUserId)
+                //    .WithMany()
+                //    .HasForeignKey(x => x.CreatedByUserId)
+                //    .HasConstraintName("FK_ProductBaseCommission_CreatedBy")
+                //    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.CreatedByUserId)
+                      .HasConstraintName("FK_ProductBaseCommission_CreatedBy");
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                      .HasConstraintName("FK_ProductBaseCommission_UpdatedBy");
+
+                //entity.HasOne(x => x.UpdatedByUserId)
+                //    .WithMany()
+                //    .HasForeignKey(x => x.UpdatedByUserId)
+                //    .HasConstraintName("FK_ProductBaseCommission_UpdatedBy")
+                //    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(x => x.Histories)
+                    .WithOne(x => x.ProductBaseCommission)
+                    .HasForeignKey(x => x.ProductBaseCommissionId)
+                    .HasConstraintName("FK_ProductBaseCommissionHistory_Base")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => x.ProductId);
+                entity.HasIndex(x => x.IsActive);
+                entity.HasIndex(x => x.EffectiveFrom);
+                entity.HasIndex(x => x.EffectiveTo);
+            });
+
+            builder.Entity<ProductBaseCommissionHistory>(entity =>
+            {
+                entity.ToTable("ProductBaseCommissionHistory");
+                entity.HasKey(x => x.HistoryId);
+
+                entity.Property(x => x.HistoryId).ValueGeneratedNever();
+                entity.Property(x => x.ProductBaseCommissionId).IsRequired();
+                entity.Property(x => x.ProductId).IsRequired();
+                entity.Property(x => x.OldCommissionType).HasConversion<byte?>();
+                entity.Property(x => x.OldFixedAmount).HasColumnType("decimal(18,2)");
+                entity.Property(x => x.OldPercentage).HasColumnType("decimal(9,4)");
+                entity.Property(x => x.NewCommissionType).HasConversion<byte?>();
+                entity.Property(x => x.NewFixedAmount).HasColumnType("decimal(18,2)");
+                entity.Property(x => x.NewPercentage).HasColumnType("decimal(9,4)");
+                entity.Property(x => x.ChangedAt).HasColumnType("datetime2").HasDefaultValueSql("SYSDATETIME()").IsRequired();
+                entity.Property(x => x.ChangedByUserId).IsRequired();
+                entity.Property(x => x.Note).HasMaxLength(500);
+                entity.Property(x => x.CreatedAt).HasColumnType("datetime2").IsRequired();
+                entity.Property(x => x.CreatedByUserId).IsRequired();
+
+                entity.HasOne(x => x.Product)
+                    .WithMany()
+                    .HasForeignKey(x => x.ProductId)
+                    .HasConstraintName("FK_ProductBaseCommissionHistory_Product")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                //entity.HasOne(x => x.ChangedByUserId)
+                //    .WithMany()
+                //    .HasForeignKey(x => x.ChangedByUserId)
+                //    .HasConstraintName("FK_ProductBaseCommissionHistory_ChangedBy")
+                //    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                     .WithMany()
+                     .HasForeignKey(e => e.ChangedByUserId)
+                     .HasConstraintName("FK_ProductBaseCommissionHistory_ChangedBy");
+
+
+                //entity.HasOne(x => x.CreatedByUserId)
+                //    .WithMany()
+                //    .HasForeignKey(x => x.CreatedByUserId)
+                //    .HasConstraintName("FK_ProductBaseCommissionHistory_CreatedBy")
+                //    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                     .WithMany()
+                     .HasForeignKey(e => e.CreatedByUserId)
+                     .HasConstraintName("FK_ProductBaseCommissionHistory_CreatedBy");
+
+
+                entity.HasIndex(x => x.ProductBaseCommissionId);
+                entity.HasIndex(x => x.ProductId);
+                entity.HasIndex(x => x.ChangedAt);
+            });
+
+            // END Commission Setup
 
 
             builder.Entity<UserProfile>(entity =>
