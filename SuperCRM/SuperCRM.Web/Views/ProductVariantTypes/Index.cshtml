@@ -4,39 +4,147 @@
     ViewData["Title"] = "Product Variant Types";
 }
 
-<h2>Product Variant Types</h2>
+
 
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
+       
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Add Product Variant Type</a>
-</p>
+<partial name="_SideBarPartial" />
+<div class="main main-dashboard-wrpper membership-main membership-overview-wrp">
+                   
+    <partial name="_TopBarPartial" />
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Type Code</th>
-            <th>Type Value</th>
-            <th>Display Order</th>
-            <th>Active</th>
-            <th style="width:120px;">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.TypeCode</td>
-                <td>@item.TypeValue</td>
-                <td>@item.DisplayOrder</td>
-                <td>@(item.IsActive ? "Yes" : "No")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.TypeCode" class="btn btn-sm btn-warning">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="main-wrapper new-dash-cls dash-account-cls">
+        <div class="container-fluid">
+            <div class="mwr-dash">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="mwr-dash-account">
+                            <div>
+                                <div class="tab-content">
+                                    <div id="account" class="tab-pane in active">
+                                        <div class="account-form-cls">
+                                            <div class="commissions-wrap">
+                                                <div class="row">
+                                                    <div class="col-md-12 col-lg-12">
+                                                        <div class="commissions-history">
+                                                            <div class="commissions-tabs">
+                                                                <div class="tab-content">
+                                                                    <div id="daily-pay" class="tab-pane in active">
+                                                                        <div class="commissions-pr tab-one">
+                                                                                          
+                                                                            <h2 id="Adh2" style="max-width: none; top: -15px; color:blue;">Product Variant Types <span> | Total: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;"> @Model.Count()</span></h2>
+                                                                            <!-- Nav tabs -->
+                                                                            <ul class="nav nav-tabs">
+                                                                                               
+                                                                                <li class="nav-item">
+                                                                                    <a class="nav-link active" id="PVListId" href="/ProductVariantTypes">Product Variants Type List</a>
+                                                                                </li>
+                                                                                <li class="nav-item">
+                                                                                    <a asp-action="Create" class="btn btn-primary" style="border-radius:15px;">Add Product Variant Type</a>
+                                                                                </li>
+                                                                            </ul>
+
+                                                                            <!-- Tab panes -->
+                                                                            <div class="tab-content">
+                                                                                              
+                                                                                <div class="tab-pane active " id="PVListTab">
+                                                                                    <div class="commissions-table commissions-table-one">
+                                                                                        <div id="example_wrapper2" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                                                                            <div class="row">
+                                                                                                <div class="col-sm-12 col-md-6" >
+                                                                                                    <div style="margin-top: 10px;">                                                                                                      
+                                                                                                                        
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="col-sm-12 col-md-6">
+                                                                                                    <div id="example_filter" class="dataTables_filter" style="text-align: right !important;"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="Search here..." aria-controls="example" style="width: 300px; display: inline-block;"></label></div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="row">
+                                                                                                <div class="col-sm-12" style=" overflow-x: scroll;">
+                                                                                                    <table id="example122" class="table table-hover responsive nowrap dataTable no-footer dtr-inline" style="width: 100%; margin-top:1%!important; " role="grid" aria-describedby="example_info">
+                                                                                                        <thead>
+                                                                                                            <tr role="row">
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Type Code</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Type Value</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Display Order</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Active</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Action</th>
+                                                                                                                             
+                                                                                                            </tr>
+                                                                                                        </thead>
+                                                                                                        <tbody>
+                                                                                                            @if (Model.Any())
+                                                                                                            {
+                                                                                                                @foreach (var item in Model)
+                                                                                                                {
+                                                                                                                    <tr>
+                                                                                                                        <td>@item.TypeCode</td>
+                                                                                                                        <td>@item.TypeValue</td>
+                                                                                                                        <td>@item.DisplayOrder</td>
+                                                                                                                        <td>@(item.IsActive ? "Yes" : "No")</td>
+                                                                                                                        <td>
+                                                                                                                            <a asp-action="Edit" asp-route-id="@item.TypeCode" class="btn btn-sm btn-warning" style="color:black!important;">Edit</a>
+                                                                                                                        </td>
+                                                                                                                    </tr>
+                                                                                                                }
+                                                                                                                            
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                <tr>
+                                                                                                                    <td colspan="8" class="text-center">No records found.</td>
+                                                                                                                </tr>
+                                                                                                            }
+                                                                                                        </tbody>
+                                                                                                    </table>
+                                                                                                </div>
+                                                                                            </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing 1 to @Model.Count() of @Model.Count() entries</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="example_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="example_previous"><a href="#" aria-controls="example" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="example" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item next disabled" id="example_next"><a href="#" aria-controls="example" data-dt-idx="2" tabindex="0" class="page-link">Next</a></li></ul></div></div></div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                               
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                                       
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+          $(document).ready(function () {
+               $(".navbar").hide();
+               //$(".footer").hide();
+              $(".side-bar-li-product-variant-type").addClass('active');
+       
+        });
+    </script>
+}
