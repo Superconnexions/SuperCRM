@@ -1,17 +1,20 @@
-﻿@model IEnumerable<SuperCRM.Web.ViewModels.Providers.ProviderListItemViewModel>
+﻿@using System.Linq
+@model IEnumerable<SuperCRM.Web.ViewModels.Providers.ProviderListItemViewModel>
 
 @{
     ViewData["Title"] = "Providers";
 }
+@section Style{
 
-<h2>Providers</h2>
+}
+@* <h2>Providers</h2> *@
 
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 
-<p>
+@* <p>
     <a asp-action="Create" class="btn btn-primary">Add Provider</a>
 </p>
 
@@ -19,8 +22,8 @@
     <thead>
         <tr>
             <th>Provider Name</th>
-            <th>Contact Email</th>
-            <th>Contact Phone</th>
+            <th>First Name</th>
+            <th>Last Name</th>
             <th>Provider URL</th>
             <th>Address</th>
             <th>Active</th>
@@ -50,4 +53,133 @@
             </tr>
         }
     </tbody>
-</table>
+</table> *@
+
+<partial name="_SideBarPartial" />
+<div class="main main-dashboard-wrpper membership-main membership-overview-wrp">
+    <partial name="_TopBarPartial" />
+    <div class="main-wrapper new-dash-cls dash-account-cls">
+        <div class="container-fluid">
+            <div class="mwr-dash">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="mwr-dash-account">
+                            <div>
+                                <div class="tab-content">
+                                    <div id="account" class="tab-pane in active">
+                                        <div class="account-form-cls">
+                                            <div class="commissions-wrap">
+                                                <div class="row">
+                                                    <div class="col-md-12 col-lg-12">
+                                                        <div class="commissions-history">
+                                                            <div class="commissions-tabs">
+                                                                <div class="tab-content">
+                                                                    <div id="daily-pay" class="tab-pane in active">
+                                                                        <div class="commissions-pr tab-one">
+                                                                            <h2 id="Agh2" style="max-width: none; top: -15px; color:blue;">Provider List <span> | Total Provider: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;">  @Model.Count() </span></h2>
+                                                                            
+                                                                            <!-- Nav tabs -->
+                                                                            <ul class="nav nav-tabs">
+                                                                                <li class="nav-item">
+                                                                                    <a class="nav-link active" id="ProviderListId" data-bs-toggle="tab" href="#ProviderListTab">Provider List</a>
+                                                                                </li>
+                                                                                <li class="nav-item">
+                                                                                    <a asp-action="Create" class="btn btn-primary" style="border-radius:15px;">Add Provider</a>
+                                                                                </li>
+                                                                              
+                                                                            </ul>
+
+                                                                            <!-- Tab panes -->
+                                                                            <div class="tab-content">
+                                                                                <div class="tab-pane active" id="ProviderListTab">
+                                                                                    <div class="commissions-table commissions-table-one">
+                                                                                        <div id="example_wrapper1" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                                                                            <div class="row"><div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-12"><div id="example_filter" class="dataTables_filter" style="text-align: right !important;"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="Search here..." aria-controls="example" style="width: 300px; display: inline-block;"></label></div></div></div>
+                                                                                            <div class="row">
+                                                                                                <div class="col-sm-12" style=" overflow-x: scroll;">
+                                                                                                    <table id="example12" class="table table-hover responsive nowrap dataTable no-footer dtr-inline" style="width: 100%; margin-top:1%!important; " role="grid" aria-describedby="example_info">
+                                                                                                        <thead>
+                                                                                                            <tr role="row">
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Date Earned: activate to sort column ascending">Provider Name</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Payment Date: activate to sort column ascending">First Name</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Last Name</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Provider URL</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Address</th>
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Active</th>
+                                                                                                               @*  <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Status</th> *@
+                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Action</th>
+                                                                                                               @*  <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Detail: activate to sort column ascending"></th> *@
+                                                                                                            </tr>
+                                                                                                        </thead>
+                                                                                                        <tbody>
+                                                                                                            @foreach (var item in Model)
+                                                                                                            {
+                                                                                                                <tr>
+                                                                                                                    <td>@item.ProviderName</td>
+                                                                                                                    <td>@item.ContactEmail</td>
+                                                                                                                    <td>@item.ContactPhone</td>
+                                                                                                                    <td>                   
+                    
+                                                                                                                        @if (!string.IsNullOrWhiteSpace(item.ProviderUrl))
+                                                                                                                        {
+                                                                                                                            <a href="@item.ProviderUrl" target="_blank">Open</a>
+                                                                                                                        }
+                                                                                                                    </td>
+                                                                                                                    <td>@item.ProviderAddress</td>
+                                                                                                                    <td>@(item.IsActive ? "Yes" : "No")</td>
+                                                                                                                    <td>
+                                                                                                                        <a asp-action="Edit" asp-route-id="@item.ProviderId" class="btn btn-sm btn-info" style="color:#000!important;">Edit</a>
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                            }
+                                                                                                        </tbody>
+                                                                                                    </table>
+                                                                                                </div>
+                                                                                            </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing 1 to @Model.Count() of @Model.Count() entries</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="example_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="example_previous"><a href="#" aria-controls="example" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="example" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item next disabled" id="example_next"><a href="#" aria-controls="example" data-dt-idx="2" tabindex="0" class="page-link">Next</a></li></ul></div></div></div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="tab-pane fade" id="AdminListTab">
+                                                                                    <div class="commissions-table commissions-table-one">
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="tab-pane fade" id="cancelAgent">
+                                                                                    <div class="commissions-table commissions-table-one">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                                       
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+          $(document).ready(function () {
+               $(".navbar").hide();$(".footer").hide();              
+        });
+    </script>
+}

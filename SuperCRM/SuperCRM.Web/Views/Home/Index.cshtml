@@ -2,9 +2,13 @@
 
 @{
     ViewData["Title"] = "Login";
+    Layout = "_SecondLayout";
 }
-@section style{
+@section Style{
        <link rel="stylesheet" type="text/css" href="../custom/css/style.css" /> 
+       <style>
+          
+       </style>
 }
 
 @* <div class="row justify-content-center mt-5">
@@ -57,7 +61,7 @@
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="cmr-vid-wrap">
-                                            <h2>Welcome to SuperCMR HOME</h2>
+                                            <h2 style="text-align: center;">Welcome to SuperCMR HOME</h2>
                                             <div class="cmr-vid-img" style="display:none">
                                                 <!-- <img src="images/SignupImg.jpg" alt="img"> -->
                                                 <img src="images/signupimg1.jpg" alt="img">
@@ -67,9 +71,9 @@
                                     <div class="col-lg-12">
                                         <div class="cmr-quick-blk">
                                             <div class="space-30"></div>
-                                            <p>SuperCMR Home is designed to put you in control of your time and income, so you can live the lifestyle you’ve always wanted! It has already created easy Income Earners and you could be next.</p>
+                                           @* <p>SuperCMR Home is designed to put you in control of your time and income, so you can live the lifestyle you’ve always wanted! It has already created easy Income Earners and you could be next.</p>
 
-                                            <h2 class="text-center"> Are you ready to use?</h2>
+                                            <h2 class="text-center"> Are you ready to use?</h2> *@
                                             <h6 class="text-center" style="color: #00b4ff;">Please Log In to Your Account</h6>
 
                                             <div class="cmr-cleint">
@@ -142,6 +146,6 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-                    $(".navbar").hide();$(".footer").hide();
+                   
     </script>
 }

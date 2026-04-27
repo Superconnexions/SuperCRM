@@ -19,6 +19,20 @@
             body {
                 margin-top:-5%;
             }
+
+          .container {
+            width: 100%;
+            padding-right: 0;
+            padding-left: 0;
+            margin-right: 0;
+           /*  argin-left: 5%;   */        
+          }
+
+              .main {
+        width: 95%;
+        margin-left: 7%;
+    }
+
             .loginMain {
                 padding-top:3%;
             }
@@ -31,7 +45,7 @@
              .dropdown-menu {
             display: none; 
             z-index: 9999 !important; 
-        }
+           }
 
             .dropdown-menu.show {
                 display: block !important; 
@@ -40,6 +54,17 @@
         #dropdownMenuButtonProfile:focus {
             box-shadow:none;
          }
+
+         #chat-side{
+          overflow-y:auto;
+          width: min-content;
+         }
+         #masterSetupDropdownUl li a:hover {
+           background-color:#3a3b3c;
+           border-radius:15px;
+         }
+
+
     </style>
 
 </head>
@@ -67,7 +92,7 @@
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="pb-3">
+        <main role="main" class="pb-32">
             @RenderBody()
         </main>
     </div>
@@ -106,18 +131,25 @@
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <script>
 $(document).ready(function(){
-    // ১. বাটনে ক্লিক করলে ড্রপডাউন টগল হবে
+   
     $("#dropdownMenuButtonProfile").on("click", function(e){
-        $("#dropdownMenuProfile").fadeToggle(100); // আপনি শুধু .toggle() বা .slideToggle() ও ব্যবহার করতে পারেন
-        e.stopPropagation(); // বাটনে ক্লিক করলে যেন উইন্ডো ক্লিক ইভেন্ট ট্রিগার না হয়
+        $("#dropdownMenuProfile").fadeToggle(100); 
+        e.stopPropagation(); 
     });
 
-    // ২. মেনুর বাইরে কোথাও ক্লিক করলে যেন মেনু বন্ধ হয়ে যায়
+   
     $(document).on("click", function(e){
         if (!$(e.target).closest("#dropdownMenuProfile").length) {
             $("#dropdownMenuProfile").hide();
         }
     });
+
+     //$("#masterSetupDropdownUl").hide();
+     $("#masterSetupDropdown").on("click", function(e){
+      $("#masterSetupDropdownUl").show();
+       $("#masterSetupDropdownUl").css("display", "contents");
+      });
+
 });
 </script>
     @await RenderSectionAsync("Scripts", required: false)

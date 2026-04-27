@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Agent Registration";
+     Layout = "_SecondLayout";
 }
 @section Style {
     <link rel="stylesheet" type="text/css" href="../custom/css/style.css" /> 
@@ -170,7 +171,7 @@
                                     <div class="col-lg-12">
                                         <div class="cmr-quick-blk">
                                             <div class="space-50"></div>
-                                            <p>Our sign-up is very easy, but to get effective use of this system, you will have to wait a while for the admin to activate it.</p>
+                                            <p class="text-center">Our sign-up is very easy, but to get effective use of this system, you will have to wait a while for the admin to activate it.</p>
 
                                             <h2 class="text-center"> Are you ready to join our team?</h2>
                                             <h6 class="text-center" style="color: #00b4ff;">Create Your Account</h6>
@@ -387,7 +388,7 @@
                                                                                             <div class="form-group">
                                                                                                 <h2 style="margin: 0px 0px 15px;"></h2>
                                                                                                 <div class="form__question">
-                                                                                                    <p>If any problem to create</p>
+                                                                                                    <p>For any issue:</p>
                                                                                                     <a class="form__primary-btn no-border-link" href="mailto: support@supercmr.com">Please Contact our support team</a>
                                                                                                     <br />
                                                                                                     <a asp-controller="Home" asp-action="Index" class="form__primary-btn no-border-link">Back to Login</a>
