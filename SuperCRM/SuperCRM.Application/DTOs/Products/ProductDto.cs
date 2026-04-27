@@ -34,6 +34,10 @@ namespace SuperCRM.Application.DTOs.Products
         public string? ProductDisplayNotes { get; set; }
         public string? PaymentNotes { get; set; }
         public string? Remarks { get; set; }
+
+        public decimal? MonthlyInstallmentAmount { get; set; }
+        public int NoOfInstallment { get; set; }
+
         public List<ProductImageDto> Images { get; set; } = new();
     }
 }

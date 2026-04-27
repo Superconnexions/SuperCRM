@@ -79,6 +79,9 @@ namespace SuperCRM.Application.Services
                 request.CurrencyCode,
                 request.Images,
                 null,
+                request.NoOfInstallment,
+                request.MonthlyInstallmentAmount,
+                request.IsThirdPartyProduct,
                 cancellationToken);
 
             if (!validation.Success)
@@ -104,7 +107,10 @@ namespace SuperCRM.Application.Services
                 IsThirdPartyProduct = request.IsThirdPartyProduct,
                 InstallmentApplicable = request.InstallmentApplicable,
                 DownPaymentAmount = request.InstallmentApplicable ? request.DownPaymentAmount : null,
-                CurrencyCode = NormalizeCode(request.CurrencyCode) ?? "GBP",
+                NoOfInstallment = request.NoOfInstallment ?? 0,
+                MonthlyInstallmentAmount = request.MonthlyInstallmentAmount,
+
+                CurrencyCode = NormalizeCode(request.CurrencyCode) ?? "£",
                 IsRequiredBankInformation = request.IsRequiredBankInformation,
                 IsProviderDeliveryProduct = request.IsProviderDeliveryProduct,
                 BasePriceType = request.BasePriceType,
@@ -152,6 +158,9 @@ namespace SuperCRM.Application.Services
                 request.CurrencyCode,
                 request.Images,
                 request.ProductId,
+                request.NoOfInstallment,
+                request.MonthlyInstallmentAmount,
+                request.IsThirdPartyProduct,
                 cancellationToken);
 
             if (!validation.Success)
@@ -172,7 +181,7 @@ namespace SuperCRM.Application.Services
             entity.IsThirdPartyProduct = request.IsThirdPartyProduct;
             entity.InstallmentApplicable = request.InstallmentApplicable;
             entity.DownPaymentAmount = request.InstallmentApplicable ? request.DownPaymentAmount : null;
-            entity.CurrencyCode = NormalizeCode(request.CurrencyCode) ?? "GBP";
+            entity.CurrencyCode = NormalizeCode(request.CurrencyCode) ?? "£";
             entity.IsRequiredBankInformation = request.IsRequiredBankInformation;
             entity.IsProviderDeliveryProduct = request.IsProviderDeliveryProduct;
             entity.BasePriceType = request.BasePriceType;
@@ -181,6 +190,8 @@ namespace SuperCRM.Application.Services
             entity.IsPortalVisible = request.IsPortalVisible;
             entity.IsPortalOrderEnabled = request.IsPortalOrderEnabled;
             entity.DisplayOrder = request.DisplayOrder;
+            entity.MonthlyInstallmentAmount = request.MonthlyInstallmentAmount;
+            entity.NoOfInstallment = request.NoOfInstallment ?? 0;
             entity.ProductDisplayNotes = CleanOptional(request.ProductDisplayNotes);
             entity.PaymentNotes = CleanOptional(request.PaymentNotes);
             entity.Remarks = CleanOptional(request.Remarks);
@@ -210,6 +221,9 @@ namespace SuperCRM.Application.Services
             string currencyCode,
             List<ProductImageDto> images,
             Guid? excludeProductId,
+            int? noOfInstallment,
+            decimal? monthlyInstallmentAmount,
+            bool isThirdPartyProduct,
             CancellationToken cancellationToken)
         {
             if (categoryId == Guid.Empty)
@@ -243,7 +257,12 @@ namespace SuperCRM.Application.Services
             if (!installmentApplicable && downPaymentAmount.HasValue && downPaymentAmount.Value != 0)
             {
                 // Not a hard error. Value will be null during save.
+                return (false, "InstallmentApplicable shuld be enable for Down Payment Amount.", null, null);
             }
+            
+            //if(!isThirdPartyProduct && installmentApplicable && (!noOfInstallment.HasValue || noOfInstallment.Value <= 0))
+            //    return (false, "Number of Installment should be greater than zero when Installment Applicable is enabled.", null, null);
+
 
             var category = await _repository.GetCategoryByIdAsync(categoryId, cancellationToken);
             if (category == null)
@@ -326,6 +345,9 @@ namespace SuperCRM.Application.Services
                 IsThirdPartyProduct = entity.IsThirdPartyProduct,
                 InstallmentApplicable = entity.InstallmentApplicable,
                 DownPaymentAmount = entity.DownPaymentAmount,
+                NoOfInstallment = entity.NoOfInstallment,
+                MonthlyInstallmentAmount = entity.MonthlyInstallmentAmount,
+
                 IsRequiredBankInformation = entity.IsRequiredBankInformation,
                 IsProviderDeliveryProduct = entity.IsProviderDeliveryProduct,
                 IsPriceEditable = entity.IsPriceEditable,

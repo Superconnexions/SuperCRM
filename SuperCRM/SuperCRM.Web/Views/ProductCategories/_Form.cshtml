@@ -16,8 +16,18 @@
 
 <div class="mb-3">
     <label asp-for="CategoryImageUrl" class="form-label"></label>
-    <input asp-for="CategoryImageUrl" class="form-control" />
+    <input asp-for="CategoryImageUrl" class="form-control" readonly />
     <span asp-validation-for="CategoryImageUrl" class="text-danger"></span>
+
+    @if ( !string.IsNullOrEmpty(Model.CategoryImageUrl) )
+    
+    {
+        
+    <div style="margin-top:10px">
+        <img src="@Model.CategoryImageUrl" alt="Category Image" style="max-width:150px; max-height:100px;margin-top:10px" />
+    </div>    }
+    
+
 </div>
 
 <div class="mb-3">

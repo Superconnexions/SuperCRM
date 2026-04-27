@@ -19,7 +19,7 @@ namespace SuperCRM.Domain.Entities
         public bool IsThirdPartyProduct { get; set; }
         public bool InstallmentApplicable { get; set; }
         public decimal? DownPaymentAmount { get; set; }
-        public string CurrencyCode { get; set; } = "GBP";
+        public string CurrencyCode { get; set; } = "£";
         public bool IsRequiredBankInformation { get; set; }
         public bool IsProviderDeliveryProduct { get; set; }
         public ProductBasePriceType BasePriceType { get; set; }
@@ -37,7 +37,8 @@ namespace SuperCRM.Domain.Entities
         public Guid? UpdatedByUserId { get; set; }
         public int SalesUnitId { get; set; }
         public string SalesUnitCode { get; set; } = string.Empty;
-
+        public decimal? MonthlyInstallmentAmount { get; set; }
+        public int NoOfInstallment { get; set; }
         public ProductCategory? Category { get; set; }
         public SalesUnit? SalesUnit { get; set; }
         public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();

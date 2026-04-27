@@ -19,7 +19,7 @@ namespace SuperCRM.Application.DTOs.Products
         public bool IsThirdPartyProduct { get; set; }
         public bool InstallmentApplicable { get; set; }
         public decimal? DownPaymentAmount { get; set; }
-        public string CurrencyCode { get; set; } = "GBP";
+        public string CurrencyCode { get; set; } = "£";
         public bool IsRequiredBankInformation { get; set; }
         public bool IsProviderDeliveryProduct { get; set; }
         public ProductBasePriceType BasePriceType { get; set; }
@@ -32,6 +32,8 @@ namespace SuperCRM.Application.DTOs.Products
         public string? PaymentNotes { get; set; }
         public string? Remarks { get; set; }
         public bool IsActive { get; set; }
+        public decimal? MonthlyInstallmentAmount { get; set; }
+        public int? NoOfInstallment { get; set; }
         public Guid? UpdatedByUserId { get; set; }
         public List<ProductImageDto> Images { get; set; } = new();
     }

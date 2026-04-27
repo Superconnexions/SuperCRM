@@ -569,6 +569,16 @@ namespace SuperCRM.Persistence.DbContexts
                       .HasColumnType("decimal(18,2)")
                       .IsRequired();
 
+                entity.Property(e => e.MonthlyInstallmentAmount)
+                    .HasColumnType("decimal(18,2)");
+
+
+                entity.Property(e => e.DisplayOrder)
+                      .IsRequired();
+
+                entity.Property(e => e.NoOfInstallment);
+                      //.IsRequired();
+
                 entity.Property(e => e.DownPaymentAmount)
                       .HasColumnType("decimal(18,2)");
 
