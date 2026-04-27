@@ -3,7 +3,7 @@
 }
 
 @section Style{
-       @* <link rel="stylesheet" type="text/css" href="../custom/css/style2.css" /> *@
+      
   <style>
                     ::placeholder {
                         color: darkgray !important;
@@ -30,7 +30,7 @@
                                 <div class="row">
                                     <div class="col-md-12 col-lg-12">
                                         <div class="mwr-dash-account">
-                                            <form>
+                                            <div>
                                                 <div class="tab-content">
                                                     <div id="account" class="tab-pane in active">
                                                         <div class="account-form-cls">
@@ -43,14 +43,14 @@
                                                                                     <div id="daily-pay" class="tab-pane in active">
                                                                                         <div class="commissions-pr tab-one">
                                                                                             <h2 id="Agh2" style="max-width: none; top: -15px; color:blue;">My Agent List <span> | Total Agent: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;"> 0</span></h2>
-                                                                                            <h2 id="Adh2" style="max-width: none; top: -15px; color:blue;">Admin List <span> | Total Admin: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;"> 0</span></h2>
+                                                                                            @* <h2 id="Adh2" style="max-width: none; top: -15px; color:blue;">Admin List <span> | Total Admin: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;"> 0</span></h2> *@
                                                                                             <!-- Nav tabs -->
                                                                                             <ul class="nav nav-tabs">
                                                                                                 <li class="nav-item">
                                                                                                     <a class="nav-link active" id="AgentListId" data-bs-toggle="tab" href="#AgentListTab">Agent List</a>
                                                                                                 </li>
                                                                                                 <li class="nav-item">
-                                                                                                    <a class="nav-link" id="AdminListId" data-bs-toggle="tab" href="#AdminListTab">Admin List</a>
+                                                                                                    <a class="nav-link" id="AdminListId1"  href="/AdminUsers">Admin List</a>
                                                                                                 </li>
                                                                                                 <!-- <li class="nav-item">
                                                                                                      <a class="nav-link" data-bs-toggle="tab" href="#cancelAgent">Cancel Agent</a>
@@ -261,37 +261,10 @@
 
 
                                                 </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-lg-3" style="display:none;">
-                                        <div class="mw-events">
-                                            <div class="commissions-side">
-                                                <div class="com-side-income">
-                                                    <p>Learn How To Increase Your Income in 2022</p>
-
-                                                    <div class="com-icome-chart">
-                                                        <div class="modal-div-canvas js-chart">
-                                                            <div class="chart-canvas">
-                                                                <iframe class="chartjs-hidden-iframe" style="width: 100%; display: block; border: 0px; height: 0px; margin: 0px; position: absolute; inset: 0px;"></iframe>
-                                                                <canvas id="openedCanvas" width="118" height="118" style="width: 118px; height: 118px;"></canvas>
-                                                                <div class="chart-background"></div>
-                                                                <span class="chart-unique-value">
-                                                                    <span class="js-count">68</span>
-                                                                    <span class="cuv-percent">%</span>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <span>Sample Promo Box</span>
-                                                    </div>
-                                                </div>
-                                                <div class="com-side-build">
-                                                    <p>How to Build A Solid Team in 60 Days</p>
-                                                    <span>Sample Promo Box</span>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                   
                                 </div>
                             </div>
                         </div>
@@ -301,20 +274,21 @@
 @section Scripts {
    <script type="text/javascript">
         $(document).ready(function () {
-            // $(".navbar").hide();$(".footer").hide();
+             $(".navbar").hide();
+             //$(".footer").hide();
        $("#Agh2").show();
-       $("#Adh2").hide();
-       $(".Total-Vl").text(15);
+       // $("#Adh2").hide();
+       $(".Total-Vl").text(8);
        $('#AgentListId').on('click', function() {
             $("#Agh2").show();
-             $("#Adh2").hide();
-             $(".Total-Vl").text(15);
+             // $("#Adh2").hide();
+             $(".Total-Vl").text(8);
         });
-        $('#AdminListId').on('click', function() {
-            $("#Agh2").hide();
-            $("#Adh2").show();
-             $(".Total-Vl").text(5);
-        });
+        // $('#AdminListId').on('click', function() {
+        //     $("#Agh2").hide();
+        //     $("#Adh2").show();
+        //      $(".Total-Vl").text(5);
+        // });
       });
     </script>
 }

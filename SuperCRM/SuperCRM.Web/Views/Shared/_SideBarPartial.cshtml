@@ -21,12 +21,12 @@
                         @if (User.IsInRole(AppRoles.SuperAdmin))
         {
 
-                            <li class="active"><a href="AdminDash.html"><img src="/custom/images/icons/sld-aic-07.png" alt="icons">Admin Dashbord</a></li>
+                            <li class="active"><a href="/Admin"><img src="/custom/images/icons/sld-aic-07.png" alt="icons">Admin Dashbord</a></li>
                             <li class=""><a href="AdminCommission.html"><img src="/custom/images/icons/timer-icon.png" alt="icons">Commission</a></li>
         }
                         @if (User.IsInRole(AppRoles.SuperCRMAdmin))
         {
-                            <li class="active"><a href="AdminDash.html"><img src="/custom/images/icons/sld-aic-07.png" alt="icons">Admin Dashbord</a></li>
+                            <li class="active"><a href="/Admin"><img src="/custom/images/icons/sld-aic-07.png" alt="icons">Admin Dashbord</a></li>
                             <li class=""><a href="AdminCommission.html"><img src="/custom/images/icons/timer-icon.png" alt="icons">Commission</a></li>
         }
                         @if (User.IsInRole(AppRoles.Agent))
