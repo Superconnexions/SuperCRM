@@ -14,46 +14,6 @@
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 
-@* <p>
-    <a asp-action="Create" class="btn btn-primary">Add Provider</a>
-</p>
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Provider Name</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Provider URL</th>
-            <th>Address</th>
-            <th>Active</th>
-            <th style="width:120px;">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.ProviderName</td>
-                <td>@item.ContactEmail</td>
-                <td>@item.ContactPhone</td>
-                <td>
-                    
-                    
-                    @if (!string.IsNullOrWhiteSpace(item.ProviderUrl))
-                    {
-                        <a href="@item.ProviderUrl" target="_blank">Open</a>
-                    }
-                 </td>
-                <td>@item.ProviderAddress</td>
-                <td>@(item.IsActive ? "Yes" : "No")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.ProviderId" class="btn btn-sm btn-warning">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table> *@
 
 <partial name="_SideBarPartial" />
 <div class="main main-dashboard-wrpper membership-main membership-overview-wrp">
@@ -178,9 +138,10 @@
 </div>
 @section Scripts {
     <script type="text/javascript">
-          $(document).ready(function () {
+        $(document).ready(function () {
                $(".navbar").hide();
-               //$(".footer").hide();              
+               //$(".footer").hide();    
+              $(".side-bar-li-providers").addClass('active'); 
         });
     </script>
 }
