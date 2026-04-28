@@ -6,33 +6,33 @@
 
 <!-- sidebar Box -->
 <button class="btn-side" onclick="openNav()"><i class="fa fa-angle-double-up" aria-hidden="true"></i> Side Panel</button>
-<div class="sidenav-wrapper sidenav main-chat" id="chat-side" >
+<div class="sidenav-wrapper sidenav main-chat" id="chat-side">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <div class="sidenav-block">
         <a href="#" class="sidenav-logo">
             <img src="/custom/images/logo.png" alt="logo">
         </a>
-        <div class="sidenav-list-blk" >
+        <div class="sidenav-list-blk">
             <div class="sidenav-list">
-                <ul>
+                <ul class="sideBarUl">
                     <li class="side-bar-li-my-account"><a href="MyAccount.html"><img src="/custom/images/icons/sld-aic-06.png" alt="icons"> My Account</a></li>
                     @if (SignInManager.IsSignedIn(User))
-                     {
+                    {
                         @if (User.IsInRole(AppRoles.SuperAdmin))
-        {
+                        {
 
                             <li class="side-bar-li-admin-dash "><a href="/Admin"><img src="/custom/images/icons/sld-aic-07.png" alt="icons">Admin Dashbord</a></li>
                             <li class="side-bar-li-admin-commission"><a href="AdminCommission.html"><img src="/custom/images/icons/timer-icon.png" alt="icons">Commission</a></li>
-        }
+                        }
                         @if (User.IsInRole(AppRoles.SuperCRMAdmin))
-        {
+                        {
                             <li class="side-bar-li-crm-admin-dash"><a href="/Admin"><img src="/custom/images/icons/sld-aic-07.png" alt="icons">Admin Dashbord</a></li>
                             <li class="side-bar-li-crm-admin-commission"><a href="AdminCommission.html"><img src="/custom/images/icons/timer-icon.png" alt="icons">Commission</a></li>
-        }
+                        }
                         @if (User.IsInRole(AppRoles.Agent))
-        {
+                        {
                             <li class=""><a href="AgentCommission.html"><img src="/custom/images/icons/sld-aic-02.png" alt="icons">Agent Commission</a></li>
-        }        
+                        }
                     }
                     else
                     {
@@ -45,74 +45,81 @@
                 </ul>
                 @if (User.IsInRole(AppRoles.SuperAdmin))
                 {
-                  <ul>
-                    <li class="side-bar-li-master-setup">
-                        <a class="nav-link dropdown-toggle"
-                           href=""
-                           id="masterSetupDropdown"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                           <img src="/custom/images/icons/sld-aic-07.png" alt="icons">Master Setup</a>
-                        <ul class="dropdown-menu" aria-labelledby="masterSetupDropdown" id="masterSetupDropdownUl" style="display: contents;">
-                            <li class="side-bar-li-providers ">
-                                <a class="dropdown-item" asp-controller="Providers" asp-action="Index">
-                                    Providers
-                                </a>
-                            </li>
+                    <ul>
+                        <li class="side-bar-li-master-setup">
+                            <a class="nav-link dropdown-toggle"
+                                   href="javascript:void(0)"
+                                   id="masterSetupDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                <img src="/custom/images/icons/sld-aic-07.png" alt="icons">Master Setup
+                            </a>
+                           @*  <ul class="dropdown-menu" aria-labelledby="masterSetupDropdown" id="masterSetupDropdownUl" style="display: contents;"> *@
+                            <ul class="dropdown-menu" aria-labelledby="masterSetupDropdown" id="masterSetupDropdownUl" style="">
+                                <li class="side-bar-li-providers ">
+                                    <a class="dropdown-item" asp-controller="Providers" asp-action="Index">
+                                        Providers
+                                    </a>
+                                </li>
 
-                            <li class="side-bar-li-product-variants">
-                                <a class="dropdown-item" asp-controller="ProductVariants" asp-action="Index">
-                                    Product Variants
-                                </a>
-                            </li>
+                                <li class="side-bar-li-product-variants">
+                                    <a class="dropdown-item" asp-controller="ProductVariants" asp-action="Index">
+                                        Product Variants
+                                    </a>
+                                </li>
 
 
-                            <li class="side-bar-li-product-variant-type">
-                                <a class="dropdown-item" asp-controller="ProductVariantTypes" asp-action="Index">
-                                    Product Variant Types
-                                </a>
-                            </li>
+                                <li class="side-bar-li-product-variant-type">
+                                    <a class="dropdown-item" asp-controller="ProductVariantTypes" asp-action="Index">
+                                        Product Variant Types
+                                    </a>
+                                </li>
 
-                            <li class="side-bar-li-product-categories">
-                                <a class="dropdown-item" asp-controller="ProductCategories" asp-action="Index">
-                                    Product Categories
-                                </a>
-                            </li>
+                                <li class="side-bar-li-product-categories">
+                                    <a class="dropdown-item" asp-controller="ProductCategories" asp-action="Index">
+                                        Product Categories
+                                    </a>
+                                </li>
 
-                            <li class="side-bar-li-sales-units">
-                                <a class="dropdown-item" asp-controller="SalesUnits" asp-action="Index">
-                                    Sales Units
-                                </a>
-                            </li>
+                                <li class="side-bar-li-sales-units">
+                                    <a class="dropdown-item" asp-controller="SalesUnits" asp-action="Index">
+                                        Sales Units
+                                    </a>
+                                </li>
 
-                            <li class="side-bar-li-products">
-                                <a class="dropdown-item" asp-controller="Products" asp-action="Index">
-                                    Products
-                                </a>
-                            </li>
+                                <li class="side-bar-li-products">
+                                    <a class="dropdown-item" asp-controller="Products" asp-action="Index">
+                                        Products
+                                    </a>
+                                </li>
 
-                            <li class="side-bar-li-provider-products">
-                                <a class="dropdown-item" asp-controller="ProviderProducts" asp-action="Index">
-                                    Provider Products
-                                </a>
-                            </li>
+                                <li class="side-bar-li-provider-products">
+                                    <a class="dropdown-item" asp-controller="ProviderProducts" asp-action="Index">
+                                        Provider Products
+                                    </a>
+                                </li>
 
-                            <li class="side-bar-li-product-base-commission">
-                                <a class="dropdown-item" asp-controller="ProductBaseCommissions" asp-action="Index">
-                                    Product base Commission
-                                </a>
-                            </li>
+                                <li class="side-bar-li-product-base-commission">
+                                    <a class="dropdown-item" asp-controller="ProductBaseCommissions" asp-action="Index">
+                                        Product base Commission
+                                    </a>
+                                </li>
+                                <li class="side-bar-li-product-base-commission">
+                                    <a class="dropdown-item">
+                                        
+                                    </a>
+                                </li>
 
-                        </ul>
+                            </ul>
                     
-                    </li>
+                        </li>
 
-                  </ul>
+                    </ul>
                 }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End sidebar Box -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End sidebar Box -->
                

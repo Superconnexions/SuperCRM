@@ -61,12 +61,30 @@
           overflow-y:auto;
           width: min-content;
          }
-         #masterSetupDropdownUl li a:hover {
+        #masterSetupDropdownUl li a:hover {
            background-color:#3a3b3c;
            border-radius:15px;
          }
+          .sideBarUl li a:hover {
+           background-color:#3a3b3c;
+           border-radius:15px;
+         }
+        
+         #masterSetupDropdownUl li a{
+             padding-left:80px;         
+         }
 
+         #masterSetupDropdownUl {
+                position: absolute; 
+                display: none;     
+            }
 
+            #masterSetupDropdownUl.show {
+                display: block !important; 
+            }
+            .sidenav-wrapper{
+             min-width:20%;
+            }
     </style>
 
 </head>
@@ -145,14 +163,30 @@ $(document).ready(function(){
             $("#dropdownMenuProfile").hide();
         }
     });
-
-     //$("#masterSetupDropdownUl").hide();
-     $("#masterSetupDropdown").on("click", function(e){
-      $("#masterSetupDropdownUl").show();
-       $("#masterSetupDropdownUl").css("display", "contents");
-      });
+    
 
 });
+</script>
+<script>
+   $(document).ready(function () {
+    $(document).on('click', '#masterSetupDropdown', function (e) {
+        e.preventDefault();
+        e.stopPropagation(); 
+        
+        console.log("Click detected!"); 
+        
+        // Dropdown menu-ti select korun
+        var dropdownMenu = $('#masterSetupDropdownUl');
+        
+        // Toggle logic
+        if (dropdownMenu.css('display') === 'none' || dropdownMenu.hasClass('hidden')) {
+            dropdownMenu.css('display', 'contents'); 
+        } else {
+            dropdownMenu.css('display', 'none');
+        }
+        });
+
+    });
 </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
