@@ -1,23 +1,61 @@
 ﻿@{
     ViewData["Title"] = "Registration Success";
+    Layout = "_SecondLayout";
 }
+@section Style {
+    <style>
+        .container-fluid {
+            margin:5% 0 !important;
+        }
+        .cmr-dash{
+         margin:5% 10% !important
+        }
+    </style>
+}
+<div class="main main-dashboard-wrpper">
+    <div class="main-wrapper">
+        <div class="container-fluid">
+            <div class="cmr-dash">
+                <div class="row">
+                    <div class="col-md-8 col-lg-8">
+                        <div class="cmr-vid-dash">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="cmr-vid-wrap">
+                                        <h2 style="font-size:28px;text-align: center; color:royalblue;">Welcome to SuperCRM</h2>
+                                       
+                                    </div>
+                                    </div>
+                                    <br />
+                                <div class="col-lg-12">
+                                    <div class="cmr-quick-blk">
+                                    <h2 style="color:lawngreen;text-align:center;">Registration Submitted Successfully</h2>
 
-<h2>Registration Submitted Successfully</h2>
+                                    <div class="alert alert-success">
+                                        Your Agent registration has been completed successfully.
+                                    </div>
 
-<div class="alert alert-success">
-    Your Agent registration has been completed successfully.
+                                    @if (ViewBag.AgentCode != null)
+                                        {
+                                         <p><strong>Your Agent Code:</strong> @ViewBag.AgentCode</p>
+                                          }
+
+                                    <p>
+                                        You can now log in with your registered credentials.
+                                        Operational access may remain restricted until admin approval is completed.
+                                    </p>
+
+                                    <p>
+                                        @* <a asp-area="Identity" asp-page="/home/Index" class="btn btn-primary">Go to Login</a> *@
+                                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Go to Login</a>
+                                    </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-@if (ViewBag.AgentCode != null)
-{
-    <p><strong>Your Agent Code:</strong> @ViewBag.AgentCode</p>
-}
-
-<p>
-    You can now log in with your registered credentials.
-    Operational access may remain restricted until admin approval is completed.
-</p>
-
-<p>
-    <a asp-area="Identity" asp-page="/Home/Index" class="btn btn-primary">Go to Login</a>
-</p>
