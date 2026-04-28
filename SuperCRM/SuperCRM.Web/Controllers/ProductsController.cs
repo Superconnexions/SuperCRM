@@ -44,6 +44,8 @@ namespace SuperCRM.Web.Controllers
                 CurrencyCode = x.CurrencyCode,
                 ImageCount = x.Images.Count,
                 ProductType = x.ProductType,
+                NoOfInstallment = x.NoOfInstallment,
+                MonthlyInstallmentAmount = x.MonthlyInstallmentAmount,
                 IsActive = x.IsActive
             }).ToList();
 
@@ -86,6 +88,8 @@ namespace SuperCRM.Web.Controllers
                 IsThirdPartyProduct = model.IsThirdPartyProduct,
                 InstallmentApplicable = model.InstallmentApplicable,
                 DownPaymentAmount = model.DownPaymentAmount,
+                NoOfInstallment = model.NoOfInstallment,
+                MonthlyInstallmentAmount = model.MonthlyInstallmentAmount,
                 CurrencyCode = model.CurrencyCode,
                 IsRequiredBankInformation = model.IsRequiredBankInformation,
                 IsProviderDeliveryProduct = model.IsProviderDeliveryProduct,
@@ -135,6 +139,8 @@ namespace SuperCRM.Web.Controllers
                 IsThirdPartyProduct = dto.IsThirdPartyProduct,
                 InstallmentApplicable = dto.InstallmentApplicable,
                 DownPaymentAmount = dto.DownPaymentAmount,
+                NoOfInstallment = dto.NoOfInstallment,
+                MonthlyInstallmentAmount = dto.MonthlyInstallmentAmount ?? 0m, // Fix: provide default value if null
                 CurrencyCode = dto.CurrencyCode,
                 IsRequiredBankInformation = dto.IsRequiredBankInformation,
                 IsProviderDeliveryProduct = dto.IsProviderDeliveryProduct,
@@ -198,6 +204,8 @@ namespace SuperCRM.Web.Controllers
                 IsThirdPartyProduct = model.IsThirdPartyProduct,
                 InstallmentApplicable = model.InstallmentApplicable,
                 DownPaymentAmount = model.DownPaymentAmount,
+                NoOfInstallment = model.NoOfInstallment,
+                MonthlyInstallmentAmount = model.MonthlyInstallmentAmount,
                 CurrencyCode = model.CurrencyCode,
                 IsRequiredBankInformation = model.IsRequiredBankInformation,
                 IsProviderDeliveryProduct = model.IsProviderDeliveryProduct,

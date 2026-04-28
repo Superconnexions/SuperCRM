@@ -57,7 +57,7 @@ namespace SuperCRM.Web.ViewModels.Products
         [Required]
         [StringLength(10)]
         [Display(Name = "Currency Code")]
-        public string CurrencyCode { get; set; } = "GBP";
+        public string CurrencyCode { get; set; } = "£"; // GBP
 
         [Display(Name = "Required Bank Information")]
         public bool IsRequiredBankInformation { get; set; }
@@ -83,6 +83,13 @@ namespace SuperCRM.Web.ViewModels.Products
 
         [Display(Name = "Display Order")]
         public int DisplayOrder { get; set; }
+
+        [Display(Name = "No of Installment")]
+        public int NoOfInstallment { get; set; }
+
+        [Display(Name = "Monthly Installment Amount")]
+        [Range(0, 999999999)]
+        public decimal MonthlyInstallmentAmount { get; set; }
 
         [StringLength(1000)]
         [Display(Name = "Product Display Notes")]
