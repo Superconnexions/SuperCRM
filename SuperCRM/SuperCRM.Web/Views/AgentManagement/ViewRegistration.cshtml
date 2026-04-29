@@ -1,0 +1,105 @@
+@model SuperCRM.Web.ViewModels.AgentManagement.AgentRegistrationEditViewModel
+
+@{
+    ViewData["Title"] = "View / Edit Agent Registration";
+}
+
+<h1>View / Edit Agent Registration</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="UpdateRegistration" method="post">
+    <input type="hidden" asp-for="AgentId" />
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="AgentCode" />
+    <input type="hidden" asp-for="Email" />
+    <input type="hidden" asp-for="IsApproved" />
+    <input type="hidden" asp-for="CreatedAt" />
+    <input type="hidden" asp-for="UpdatedAt" />
+    <input type="hidden" asp-for="ApprovedAt" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="AgentCode" class="form-label"></label>
+            <input asp-for="AgentCode" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="IsApproved" class="form-label"></label>
+            <input value="@(Model.IsApproved ? "Yes" : "No")" class="form-control" readonly />
+            <small class="form-text text-muted">IsApproved is maintained by Update Registration action.</small>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="PhoneNo" class="form-label"></label>
+            <input asp-for="PhoneNo" class="form-control" />
+            <span asp-validation-for="PhoneNo" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="MobileNo" class="form-label"></label>
+            <input asp-for="MobileNo" class="form-control" />
+            <span asp-validation-for="MobileNo" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="RegistrationStatus" class="form-label"></label>
+            <select asp-for="RegistrationStatus" asp-items="Model.RegistrationStatusOptions" class="form-select"></select>
+            <span asp-validation-for="RegistrationStatus" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3 d-flex align-items-end">
+            <div class="form-check">
+                <input asp-for="IsCommissionEligible" class="form-check-input" />
+                <label asp-for="IsCommissionEligible" class="form-check-label"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="CreatedAt" class="form-label"></label>
+            <input value="@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="ApprovedAt" class="form-label"></label>
+            <input value="@Model.ApprovedAt?.ToString("yyyy-MM-dd HH:mm")" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="UpdatedAt" class="form-label"></label>
+            <input value="@Model.UpdatedAt?.ToString("yyyy-MM-dd HH:mm")" class="form-control" readonly />
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Update Registration</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

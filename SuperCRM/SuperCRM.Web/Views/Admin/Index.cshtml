@@ -1,6 +1,42 @@
-﻿@{
-    ViewData["Title"] = "Admin Dashboard";
+﻿@using Microsoft.AspNetCore.Identity
+@using SuperCRM.Persistence.Identity
+@using SuperCRM.Shared
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+@{
+
+    @if (User.IsInRole(AppRoles.SuperAdmin))
+    {
+        ViewData["Title"] = "Supe Admin Dashboard";
+
+    }
+
+    @if (User.IsInRole(AppRoles.SuperCRMAdmin))
+    {
+        ViewData["Title"] = "Admin Dashboard";
+
+    }
+
+
+    
 }
 
-<h2>Admin Dashboard</h2>
-<p>Welcome to the admin area.</p>
+
+
+@if (User.IsInRole(AppRoles.SuperAdmin))
+{
+    <h2>Super Admin Dashboard</h2>
+    <p>Welcome to the super admin area.</p>
+}
+
+@if (User.IsInRole(AppRoles.SuperCRMAdmin))
+{
+
+    <h2>Admin Dashboard</h2>
+    <p>Welcome to the admin area.</p>
+
+}
+
+

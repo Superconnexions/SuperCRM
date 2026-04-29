@@ -97,6 +97,11 @@ builder.Services.AddScoped<IApplicationUserAccountService, ApplicationUserAccoun
 builder.Services.AddScoped<IAgentRegistrationService, AgentRegistrationService>();
 // END Registration Services
 
+// Register Agent Management dependencies:
+builder.Services.AddScoped<IAgentManagementRepository, AgentManagementRepository>();
+builder.Services.AddScoped<IAgentManagementService, AgentManagementService>();
+// END Agent Management Services
+
 builder.Services.AddScoped<IGeoLookupRepository, GeoLookupRepository>();
 builder.Services.AddScoped<IGeoLookupService, GeoLookupService>();
 

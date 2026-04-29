@@ -1,4 +1,4 @@
-SELECT 
+﻿SELECT 
    -- P.ProductId,
     ISNULL(PC.CategoryName, '') AS CategoryName,
     P.ProductCode,
@@ -41,7 +41,7 @@ SELECT
 	[NoOfInstallment] as [No of Installment],
 	 ISNULL(MonthlyInstallmentAmount,0) as 'Monthly Installment Amount',
 
-    -- BIT ? Yes/No
+    -- BIT → Yes/No
     CASE WHEN P.IsThirdPartyProduct = 1 THEN 'Yes' ELSE 'No' END AS IsProviderProduct,
     
     CASE WHEN P.IsRequiredBankInformation = 1 THEN 'Yes' ELSE 'No' END AS IsRequiredBankInformation,

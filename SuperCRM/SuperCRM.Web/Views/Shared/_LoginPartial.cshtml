@@ -7,16 +7,10 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        @if (User.IsInRole(AppRoles.SuperAdmin))
+        @if (User.IsInRole(AppRoles.SuperAdmin) || User.IsInRole(AppRoles.SuperCRMAdmin))
         {
 
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">SuperAdmin Dashboard</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="AdminUsers" asp-action="Index">Admin Users</a>
-            </li>
+            
 
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle text-dark"
@@ -28,6 +22,37 @@
                     Master Setup
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="masterSetupDropdown">
+
+                    @if (User.IsInRole(AppRoles.SuperAdmin))
+                    {
+
+                        <li>
+                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">SuperAdmin Dashboard</a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">Admin Users</a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" asp-controller="ProductBaseCommissions" asp-action="Index">
+                                Product base Commission
+                            </a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole(AppRoles.SuperCRMAdmin))
+                    {
+                        <li>
+                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                        </li>
+
+                    }
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="AgentManagement" asp-action="Index">Agent Management</a>
+                    </li>
+
                     <li>
                         <a class="dropdown-item" asp-controller="Providers" asp-action="Index">
                             Providers
@@ -71,26 +96,13 @@
                         </a>
                     </li>
 
-                    <li>
-                        <a class="dropdown-item" asp-controller="ProductBaseCommissions" asp-action="Index">
-                            Product base Commission
-                        </a>
-                    </li>
+                    
 
                 </ul>
             </li>
-@* 
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Providers" asp-action="Index">Providers</a>
-            </li> *@
+
         }
 
-        @if (User.IsInRole(AppRoles.SuperCRMAdmin))
-        {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
-            </li>
-        }
 
         @if (User.IsInRole(AppRoles.Agent))
         {
