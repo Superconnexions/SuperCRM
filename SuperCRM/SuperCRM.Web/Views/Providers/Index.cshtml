@@ -34,7 +34,7 @@
                                                         <div class="commissions-history">
                                                             <div class="commissions-tabs">
                                                                 <div class="tab-content">
-                                                                    <div id="daily-pay" class="tab-pane in active">
+                                                                    <div id="" class="tab-pane in active">
                                                                         <div class="commissions-pr tab-one">
                                                                             <h2 id="Agh2" style="max-width: none; top: -15px; color:blue;">Provider List <span> | Total Provider: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;">  @Model.Count() </span></h2>
                                                                             
@@ -136,12 +136,22 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
                $(".navbar").hide();
                //$(".footer").hide();    
               $(".side-bar-li-providers").addClass('active'); 
+
+        var dropdownMenuP = $('#masterSetupDropdownUl');
+        
+        // Toggle logic
+        if (dropdownMenuP.css('display') === 'none' || dropdownMenuP.hasClass('hidden')) {
+            dropdownMenuP.css('display', 'contents');
+        } else {
+            dropdownMenuP.css('display', 'none');
+        }
         });
     </script>
 }
