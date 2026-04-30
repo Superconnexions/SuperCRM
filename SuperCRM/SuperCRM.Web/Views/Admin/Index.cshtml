@@ -40,3 +40,297 @@
 }
 
 
+@section Style{
+      
+  <style>
+                    ::placeholder {
+                        color: darkgray !important;
+                        font-size: small !important;
+                    }
+                    .editIn {
+                        font-size: small !important;
+                    }
+                    .form-group {
+                      margin-top:10px;
+                    }
+                    .top-sec {
+                        padding: 0;
+                    }
+                </style>
+
+}
+
+ <partial name="_SideBarPartial" />
+ <div class="main main-dashboard-wrpper membership-main membership-overview-wrp">
+                   
+      <partial name="_TopBarPartial" />
+
+      <div class="main-wrapper new-dash-cls dash-account-cls">
+                        <div class="container-fluid">
+                            <div class="mwr-dash">
+                                <div class="row">
+                                    <div class="col-md-12 col-lg-12">
+                                        <div class="mwr-dash-account">
+                                            <div>
+                                                <div class="tab-content">
+                                                    <div id="account" class="tab-pane in active">
+                                                        <div class="account-form-cls">
+                                                            <div class="commissions-wrap">
+                                                                <div class="row">
+                                                                    <div class="col-md-12 col-lg-12">
+                                                                        <div class="commissions-history">
+                                                                            <div class="commissions-tabs">
+                                                                                <div class="tab-content">
+                                                                                    <div id="daily-pay" class="tab-pane in active">
+                                                                                        <div class="commissions-pr tab-one">
+                                                                                            <h2 id="Agh2" style="max-width: none; top: -15px; color:blue;">My Agent List <span> | Total Agent: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;"> 0</span></h2>
+                                                                                            @* <h2 id="Adh2" style="max-width: none; top: -15px; color:blue;">Admin List <span> | Total Admin: </span> <span class="Total-Vl" style="color:blue;font-weight:bold;"> 0</span></h2> *@
+                                                                                            <!-- Nav tabs -->
+                                                                                            <ul class="nav nav-tabs">
+                                                                                                <li class="nav-item">
+                                                                                                    <a class="nav-link active" id="AgentListId" data-bs-toggle="tab" href="#AgentListTab">Agent List</a>
+                                                                                                </li>
+                                                                                                <li class="nav-item">
+                                                                                                    <a class="nav-link" id="AdminListId1"  href="/AdminUsers">Admin List</a>
+                                                                                                </li>
+                                                                                                <!-- <li class="nav-item">
+                                                                                                     <a class="nav-link" data-bs-toggle="tab" href="#cancelAgent">Cancel Agent</a>
+                                                                                                    </li>-->
+                                                                                            </ul>
+
+                                                                                            <!-- Tab panes -->
+                                                                                            <div class="tab-content">
+                                                                                                <div class="tab-pane active" id="AgentListTab">
+                                                                                                    <div class="commissions-table commissions-table-one">
+                                                                                                        <div id="example_wrapper1" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                                                                                            <div class="row"><div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-12"><div id="example_filter" class="dataTables_filter" style="text-align: right !important;"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="Search here..." aria-controls="example" style="width: 300px; display: inline-block;"></label></div></div></div>
+                                                                                                            <div class="row">
+                                                                                                                <div class="col-sm-12" style=" overflow-x: scroll;">
+                                                                                                                    <table id="example12" class="table table-hover responsive nowrap dataTable no-footer dtr-inline" style="width: 100%; margin-top:1%!important; " role="grid" aria-describedby="example_info">
+                                                                                                                        <thead>
+                                                                                                                            <tr role="row">
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Date Earned: activate to sort column ascending">Agent Id</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Payment Date: activate to sort column ascending">First Name</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Last Name</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Email</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Verified</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Signup Date</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Status</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Action</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Detail: activate to sort column ascending"></th>
+                                                                                                                            </tr>
+                                                                                                                        </thead>
+                                                                                                                        <tbody>
+                                                                                                                            <tr role="row" class="even">
+                                                                                                                                <td tabindex="0">26001</td>
+                                                                                                                                <td>Tomas</td>
+                                                                                                                                <td>Lenda</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">tomas@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Inactive</td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Accept</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="odd">
+                                                                                                                                <td tabindex="0">26002</td>
+                                                                                                                                <td>Alber</td>
+                                                                                                                                <td>Jeen</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">alber@email.com</button></td>
+                                                                                                                                <td>No</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Inactive</td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Accept</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="even">
+                                                                                                                                <td tabindex="0">26003</td>
+                                                                                                                                <td>Sunfer</td>
+                                                                                                                                <td>Monda</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">sunfer@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Canceled</td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">No</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-warning">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="odd">
+                                                                                                                                <td tabindex="0">26001</td>
+                                                                                                                                <td>Josy</td>
+                                                                                                                                <td>Morger</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">josy@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Active</td>
+                                                                                                                                <td><button type="button" class="btn btn-success">Accepted</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="even">
+                                                                                                                                <td tabindex="0">26001</td>
+                                                                                                                                <td>Tomasu</td>
+                                                                                                                                <td>Nemada</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">tomasu@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Active</td>
+                                                                                                                                <td><button type="button" class="btn btn-success">Accepted</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                </div>
+                                                                                                            </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing 1 to 8 of 8 entries</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="example_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="example_previous"><a href="#" aria-controls="example" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="example" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item next disabled" id="example_next"><a href="#" aria-controls="example" data-dt-idx="2" tabindex="0" class="page-link">Next</a></li></ul></div></div></div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="tab-pane fade" id="AdminListTab">
+                                                                                                    <div class="commissions-table commissions-table-one">
+                                                                                                         <div id="example_wrapper2" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                                                                                            <div class="row"><div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-12"><div id="example_filter" class="dataTables_filter" style="text-align: right !important;"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="Search here..." aria-controls="example" style="width: 300px; display: inline-block;"></label></div></div></div>
+                                                                                                            <div class="row">
+                                                                                                                <div class="col-sm-12" style=" overflow-x: scroll;">
+                                                                                                                    <table id="example122" class="table table-hover responsive nowrap dataTable no-footer dtr-inline" style="width: 100%; margin-top:1%!important; " role="grid" aria-describedby="example_info">
+                                                                                                                        <thead>
+                                                                                                                            <tr role="row">
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Date Earned: activate to sort column ascending">Admin Id</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Payment Date: activate to sort column ascending">First Name</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Last Name</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Email</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Verified</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Signup Date</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Status</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Amount: activate to sort column ascending">Action</th>
+                                                                                                                                <th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" style="width: auto;" aria-label="Detail: activate to sort column ascending"></th>
+                                                                                                                            </tr>
+                                                                                                                        </thead>
+                                                                                                                        <tbody>
+                                                                                                                            <tr role="row" class="even">
+                                                                                                                                <td tabindex="0">26001</td>
+                                                                                                                                <td>Tomas</td>
+                                                                                                                                <td>Lenda</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">tomas@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Inactive</td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Accept</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="odd">
+                                                                                                                                <td tabindex="0">26002</td>
+                                                                                                                                <td>Alber</td>
+                                                                                                                                <td>Jeen</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">alber@email.com</button></td>
+                                                                                                                                <td>No</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Inactive</td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Accept</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="even">
+                                                                                                                                <td tabindex="0">26003</td>
+                                                                                                                                <td>Sunfer</td>
+                                                                                                                                <td>Monda</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">sunfer@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Canceled</td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">No</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-warning">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="odd">
+                                                                                                                                <td tabindex="0">26001</td>
+                                                                                                                                <td>Josy</td>
+                                                                                                                                <td>Morger</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">josy@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Active</td>
+                                                                                                                                <td><button type="button" class="btn btn-success">Accepted</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+                                                                                                                            <tr role="row" class="even">
+                                                                                                                                <td tabindex="0">26001</td>
+                                                                                                                                <td>Tomasu</td>
+                                                                                                                                <td>Nemada</td>
+                                                                                                                                <td><button type="button" class="btn btn-link">tomasu@email.com</button></td>
+                                                                                                                                <td>Yes</td>
+                                                                                                                                <td tabindex="0">02/01/2026</td>
+
+                                                                                                                                <td>Active</td>
+                                                                                                                                <td><button type="button" class="btn btn-success">Accepted</button></td>
+                                                                                                                                <td><button type="button" class="btn btn-primary">Cencel</button></td>
+                                                                                                                            </tr>
+
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                </div>
+                                                                                                            </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="example_info" role="status" aria-live="polite">Showing 1 to 8 of 8 entries</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="example_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="example_previous"><a href="#" aria-controls="example" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="example" data-dt-idx="1" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item next disabled" id="example_next"><a href="#" aria-controls="example" data-dt-idx="2" tabindex="0" class="page-link">Next</a></li></ul></div></div></div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="tab-pane fade" id="cancelAgent">
+                                                                                                    <div class="commissions-table commissions-table-one">
+
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                       
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ </div>
+
+@section Scripts {
+   <script type="text/javascript">
+        $(document).ready(function () {
+             $(".navbar").hide();
+             //$(".footer").hide();
+         $(".side-bar-li-admin-dash").addClass('active'); 
+       $("#Agh2").show();
+       // $("#Adh2").hide();
+       $(".Total-Vl").text(8);
+       $('#AgentListId').on('click', function() {
+            $("#Agh2").show();
+             // $("#Adh2").hide();
+             $(".Total-Vl").text(8);
+        });
+        // $('#AdminListId').on('click', function() {
+        //     $("#Agh2").hide();
+        //     $("#Adh2").show();
+        //      $(".Total-Vl").text(5);
+        // });
+      });
+    </script>
+}

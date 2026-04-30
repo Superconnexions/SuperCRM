@@ -3,16 +3,205 @@
 @{
     ViewData["Title"] = "Edit Provider";
 }
+@section Style {
+   
+    <link rel="stylesheet" type="text/css" href="/custom/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/custom/css/animate.css" />   
+     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/custom/css/style2.css" />
+    <link rel="stylesheet" type="text/css" href="/custom/css/responsive.css" />
+ <style>
+        .account-form-cls {
+           padding: 0 25px;
+        }
+        .nav-tabs {
+            border-bottom: 0;
+        }
+        .nav-item a{ border-radius:5px;}
 
-<h2>Edit Provider</h2>
+        .nav-tabs {
+    padding: 5px;
+    width: fit-content;
+    border-bottom: none;
+    background-color: #3e4042;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    position: relative;
+    z-index: 5;}
+
+    .cmr-quick-blk {
+     margin-top:-6%;
+    }
+
+ </style>
+}
+@* <h2>Edit Provider</h2>
 
 <form asp-action="Edit" method="post">
     <input asp-for="ProviderId" type="hidden" />
     <partial name="_ProviderForm" model="Model" />
     <button type="submit" class="btn btn-primary">Update</button>
     <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+</form> *@
+
+<partial name="_SideBarPartial" />
+<div class="main main-dashboard-wrpper">
+    <partial name="_TopBarPartial" />
+    <div class="main-wrapper">
+        <div class="container-fluid">
+            <div class="cmr-dash">
+                <div class="row">
+                    <div class="col-md-8 col-lg-12">
+                        <div class="cmr-vid-dash">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="cmr-vid-wrap">
+                                        <!-- Nav tabs -->
+                                        <ul class="nav nav-tabs">
+                                            <li class="nav-item">
+                                                <a asp-action="Index" class="nav-link btn" >Provider List</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a asp-action="Create" class=" nav-link btn " >Add Provider</a>
+                                            </li>
+                                                                              
+                                        </ul>
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="cmr-quick-blk">                                        
+                                        @* <h4 class="text-center" style="color: #00b4ff;">Add Provider</h4>  *@
+                                        <h2 style="font-size:28px;text-align: center; color:royalblue;">Edit Provider</h2>
+                                        <div class="cmr-cleint">
+                                            <div class="row">
+                                                <div class="cmr-dash-account">
+                                                    <form asp-action="Edit" method="post">
+                                                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                                                         <input asp-for="ProviderId" type="hidden" />
+                                                        <div class="tab-content">
+                                                            <div id="account" class="tab-pane in active">
+                                                                <div class="account-form-cls">
+                                                                    <div class="row">
+                                                                                                                                                 
+                                                                        <div class="col-lg-12">
+                                                                            <h4 style="margin: 3% 0 0 0;">Provider INFORMATION</h4>
+                                                                            <hr class="my-4" style="margin-top: 10px !important">
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>Provider Name</label>
+                                                                                            <input asp-for="ProviderName" type="text" class="form-control">
+                                                                                                <span asp-validation-for="ProviderName" class="text-danger"></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Provider Url</label>
+                                                                                                <input asp-for="ProviderUrl" type="text" class="form-control">
+                                                                                                    <span asp-validation-for="ProviderUrl" class="text-danger"></span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                               <div class="row marginTop3p">
+                                                                                        <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                <label>Contact Email</label>
+                                                                                                <input asp-for="ContactEmail" type="text" class="form-control">
+                                                                                                    <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                                                                                                </div>
+                                                                                               
+                                                                                            </div>
+                                                                                            <div class="col-lg-6">
+                                                                                                <div class="form-group">
+                                                                                                    <label>Contact Phone:</label>
+                                                                                                    <input asp-for="ContactPhone" type="text" class="form-control">
+                                                                                                        <span asp-validation-for="ContactPhone" class="text-danger"></span>
+                                                                                                    </div>
+                                                                                             </div>
+                                                                               </div>                                                                                                                                                                                         
+                                                                            </div> 
+                                                                            <div class="form-group-blk">
+                                                                            <div class="row marginTop3p">
+                                                                                         <div class="col-lg-6">
+                                                                                                        <div class="form-group">
+                                                                                                            <label>Provider Address</label>
+                                                                                                            <input asp-for="ProviderAddress" type="text" class="form-control">
+                                                                                                                <span asp-validation-for="ProviderAddress" class="text-danger"></span>
+                                                                                                            </div>
+                                                                                           </div>
+                                                                                          <div class="col-lg-6">
+                                                                                              <div class="form-group">                                                                                                            
+                                                                                                                                                                                                                           
+
+                                                                                                </div>
+                                                                                          </div>
+                                                                            </div>
+                                                                            </div>      
+                                                                             <div class="from-group-blk">
+                                                                                 <div class="row marginTop3p">
+                                                                                       <div class="col-lg-6">
+                                                                                            <div class="form-group">
+                                                                                                  <input asp-for="IsActive" type="checkbox" class="form-control1">
+                                                                                                  <span asp-validation-for="IsActive" class="text-danger"></span>
+                                                                                                  <label>IsActive</label>
+                                                                                            </div>
+                                                                                       </div>
+                                                                                      <div class="col-lg-6">                                                                                                                
+                                                                                            <div class="form-group">                                                                                                               
+                                                                                                                         
+                                                                                                <div >
+                                                                                                        <a asp-action="Index" class="btn btn-secondary">Back</a> &emsp;
+                                                                                                       @*  <button type="submit" class="btn btn-primary signup-btn form__submit">Submit</button> *@
+                                                                                                        <button type="submit" class="btn btn-primary">Update</button>
+                                                                                                   </div>                                                                                                                         
+                                                                                                                        
+                                                                                             </div>                                                                                                               
+                                                                                      </div>
+                                                                                 </div>
+                                                                              </div>
+                                                                        </div>
+                                                                                                                                                                                    
+                                                                      
+                                                                     </div>
+                                                                </div>
+                                                            </div>
+                                                         </div>
+                                                     </form>                                                                                            
+                                                 </div>
+                                            </div>
+                                         </div>
+                                    </div>
+                                </div>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+             </div>
+         </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+     <script type="text/javascript">
+                                $(document).ready(function () {
+                                       $(".navbar").hide();
+                                       //$(".footer").hide();
+                                      $(".side-bar-li-providers").addClass('active');
+
+                                var dropdownMenuP = $('#masterSetupDropdownUl');
+        
+                                // Toggle logic
+                                if (dropdownMenuP.css('display') === 'none' || dropdownMenuP.hasClass('hidden')) {
+                                    dropdownMenuP.css('display', 'contents');
+                                } else {
+                                    dropdownMenuP.css('display', 'none');
+                                }
+                                });
+                            </script>
 }
