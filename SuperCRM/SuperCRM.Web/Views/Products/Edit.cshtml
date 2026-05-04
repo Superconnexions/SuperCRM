@@ -1,3 +1,4 @@
+@* 
 @model SuperCRM.Web.ViewModels.Products.ProductCreateEditViewModel
 
 @{
@@ -13,8 +14,520 @@
     <a asp-action="Index" class="btn btn-secondary">Back</a>
 </form>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/products-form.js"></script>
+ @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/products-form.js"></script>
+       
+    }
+
+ *@
+
+
+ @using System.Linq
+@model SuperCRM.Web.ViewModels.Products.ProductCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Product";
 }
+@section Style {
+     
+    <link rel="stylesheet" type="text/css" href="/custom/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/custom/css/animate.css" />   
+     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/custom/css/style2.css" />
+    <link rel="stylesheet" type="text/css" href="/custom/css/responsive.css" />
+ <style>
+        .account-form-cls {
+           padding: 0 25px;
+        }
+        .nav-tabs {
+            border-bottom: 0;
+        }
+        .nav-item a{ border-radius:5px;}
+
+        .nav-tabs {
+    padding: 5px;
+    width: fit-content;
+    border-bottom: none;
+    background-color: #3e4042;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    position: relative;
+    z-index: 5;}
+
+        .cmr-quick-blk {
+     margin-top:-6%;
+    }
+    #product-image-rows * {
+      color:#d9d9d9;
+    }
+    .main-wrapper{
+        margin-bottom: 10px;    padding-bottom: 20px;
+    }
+ </style>
+}
+
+ <partial name="_SideBarPartial" />
+<div class="main main-dashboard-wrpper">
+    <partial name="_TopBarPartial" />
+    <div class="main-wrapper">
+        <div class="container-fluid">
+            <div class="cmr-dash">
+                <div class="row">
+                    <div class="col-md-8 col-lg-12">
+                        <div class="cmr-vid-dash">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="cmr-vid-wrap">
+                                        <!-- Nav tabs -->
+                                        <ul class="nav nav-tabs">
+                                            <li class="nav-item">
+                                                <a asp-action="Index" class="nav-link btn">Product List</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a asp-action="Create" class=" nav-link btn ">Add Product</a>
+                                            </li>
+                                                                              
+                                        </ul>
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="cmr-quick-blk">                                      
+                                        <h2 style="font-size:28px;text-align: center; color:royalblue;">Edit Product</h2>
+                                        <div class="cmr-cleint">
+                                            <div class="row">
+                                                <div class="cmr-dash-account">
+                                                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                                                         <input asp-for="ProductId" type="hidden" />
+                                                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                                                        <div class="tab-content">
+                                                            <div id="account" class="tab-pane in active">
+                                                                <div class="account-form-cls">
+                                                                    <div class="row">                                                                                                                                                 
+                                                                        <div class="col-lg-12">
+                                                                            <h4 style="margin: 3% 0 0 0;">Product INFORMATION</h4>
+                                                                            <hr class="my-4" style="margin-top: 10px !important">
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>Category Id</label>
+                                                                                            <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+                                                                                                <option value="">-- Select Category --</option>
+                                                                                            </select>
+                                                                                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>Sales Unit Id</label>
+                                                                                            <select asp-for="SalesUnitId" asp-items="Model.SalesUnitOptions" class="form-select">
+                                                                                                <option value="">-- Select Sales Unit --</option>
+                                                                                            </select>
+                                                                                            <span asp-validation-for="SalesUnitId" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <label>ProductCode</label>
+                                                                                            <input asp-for="ProductCode" class="form-control" />
+                                                                                            <span asp-validation-for="ProductCode" class="text-danger"></span>
+                                                                                        </div>
+                                                                                               
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <label>ProductType</label>
+                                                                                            <select asp-for="ProductType" asp-items="Model.ProductTypeOptions" class="form-select"></select>
+                                                                                            <span asp-validation-for="ProductType" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <label>CustomerType</label>
+                                                                                            <select asp-for="CustomerType" asp-items="Model.CustomerTypeOptions" class="form-select">
+                                                                                                <option value="">-- Optional --</option>
+                                                                                            </select>
+                                                                                            <span asp-validation-for="CustomerType" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">                                                                                   
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>ProductName</label>
+                                                                                            <input asp-for="ProductName" class="form-control" />
+                                                                                            <span asp-validation-for="ProductName" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                     <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>ProductDisplayName</label>
+                                                                                            <input asp-for="ProductDisplayName" class="form-control" />
+                                                                                            <span asp-validation-for="ProductDisplayName" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">                                                                                   
+                                                                                    <div class="col-lg-12">
+                                                                                        <div class="form-group">
+                                                                                            <label>ProductDescription</label>
+                                                                                            <textarea asp-for="ProductDescription" class="form-control" rows="3"></textarea>
+                                                                                            <span asp-validation-for="ProductDescription" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <label>BasePriceType</label>
+                                                                                            <select asp-for="BasePriceType" asp-items="Model.BasePriceTypeOptions" class="form-select"></select>
+                                                                                            <span asp-validation-for="BasePriceType" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <label>BasePrice</label>
+                                                                                            <input asp-for="BasePrice" class="form-control" />
+                                                                                            <span asp-validation-for="BasePrice" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                     <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <label>CurrencyCode</label>
+                                                                                            <input asp-for="CurrencyCode" class="form-control" />
+                                                                                            <span asp-validation-for="CurrencyCode" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>                                                                          
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>NoOfInstallment</label>
+                                                                                            <input asp-for="NoOfInstallment" class="form-control" />
+                                                                                            <span asp-validation-for="NoOfInstallment" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>MonthlyInstallmentAmount</label>
+                                                                                            <input asp-for="MonthlyInstallmentAmount" class="form-control" />
+                                                                                             <span asp-validation-for="MonthlyInstallmentAmount" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>DownPaymentAmount</label>
+                                                                                            <input asp-for="DownPaymentAmount" class="form-control" />
+                                                                                            <span asp-validation-for="DownPaymentAmount" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <label>DisplayOrder</label>
+                                                                                            <input asp-for="DisplayOrder" class="form-control" />
+                                                                                            <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsThirdPartyProduct" class="form-check-input" />
+                                                                                            <label>IsThirdPartyProduct</label>                                                                                           
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="InstallmentApplicable" class="form-check-input" />
+                                                                                            <label>InstallmentApplicable</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsRequiredBankInformation" class="form-check-input" />
+                                                                                            <label>IsRequiredBankInformation</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsProviderDeliveryProduct" class="form-check-input" />
+                                                                                            <label>IsProviderDeliveryProduct</label>                                                                                           
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsPriceEditable" class="form-check-input" />
+                                                                                            <label>IsPriceEditable</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                     <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsPortalVisible" class="form-check-input" />
+                                                                                            <label>IsPortalVisible</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsPortalOrderEnabled" class="form-check-input" />
+                                                                                            <label>IsPortalOrderEnabled</label>                                                                                           
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group">
+                                                                                            <input asp-for="IsActive" class="form-check-input" />
+                                                                                            <label>IsActive</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-12">
+                                                                                        <div class="form-group">
+                                                                                            <label>ProductDisplayNotes</label>
+                                                                                            <textarea asp-for="ProductDisplayNotes" class="form-control" rows="3"></textarea>
+                                                                                            <span asp-validation-for="ProductDisplayNotes" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>                                                                                  
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">                                                                                   
+                                                                                    <div class="col-lg-12">
+                                                                                        <div class="form-group">
+                                                                                            <label>PaymentNotes</label>
+                                                                                            <textarea asp-for="PaymentNotes" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="PaymentNotes" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-12">
+                                                                                        <div class="form-group">
+                                                                                            <label>Remarks</label>
+                                                                                            <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                                                                                            <span asp-validation-for="Remarks" class="text-danger"></span>
+                                                                                        </div>
+                                                                                    </div>                                                                                   
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                                                <h4 class="mb-0">Product Images</h4>
+                                                                                                
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                               <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                                                
+                                                                                                <button type="button" id="add-image-row" class="btn btn-sm btn-outline-primary">Add Image Row</button>
+                                                                                            </div>                                                                                      
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                             <div class="form-group-blk">
+                                                                                <div class="row marginTop3p">                                                                                    
+                                                                                    <div class="col-lg-12">
+                                                                                        <div class="form-group">
+                                                                                            <div id="product-image-rows">
+                                                                                                @for (var i = 0; i < Model.Images.Count; i++)
+                                                                                                {
+                                                                                                    <div class="card mb-3 product-image-row">
+                                                                                                        <div class="card-body">
+                                                                                                            <input asp-for="Images[@i].ProductImageId" type="hidden" />
+                                                                                                            <input asp-for="Images[@i].ExistingImageUrl" type="hidden" />
+
+                                                                                                            <div class="row">
+                                                                                                                <div class="col-md-4 mb-3">
+                                                                                                                    <label class="form-label">Current Image</label>
+                                                                                                                    @if (!string.IsNullOrWhiteSpace(Model.Images[i].ExistingImageUrl))
+                                                                                                                    {
+                                                                                                                        <div class="mb-2">
+                                                                                                                            <img src="@Model.Images[i].ExistingImageUrl" alt="Product Image" style="max-width:150px; max-height:100px;" />
+                                                                                                                        </div>
+                                                                                                                        <div><small>@Model.Images[i].ExistingImageUrl</small></div>
+                                                                                                                    }
+                                                                                                                    else
+                                                                                                                    {
+                                                                                                                        <div><small>No image selected yet.</small></div>
+                                                                                                                    }
+                                                                                                                </div>
+
+                                                                                                                <div class="col-md-4 mb-3">
+                                                                                                                    <label asp-for="Images[@i].UploadFile" class="form-label"></label>
+                                                                                                                    <input asp-for="Images[@i].UploadFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                                                                                                                    <span asp-validation-for="Images[@i].UploadFile" class="text-danger"></span>
+                                                                                                                </div>
+
+                                                                                                                <div class="col-md-2 mb-3">
+                                                                                                                    <label asp-for="Images[@i].DisplayOrder" class="form-label"></label>
+                                                                                                                    <input asp-for="Images[@i].DisplayOrder" class="form-control" />
+                                                                                                                    <span asp-validation-for="Images[@i].DisplayOrder" class="text-danger"></span>
+                                                                                                                </div>
+
+                                                                                                                <div class="col-md-2">
+                                                                                                                    <div class="form-check mt-4">
+                                                                                                                        <input asp-for="Images[@i].IsPrimary" class="form-check-input product-image-primary" />
+                                                                                                                        <label asp-for="Images[@i].IsPrimary" class="form-check-label"></label>
+                                                                                                                    </div>
+                                                                                                                    <div class="form-check mt-2">
+                                                                                                                        <input asp-for="Images[@i].RemoveImage" class="form-check-input" />
+                                                                                                                        <label asp-for="Images[@i].RemoveImage" class="form-check-label"></label>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                }
+                                                                                            </div>
+                                                                                           
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="from-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                           <script type="text/template" id="product-image-row-template">
+                                                                                            <div class="card mb-3 product-image-row">
+                                                                                                <div class="card-body">
+                                                                                                    <input name="Images[__index__].ProductImageId" type="hidden" value="" />
+                                                                                                    <input name="Images[__index__].ExistingImageUrl" type="hidden" value="" />
+
+                                                                                                    <div class="row">
+                                                                                                        <div class="col-md-4 mb-3">
+                                                                                                            <label class="form-label">Current Image</label>
+                                                                                                            <div><small>No image selected yet.</small></div>
+                                                                                                        </div>
+
+                                                                                                        <div class="col-md-4 mb-3">
+                                                                                                            <label class="form-label" for="Images___index___UploadFile">Image File</label>
+                                                                                                            <input name="Images[__index__].UploadFile" id="Images___index___UploadFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                                                                                                        </div>
+
+                                                                                                        <div class="col-md-2 mb-3">
+                                                                                                            <label class="form-label" for="Images___index___DisplayOrder">Display Order</label>
+                                                                                                            <input name="Images[__index__].DisplayOrder" id="Images___index___DisplayOrder" class="form-control" value="0" />
+                                                                                                        </div>
+
+                                                                                                        <div class="col-md-2">
+                                                                                                            <div class="form-check mt-4">
+                                                                                                                <input name="Images[__index__].IsPrimary" id="Images___index___IsPrimary" class="form-check-input product-image-primary" type="checkbox" value="true" />
+                                                                                                                <input name="Images[__index__].IsPrimary" type="hidden" value="false" />
+                                                                                                                <label class="form-check-label" for="Images___index___IsPrimary">Primary</label>
+                                                                                                            </div>
+                                                                                                            <div class="form-check mt-2">
+                                                                                                                <input name="Images[__index__].RemoveImage" id="Images___index___RemoveImage" class="form-check-input" type="checkbox" value="true" />
+                                                                                                                <input name="Images[__index__].RemoveImage" type="hidden" value="false" />
+                                                                                                                <label class="form-check-label" for="Images___index___RemoveImage">Remove</label>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            </script>
+                                                                                        </div>
+                                                                                        <div class="col-lg-6">
+                                                                                           @*  <div class="form-group">                                                                                                                         
+                                                                                                <div>
+                                                                                                    <a asp-action="Index" class="btn btn-secondary">Back</a> &emsp;
+                                                                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                                                                </div>
+                                                                                                                        
+                                                                                            </div> *@
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>                                                                                                                                                                                  
+                                                                            <div class="from-group-blk">
+                                                                                <div class="row marginTop3p">
+                                                                                     <div class="col-lg-6">
+                                                                                            <div class="form-group">                                                                                                                         
+                                                                                                <div>
+                                                                                                    <a asp-action="Index" class="btn btn-secondary">Back</a> &emsp;
+                                                                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                                                                </div>
+                                                                                                                        
+                                                                                            </div>
+                                                                                        </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                      </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+
+
+ @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/products-form.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                   $(".navbar").hide();
+                   //$(".footer").hide();
+                  $(".side-bar-li-products").addClass('active');
+
+            var dropdownMenuP = $('#masterSetupDropdownUl');
+        
+            // Toggle logic
+            if (dropdownMenuP.css('display') === 'none' || dropdownMenuP.hasClass('hidden')) {
+                dropdownMenuP.css('display', 'contents');
+            } else {
+                dropdownMenuP.css('display', 'none');
+            }
+            });
+        </script>
+    }
 

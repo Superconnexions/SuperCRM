@@ -4,7 +4,14 @@
 @{
     ViewData["Title"] = "Products";
 }
-
+@section Style {
+    <style>
+        .main-wrapper {
+            margin-bottom: 10px;
+            padding-bottom: 20px;
+        }
+    </style>
+}
 @* <h2>Products</h2> *@
 
 @if (TempData["SuccessMessage"] != null)
@@ -62,8 +69,7 @@
             <div class="mwr-dash">
                 <div class="row">
                     <div class="col-md-12 col-lg-12">
-                        <div class="mwr-dash-account">
-                            <div>
+                        <div class="mwr-dash-account">                           
                                 <div class="tab-content">
                                     <div id="account" class="tab-pane in active">
                                         <div class="account-form-cls">
@@ -95,7 +101,7 @@
                                                                                         <div id="example_wrapper1" class="dataTables_wrapper dt-bootstrap4 no-footer">
                                                                                             <div class="row"><div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-12"><div id="example_filter" class="dataTables_filter" style="text-align: right !important;"><label>Search:<input type="search" class="form-control form-control-sm" placeholder="Search here..." aria-controls="example" style="width: 300px; display: inline-block;"></label></div></div></div>
                                                                                             <div class="row">
-                                                                                                <div class="col-sm-12" style=" overflow-x: scroll;">
+                                                                                                <div class="col-sm-12" style="max-height:500px; overflow-x: scroll;">
                                                                                                     <table id="example12" class="table table-hover responsive nowrap dataTable no-footer dtr-inline" style="width: 100%; margin-top:1%!important; " role="grid" aria-describedby="example_info">
                                                                                                         <thead>
                                                                                                             <tr role="row">
@@ -166,8 +172,7 @@
                                     </div>
 
 
-                                </div>
-                            </div>
+                                </div>                            
                         </div>
                     </div>
                    
