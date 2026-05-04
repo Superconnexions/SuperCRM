@@ -23,6 +23,8 @@ namespace SuperCRM.Persistence.Repositories
                 .AsNoTracking()
                 .Include(x => x.Product)
                 .Include(x => x.VariantType)
+                .OrderBy(x => x.Product.ProductName ?? "")
+                .ThenBy(x => x.DisplayOrder)
                 .ToListAsync(cancellationToken);
         }
 

@@ -67,5 +67,13 @@ LEFT JOIN ProductCategories PC
     ON P.CategoryId = PC.CategoryId
 LEFT JOIN SalesUnits SU 
     ON P.SalesUnitId = SU.SalesUnitId
+	where P.IsThirdPartyProduct = 1
+	--AND P.ProductCode IN ('CARD-MACH-WORLDPAY-PKG2','CARD-MACH-ANYOTHER-PKG1')
+	--AND P.IsActive = 0
+	
+
+	--UPDATE Products
+	--SET IsActive = 0
+	--WHERE ProductCode IN ('CARD-MACH-WORLDPAY-PKG2','CARD-MACH-ANYOTHER-PKG1')
 
 	order by P.CustomerType, CategoryName, ISNULL(P.DisplayOrder, 0), P.ProductName
