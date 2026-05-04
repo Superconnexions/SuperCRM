@@ -24,6 +24,8 @@ namespace SuperCRM.Persistence.Repositories
                 .Include(x => x.Category)
                 .Include(x => x.SalesUnit)
                 .Include(x => x.ProductImages)
+                .OrderBy(x => x.DisplayOrder)
+                .ThenBy(x => x.ProductCode)
                 .ToListAsync(cancellationToken);
         }
 
