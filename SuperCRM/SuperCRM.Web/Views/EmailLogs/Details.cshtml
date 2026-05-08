@@ -1,0 +1,46 @@
+@model SuperCRM.Application.DTOs.EmailSettings.EmailLogDetailsDto
+
+@{
+    ViewData["Title"] = "Email Log Details";
+}
+
+<h1>Email Log Details</h1>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">To</dt><dd class="col-sm-9">@Model.ToEmail</dd>
+            <dt class="col-sm-3">Cc</dt><dd class="col-sm-9">@Model.CcEmail</dd>
+            <dt class="col-sm-3">Bcc</dt><dd class="col-sm-9">@Model.BccEmail</dd>
+            <dt class="col-sm-3">Subject</dt><dd class="col-sm-9">@Model.Subject</dd>
+            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@(Model.IsSent ? "Sent" : "Failed")</dd>
+            <dt class="col-sm-3">Created At</dt><dd class="col-sm-9">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+            <dt class="col-sm-3">Sent At</dt><dd class="col-sm-9">@Model.SentAt?.ToString("yyyy-MM-dd HH:mm")</dd>
+            <dt class="col-sm-3">Source</dt><dd class="col-sm-9">@Model.SourceModule</dd>
+            <dt class="col-sm-3">Error</dt><dd class="col-sm-9 text-danger">@Model.ErrorMessage</dd>
+        </dl>
+    </div>
+</div>
+
+<h4>Full Body</h4>
+@if (Model.IsHtml)
+{
+    <div class="border rounded p-3 bg-light">
+        @Html.Raw(Model.Body)
+    </div>
+}
+else
+{
+    <pre class="border rounded p-3 bg-light">@Model.Body</pre>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to Logs</a>
+    @if (!Model.IsSent)
+    {
+        <form asp-action="Resend" method="post" class="d-inline">
+            <input type="hidden" name="id" value="@Model.EmailLogId" />
+            <button type="submit" class="btn btn-warning" onclick="return confirm('Resend this failed email?');">Resend</button>
+        </form>
+    }
+</div>

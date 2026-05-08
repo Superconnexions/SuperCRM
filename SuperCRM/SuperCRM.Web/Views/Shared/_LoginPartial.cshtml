@@ -39,6 +39,12 @@
                                 Product base Commission
                             </a>
                         </li>
+
+                        <li>
+                            <a class="dropdown-item" asp-controller="EmailLogs" asp-action="Index">
+                                Email Logs
+                            </a>
+                        </li>
                     }
 
                     @if (User.IsInRole(AppRoles.SuperCRMAdmin))

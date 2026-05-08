@@ -40,9 +40,7 @@ namespace SuperCRM.Infrastructure.Email
         {
             var setting = await _emailSettingRepository.GetDefaultActiveAsync(cancellationToken);
             if (setting == null)
-            {
                 return new SendEmailResultDto { Success = false, Message = "No active default email setting found." };
-            }
 
             var log = new EmailLog
             {
@@ -52,6 +50,7 @@ namespace SuperCRM.Infrastructure.Email
                 CcEmail = request.CcEmail,
                 BccEmail = request.BccEmail,
                 Subject = request.Subject,
+                Body = request.Body,
                 BodyPreview = request.Body.Length > 1000 ? request.Body[..1000] : request.Body,
                 IsHtml = request.IsHtml,
                 IsSent = false,
@@ -74,12 +73,11 @@ namespace SuperCRM.Infrastructure.Email
                     bodyBuilder.HtmlBody = request.Body;
                 else
                     bodyBuilder.TextBody = request.Body;
-
                 message.Body = bodyBuilder.ToMessageBody();
 
-                //using var smtp = new SmtpClient();
                 using var smtp = new MailKit.Net.Smtp.SmtpClient();
                 var secureSocketOption = setting.EnableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto;
+
                 await smtp.ConnectAsync(setting.SmtpServer, setting.Port, secureSocketOption, cancellationToken);
                 await smtp.AuthenticateAsync(setting.Username, _encryptionService.Decrypt(setting.EncryptedPassword), cancellationToken);
                 await smtp.SendAsync(message, cancellationToken);

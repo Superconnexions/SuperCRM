@@ -1,7 +1,6 @@
-
-namespace SuperCRM.Domain.Entities
+namespace SuperCRM.Application.DTOs.EmailSettings
 {
-    public class EmailLog
+    public class EmailLogDetailsDto
     {
         public Guid EmailLogId { get; set; }
         public Guid? EmailSettingId { get; set; }
@@ -17,10 +16,5 @@ namespace SuperCRM.Domain.Entities
         public string? ErrorMessage { get; set; }
         public string? SourceModule { get; set; }
         public DateTime CreatedAt { get; set; }
-        public Guid? CreatedByUserId { get; set; }
-
-        public EmailSetting? EmailSetting { get; set; }
-
-
     }
 }

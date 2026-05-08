@@ -697,16 +697,17 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.ToTable("EmailLogs");
                 entity.HasKey(e => e.EmailLogId);
                 entity.Property(e => e.EmailLogId).ValueGeneratedNever();
-                entity.Property(e => e.ToEmail).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.ToEmail).HasMaxLength(300).IsRequired();
                 entity.Property(e => e.CcEmail).HasMaxLength(500);
                 entity.Property(e => e.BccEmail).HasMaxLength(500);
                 entity.Property(e => e.Subject).HasMaxLength(300).IsRequired();
                 entity.Property(e => e.BodyPreview).HasMaxLength(1000);
-                entity.Property(e => e.IsHtml).IsRequired();
-                entity.Property(e => e.IsSent).IsRequired();
-                entity.Property(e => e.SentAt).HasColumnType("datetime2");
+                entity.Property(e => e.Body).HasColumnType("nvarchar(max)");
+                entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
                 entity.Property(e => e.SourceModule).HasMaxLength(100);
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
+                entity.Property(e => e.SentAt).HasColumnType("datetime2");
+
 
                 entity.HasOne(e => e.EmailSetting)
                     .WithMany(e => e.EmailLogs)

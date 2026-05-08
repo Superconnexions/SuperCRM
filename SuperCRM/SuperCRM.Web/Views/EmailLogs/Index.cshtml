@@ -1,0 +1,141 @@
+@model SuperCRM.Web.ViewModels.EmailSettings.EmailLogIndexViewModel
+
+@{
+    ViewData["Title"] = "Email Logs";
+}
+
+<h1>Email Logs</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input name="searchText" value="@Model.SearchText" class="form-control" placeholder="To, subject, source, error" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Status</label>
+        <select name="isSent" class="form-select">
+            <option value="">All</option>
+            <option value="true" selected="@(Model.IsSent == true)">Sent</option>
+            <option value="false" selected="@(Model.IsSent == false)">Failed</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Page Size</label>
+        <select name="pageSize" class="form-select">
+            <option value="10" selected="@(Model.PageSize == 10)">10</option>
+            <option value="20" selected="@(Model.PageSize == 20)">20</option>
+            <option value="50" selected="@(Model.PageSize == 50)">50</option>
+            <option value="100" selected="@(Model.PageSize == 100)">100</option>
+        </select>
+    </div>
+    <div class="col-md-3 d-flex align-items-end gap-2">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a asp-action="Index" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
+<div class="mb-2">
+    <strong>Total:</strong> @Model.Logs.TotalRecords
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Created At</th>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Sent At</th>
+            <th>Error</th>
+            <th>Source</th>
+            <th style="width:170px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model.Logs.Items.Any())
+    {
+        foreach (var item in Model.Logs.Items)
+        {
+            <tr>
+                <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.ToEmail</td>
+                <td>@item.Subject</td>
+                <td>
+                    @if (item.IsSent)
+                    {
+                        <span class="badge bg-success">Sent</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Failed</span>
+                    }
+                </td>
+                <td>@item.SentAt?.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.ErrorMessage</td>
+                <td>@item.SourceModule</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.EmailLogId" class="btn btn-sm btn-info">View</a>
+                    @if (!item.IsSent)
+                    {
+                        <form asp-action="Resend" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.EmailLogId" />
+                            <button type="submit" class="btn btn-sm btn-warning"
+                                    onclick="return confirm('Resend this failed email?');">
+                                Resend
+                            </button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr><td colspan="8" class="text-center">No email logs found.</td></tr>
+    }
+    </tbody>
+</table>
+
+@if (Model.Logs.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(Model.Logs.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-pageNumber="@(Model.Logs.PageNumber - 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-isSent="@Model.IsSent"
+                   asp-route-searchText="@Model.SearchText">Previous</a>
+            </li>
+            @for (var i = 1; i <= Model.Logs.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Logs.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-pageNumber="@i"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-isSent="@Model.IsSent"
+                       asp-route-searchText="@Model.SearchText">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.Logs.HasNextPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-pageNumber="@(Model.Logs.PageNumber + 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-isSent="@Model.IsSent"
+                   asp-route-searchText="@Model.SearchText">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
