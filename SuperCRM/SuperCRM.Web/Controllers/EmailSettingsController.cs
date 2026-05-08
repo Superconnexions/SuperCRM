@@ -166,24 +166,6 @@ namespace SuperCRM.Web.Controllers
             return View(vm);
         }
 
-        //public async Task<IActionResult> Logs(CancellationToken cancellationToken = default)
-        //{
-        //    var logs = await _emailLogService.GetRecentAsync(100, cancellationToken);
-        //    var vm = logs.Select(x => new EmailLogListItemViewModel
-        //    {
-        //        EmailLogId = x.EmailLogId,
-        //        ToEmail = x.ToEmail,
-        //        Subject = x.Subject,
-        //        IsSent = x.IsSent,
-        //        SentAt = x.SentAt,
-        //        ErrorMessage = x.ErrorMessage,
-        //        SourceModule = x.SourceModule,
-        //        CreatedAt = x.CreatedAt
-        //    }).ToList();
-
-        //    return View(vm);
-        //}
-
         private Guid GetUserId()
         {
             var raw = User.FindFirstValue(ClaimTypes.NameIdentifier);
