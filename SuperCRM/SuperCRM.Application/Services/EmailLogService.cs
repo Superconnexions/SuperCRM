@@ -63,7 +63,20 @@ namespace SuperCRM.Application.Services
             if (string.IsNullOrWhiteSpace(body))
                 return (false, "Email body is empty. Resend cannot continue.");
 
-            var result = await _emailSenderService.SendAsync(new SendEmailRequestDto
+            //var result = await _emailSenderService.SendAsync(new SendEmailRequestDto
+            //{
+            //    ToEmail = log.ToEmail,
+            //    CcEmail = log.CcEmail,
+            //    BccEmail = log.BccEmail,
+            //    Subject = log.Subject,
+            //    Body = body,
+            //    IsHtml = log.IsHtml,
+            //    SourceModule = "EmailLogs-Resend",
+            //    CreatedByUserId = requestedByUserId
+            //}, cancellationToken);
+
+            var result = await _emailSenderService.SendWithoutCreatingLogAsync(
+            new SendEmailRequestDto
             {
                 ToEmail = log.ToEmail,
                 CcEmail = log.CcEmail,
@@ -73,9 +86,30 @@ namespace SuperCRM.Application.Services
                 IsHtml = log.IsHtml,
                 SourceModule = "EmailLogs-Resend",
                 CreatedByUserId = requestedByUserId
-            }, cancellationToken);
+            },
+            cancellationToken);
 
-            return (result.Success, result.Message);
+
+            if (result.Success)
+            {
+                log.IsSent = true;
+                log.SentAt = DateTime.UtcNow;
+                log.ErrorMessage = null;
+                log.SourceModule = "EmailLogs-Resent";
+
+                await _emailLogRepository.UpdateAsync(log, cancellationToken);
+                await _emailLogRepository.SaveChangesAsync(cancellationToken);
+
+                return (true, "Failed email resent successfully.");
+            }
+
+            log.ErrorMessage = result.Message;
+            log.SourceModule = "EmailLogs-Resend-Failed";
+
+            await _emailLogRepository.UpdateAsync(log, cancellationToken);
+            await _emailLogRepository.SaveChangesAsync(cancellationToken);
+
+            return (false, result.Message);
         }
     }
 }

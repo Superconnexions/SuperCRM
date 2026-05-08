@@ -23,6 +23,74 @@ namespace SuperCRM.Infrastructure.Email
             _encryptionService = encryptionService;
         }
 
+        public async Task<SendEmailResultDto> SendWithoutCreatingLogAsync(SendEmailRequestDto request,CancellationToken cancellationToken = default)
+        {
+            var setting = await _emailSettingRepository.GetDefaultActiveAsync(cancellationToken);
+            if (setting == null)
+            {
+                return new SendEmailResultDto
+                {
+                    Success = false,
+                    Message = "No active default email setting found."
+                };
+            }
+
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(setting.SenderName, setting.SenderEmail));
+
+                AddAddresses(message.To, request.ToEmail);
+                AddAddresses(message.Cc, request.CcEmail);
+                AddAddresses(message.Bcc, request.BccEmail);
+
+                message.Subject = request.Subject;
+
+                var bodyBuilder = new BodyBuilder();
+
+                if (request.IsHtml)
+                    bodyBuilder.HtmlBody = request.Body;
+                else
+                    bodyBuilder.TextBody = request.Body;
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                using var smtp = new MailKit.Net.Smtp.SmtpClient();
+
+                var secureSocketOption = setting.EnableSsl
+                    ? SecureSocketOptions.StartTls
+                    : SecureSocketOptions.Auto;
+
+                await smtp.ConnectAsync(
+                    setting.SmtpServer,
+                    setting.Port,
+                    secureSocketOption,
+                    cancellationToken);
+
+                await smtp.AuthenticateAsync(
+                    setting.Username,
+                    _encryptionService.Decrypt(setting.EncryptedPassword),
+                    cancellationToken);
+
+                await smtp.SendAsync(message, cancellationToken);
+                await smtp.DisconnectAsync(true, cancellationToken);
+
+                return new SendEmailResultDto
+                {
+                    Success = true,
+                    Message = "Email sent successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new SendEmailResultDto
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
         public Task<SendEmailResultDto> SendTestEmailAsync(string toEmail, Guid? requestedByUserId, CancellationToken cancellationToken = default)
         {
             return SendAsync(new SendEmailRequestDto

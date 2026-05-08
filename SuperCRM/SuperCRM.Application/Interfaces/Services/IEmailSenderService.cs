@@ -6,5 +6,6 @@ namespace SuperCRM.Application.Interfaces.Services
     {
         Task<SendEmailResultDto> SendAsync(SendEmailRequestDto request, CancellationToken cancellationToken = default);
         Task<SendEmailResultDto> SendTestEmailAsync(string toEmail, Guid? requestedByUserId, CancellationToken cancellationToken = default);
+        Task<SendEmailResultDto> SendWithoutCreatingLogAsync(SendEmailRequestDto request,CancellationToken cancellationToken = default);
     }
 }

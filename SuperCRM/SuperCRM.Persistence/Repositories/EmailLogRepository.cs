@@ -10,7 +10,7 @@ namespace SuperCRM.Persistence.Repositories
     public class EmailLogRepository : IEmailLogRepository
     {
         private readonly SuperCrmDbContext _dbContext;
-
+        
         public EmailLogRepository(SuperCrmDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -19,6 +19,12 @@ namespace SuperCRM.Persistence.Repositories
         public async Task AddAsync(EmailLog entity, CancellationToken cancellationToken = default)
         {
             await _dbContext.EmailLogs.AddAsync(entity, cancellationToken);
+        }
+
+        public Task UpdateAsync(EmailLog entity, CancellationToken cancellationToken = default)
+        {
+            _dbContext.EmailLogs.Update(entity);
+            return Task.CompletedTask;
         }
 
         public Task SaveChangesAsync(CancellationToken cancellationToken = default)
