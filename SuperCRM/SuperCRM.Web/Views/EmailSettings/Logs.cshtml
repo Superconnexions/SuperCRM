@@ -1,0 +1,44 @@
+@model List<SuperCRM.Web.ViewModels.EmailSettings.EmailLogListItemViewModel>
+
+@{
+    ViewData["Title"] = "Email Logs";
+}
+
+<h1>Email Logs</h1>
+
+<p><a asp-action="Index" class="btn btn-secondary">Back to Email Settings</a></p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Created At</th>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Sent</th>
+            <th>Sent At</th>
+            <th>Source</th>
+            <th>Error</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.ToEmail</td>
+                <td>@item.Subject</td>
+                <td>@(item.IsSent ? "Yes" : "No")</td>
+                <td>@item.SentAt?.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.SourceModule</td>
+                <td>@item.ErrorMessage</td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr><td colspan="7" class="text-center">No email logs found.</td></tr>
+    }
+    </tbody>
+</table>

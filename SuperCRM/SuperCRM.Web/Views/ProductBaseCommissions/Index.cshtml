@@ -50,6 +50,7 @@
             <th>Percentage</th>
             <th>Effective From</th>
             <th>Effective To</th>
+            <th>Currency</th>
             <th>Is Active</th>
             <th style="width:220px;">Actions</th>
         </tr>
@@ -67,6 +68,7 @@
                 <td>@item.Percentage</td>
                 <td>@item.EffectiveFrom?.ToString("yyyy-MM-dd")</td>
                 <td>@item.EffectiveTo?.ToString("yyyy-MM-dd")</td>
+                <td>@item.CurrencyCode</td>
                 <td>@item.IsActive</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ProductBaseCommissionId" class="btn btn-sm btn-primary">Edit</a>

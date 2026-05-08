@@ -55,7 +55,7 @@ namespace SuperCRM.Application.Services
 
         public async Task<(bool Success, string ErrorMessage)> CreateAsync(CreateProductBaseCommissionDto request, CancellationToken cancellationToken = default)
         {
-            var validation = await ValidateAsync(request.ProductId, request.CommissionType, request.FixedAmount, request.Percentage, request.EffectiveFrom, request.EffectiveTo, null, cancellationToken);
+            var validation = await ValidateAsync(request.ProductId, request.CommissionType, request.FixedAmount, request.Percentage, request.EffectiveFrom, request.EffectiveTo, request.CurrencyCode ,null, cancellationToken);
             if (!validation.Success)
                 return validation;
 
@@ -69,6 +69,8 @@ namespace SuperCRM.Application.Services
                 IsActive = true,
                 EffectiveFrom = request.EffectiveFrom,
                 EffectiveTo = request.EffectiveTo,
+                Note = request.Note,
+                CurrencyCode = request.CurrencyCode,
                 CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = request.CreatedByUserId
             };
@@ -103,7 +105,7 @@ namespace SuperCRM.Application.Services
             if (entity == null)
                 return (false, "Product base commission not found.");
 
-            var validation = await ValidateAsync(request.ProductId, request.CommissionType, request.FixedAmount, request.Percentage, request.EffectiveFrom, request.EffectiveTo, request.ProductBaseCommissionId, cancellationToken);
+            var validation = await ValidateAsync(request.ProductId, request.CommissionType, request.FixedAmount, request.Percentage, request.EffectiveFrom, request.EffectiveTo, request.CurrencyCode, request.ProductBaseCommissionId, cancellationToken);
             if (!validation.Success)
                 return validation;
 
@@ -121,6 +123,7 @@ namespace SuperCRM.Application.Services
                 ChangedAt = DateTime.UtcNow,
                 ChangedByUserId = request.UpdatedByUserId,
                 Note = string.IsNullOrWhiteSpace(request.Note) ? "Updated" : request.Note,
+          
                 CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = request.UpdatedByUserId
             };
@@ -131,6 +134,8 @@ namespace SuperCRM.Application.Services
             entity.Percentage = history.NewPercentage;
             entity.EffectiveFrom = request.EffectiveFrom;
             entity.EffectiveTo = request.EffectiveTo;
+            entity.Note = request.Note;
+            entity.CurrencyCode = request.CurrencyCode;
             entity.UpdatedAt = DateTime.UtcNow;
             entity.UpdatedByUserId = request.UpdatedByUserId;
 
@@ -225,6 +230,7 @@ namespace SuperCRM.Application.Services
             decimal? percentage,
             DateTime? effectiveFrom,
             DateTime? effectiveTo,
+            string? currencyCode,
             Guid? excludeCommissionId,
             CancellationToken cancellationToken)
         {
@@ -234,6 +240,9 @@ namespace SuperCRM.Application.Services
             var product = await _repository.GetProductByIdAsync(productId, cancellationToken);
             if (product == null)
                 return (false, "Selected product was not found.");
+
+            if (string.IsNullOrWhiteSpace(currencyCode))
+                return (false, "Currency code is required.");
 
             if (effectiveFrom.HasValue && effectiveTo.HasValue && effectiveFrom > effectiveTo)
                 return (false, "Effective To must be greater than or equal to Effective From.");
@@ -285,6 +294,8 @@ namespace SuperCRM.Application.Services
                 IsActive = x.IsActive,
                 EffectiveFrom = x.EffectiveFrom,
                 EffectiveTo = x.EffectiveTo,
+                Note = x.Note,
+                CurrencyCode = x.CurrencyCode,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt
             };

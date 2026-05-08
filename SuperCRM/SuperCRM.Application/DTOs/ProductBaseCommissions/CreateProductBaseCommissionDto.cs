@@ -12,5 +12,6 @@ namespace SuperCRM.Application.DTOs.ProductBaseCommissions
         public DateTime? EffectiveTo { get; set; }
         public Guid CreatedByUserId { get; set; }
         public string? Note { get; set; }
+        public string CurrencyCode { get; set; } = string.Empty;
     }
 }

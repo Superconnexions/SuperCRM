@@ -1,0 +1,61 @@
+@model SuperCRM.Web.ViewModels.EmailSettings.EmailSettingCreateEditViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="mb-3">
+    <label asp-for="SettingName" class="form-label"></label>
+    <input asp-for="SettingName" class="form-control" />
+    <span asp-validation-for="SettingName" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="SmtpServer" class="form-label"></label>
+    <input asp-for="SmtpServer" class="form-control" />
+    <span asp-validation-for="SmtpServer" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Port" class="form-label"></label>
+    <input asp-for="Port" class="form-control" />
+    <span asp-validation-for="Port" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="SenderName" class="form-label"></label>
+    <input asp-for="SenderName" class="form-control" />
+    <span asp-validation-for="SenderName" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="SenderEmail" class="form-label"></label>
+    <input asp-for="SenderEmail" class="form-control" />
+    <span asp-validation-for="SenderEmail" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Username" class="form-label"></label>
+    <input asp-for="Username" class="form-control" />
+    <span asp-validation-for="Username" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Password" class="form-label"></label>
+    <input asp-for="Password" class="form-control" />
+    <span asp-validation-for="Password" class="text-danger"></span>
+    <small class="form-text text-muted">For Gmail, use an App Password. Leave blank during edit to keep existing password.</small>
+</div>
+
+<div class="form-check mb-2">
+    <input asp-for="EnableSsl" class="form-check-input" />
+    <label asp-for="EnableSsl" class="form-check-label"></label>
+</div>
+
+<div class="form-check mb-2">
+    <input asp-for="IsDefault" class="form-check-input" />
+    <label asp-for="IsDefault" class="form-check-label"></label>
+</div>
+
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+</div>

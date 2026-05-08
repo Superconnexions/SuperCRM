@@ -1,0 +1,27 @@
+@model SuperCRM.Web.ViewModels.EmailSettings.TestEmailViewModel
+
+@{
+    ViewData["Title"] = "Send Test Email";
+}
+
+<h1>Send Test Email</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="Test" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="ToEmail" class="form-label"></label>
+        <input asp-for="ToEmail" class="form-control" />
+        <span asp-validation-for="ToEmail" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Test Email</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

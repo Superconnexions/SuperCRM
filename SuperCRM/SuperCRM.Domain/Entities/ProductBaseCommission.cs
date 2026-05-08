@@ -17,6 +17,8 @@ namespace SuperCRM.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
         public Guid? UpdatedByUserId { get; set; }
 
+        public string? Note { get; set; }
+        public string CurrencyCode { get; set; } = "Tk.";
         public Product? Product { get; set; }
         //public ApplicationUser? CreatedByUser { get; set; }
         //public ApplicationUser? UpdatedByUser { get; set; }

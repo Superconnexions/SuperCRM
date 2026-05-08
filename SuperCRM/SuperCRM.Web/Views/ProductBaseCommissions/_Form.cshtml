@@ -43,6 +43,14 @@
 </div>
 
 <div class="mb-3">
+    <label asp-for="CurrencyCode" class="form-label"></label>
+    <select asp-for="CurrencyCode" asp-items="Model.CurrencyOptions" class="form-select">
+        <option value="">-- Please Select --</option>
+    </select>
+    <span asp-validation-for="CurrencyCode" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
     <label asp-for="Note" class="form-label"></label>
     <textarea asp-for="Note" class="form-control" rows="3"></textarea>
     <span asp-validation-for="Note" class="text-danger"></span>

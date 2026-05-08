@@ -49,6 +49,10 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<ProductBaseCommission> ProductBaseCommissions { get; set; }
         public DbSet<ProductBaseCommissionHistory> ProductBaseCommissionHistories { get; set; }
 
+
+        public DbSet<EmailSetting> EmailSettings => Set<EmailSetting>();
+        public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -344,6 +348,8 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(x => x.EffectiveTo).HasColumnType("datetime2");
                 entity.Property(x => x.CreatedAt).HasColumnType("datetime2").IsRequired();
                 entity.Property(x => x.CreatedByUserId).IsRequired();
+                entity.Property(x => x.CurrencyCode).HasMaxLength(10).IsRequired();
+                entity.Property(x => x.Note).HasMaxLength(500);
                 entity.Property(x => x.UpdatedAt).HasColumnType("datetime2");
                 entity.Property(x => x.UpdatedByUserId);
 
@@ -648,6 +654,79 @@ namespace SuperCRM.Persistence.DbContexts
             });
 
             // END Product Management
+
+            // Start Email Settings
+
+
+            builder.Entity<EmailSetting>(entity =>
+            {
+                entity.ToTable("EmailSettings");
+                entity.HasKey(e => e.EmailSettingId);
+                entity.Property(e => e.EmailSettingId).ValueGeneratedNever();
+                entity.Property(e => e.SettingName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.SmtpServer).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.Port).IsRequired();
+                entity.Property(e => e.SenderName).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.SenderEmail).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.Username).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.EncryptedPassword).IsRequired();
+                entity.Property(e => e.EnableSsl).IsRequired();
+                entity.Property(e => e.IsDefault).IsRequired();
+                entity.Property(e => e.IsActive).IsRequired();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
+
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedByUserId)
+                    .HasConstraintName("FK_EmailSettings_CreatedBy")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedByUserId)
+                    .HasConstraintName("FK_EmailSettings_UpdatedBy")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => e.SettingName).IsUnique().HasDatabaseName("UQ_EmailSettings_SettingName");
+                entity.HasIndex(e => new { e.IsActive, e.IsDefault }).HasDatabaseName("IX_EmailSettings_IsActive_IsDefault");
+            });
+
+            builder.Entity<EmailLog>(entity =>
+            {
+                entity.ToTable("EmailLogs");
+                entity.HasKey(e => e.EmailLogId);
+                entity.Property(e => e.EmailLogId).ValueGeneratedNever();
+                entity.Property(e => e.ToEmail).HasMaxLength(500).IsRequired();
+                entity.Property(e => e.CcEmail).HasMaxLength(500);
+                entity.Property(e => e.BccEmail).HasMaxLength(500);
+                entity.Property(e => e.Subject).HasMaxLength(300).IsRequired();
+                entity.Property(e => e.BodyPreview).HasMaxLength(1000);
+                entity.Property(e => e.IsHtml).IsRequired();
+                entity.Property(e => e.IsSent).IsRequired();
+                entity.Property(e => e.SentAt).HasColumnType("datetime2");
+                entity.Property(e => e.SourceModule).HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
+
+                entity.HasOne(e => e.EmailSetting)
+                    .WithMany(e => e.EmailLogs)
+                    .HasForeignKey(e => e.EmailSettingId)
+                    .HasConstraintName("FK_EmailLogs_EmailSetting")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedByUserId)
+                    .HasConstraintName("FK_EmailLogs_CreatedBy")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new { e.IsSent, e.CreatedAt }).HasDatabaseName("IX_EmailLogs_IsSent_CreatedAt");
+                entity.HasIndex(e => e.EmailSettingId).HasDatabaseName("IX_EmailLogs_EmailSettingId");
+                entity.HasIndex(e => new { e.SourceModule, e.CreatedAt }).HasDatabaseName("IX_EmailLogs_SourceModule_CreatedAt");
+            });
+
+
+            // END Email Settings
 
 
             builder.ApplyConfigurationsFromAssembly(typeof(SuperCrmDbContext).Assembly);

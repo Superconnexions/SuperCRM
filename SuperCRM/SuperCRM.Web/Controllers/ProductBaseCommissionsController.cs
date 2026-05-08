@@ -33,6 +33,7 @@ namespace SuperCRM.Web.Controllers
                 ProductKeyword = productKeyword,
                 EffectiveFrom = effectiveFrom,
                 EffectiveTo = effectiveTo,
+                
                 IncludeInactive = includeInactive,
                 Items = items
             });
@@ -68,6 +69,7 @@ namespace SuperCRM.Web.Controllers
                 EffectiveFrom = vm.EffectiveFrom,
                 EffectiveTo = vm.EffectiveTo,
                 CreatedByUserId = userId,
+                CurrencyCode = vm.CurrencyCode,
                 Note = vm.Note
             }, cancellationToken);
 
@@ -94,6 +96,8 @@ namespace SuperCRM.Web.Controllers
                 CommissionType = dto.CommissionType,
                 FixedAmount = dto.FixedAmount,
                 Percentage = dto.Percentage,
+                Note = dto.Note,
+                CurrencyCode = dto.CurrencyCode,
                 EffectiveFrom = dto.EffectiveFrom,
                 EffectiveTo = dto.EffectiveTo
             };
@@ -125,6 +129,7 @@ namespace SuperCRM.Web.Controllers
                 Percentage = vm.Percentage,
                 EffectiveFrom = vm.EffectiveFrom,
                 EffectiveTo = vm.EffectiveTo,
+                CurrencyCode = vm.CurrencyCode,               
                 UpdatedByUserId = userId,
                 Note = vm.Note
             }, cancellationToken);
@@ -220,12 +225,23 @@ namespace SuperCRM.Web.Controllers
                     Text = $"{x.ProductName} ({x.ProductCode})"
                 })
                 .ToList();
+
+            vm.CurrencyOptions = GetCurrencyOptions();
         }
 
         private Guid GetUserId()
         {
             var raw = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Guid.TryParse(raw, out var id) ? id : Guid.Empty;
+        }
+
+        private static List<SelectListItem> GetCurrencyOptions()
+        {
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Tk.", Text = "BDT" },
+                new SelectListItem { Value = "£", Text = "GBP" }
+            };
         }
     }
 }

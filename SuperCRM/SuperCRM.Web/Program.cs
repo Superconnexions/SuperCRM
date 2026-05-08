@@ -4,14 +4,16 @@ using SuperCRM.Application.Interfaces.Persistence;
 using SuperCRM.Application.Interfaces.Security;
 using SuperCRM.Application.Interfaces.Services;
 using SuperCRM.Application.Services;
+using SuperCRM.Infrastructure.Email;
+using SuperCRM.Infrastructure.Security;
 using SuperCRM.Infrastructure.Services;
-
 //using SuperCRM.Infrastructure.Services;
 using SuperCRM.Persistence.Dapper;
 using SuperCRM.Persistence.DbContexts;
 using SuperCRM.Persistence.Identity;
 using SuperCRM.Persistence.Repositories;
 using SuperCRM.Shared;
+using SuperCRM.Web.Helpers;
 //using SuperCRM.Shared;
 
 
@@ -128,6 +130,16 @@ builder.Services.AddScoped<IProductImageRepository, ProductImageRepository>();
 builder.Services.AddScoped<IProductImageService, ProductImageService>();
 //.Services.AddScoped<IProductLookupService, ProductLookupService>();
 // END Product Management
+
+builder.Services.AddDataProtection();
+
+builder.Services.AddScoped<IEmailSettingRepository, EmailSettingRepository>();
+builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+builder.Services.AddScoped<IEmailEncryptionService, EmailEncryptionService>();
+builder.Services.AddScoped<IEmailSettingService, EmailSettingService>();
+builder.Services.AddScoped<IEmailLogService, EmailLogService>();
+builder.Services.AddScoped<IEmailSenderService, MailKitEmailSenderService>();
+builder.Services.AddScoped<IEmailHelper, EmailHelper>();
 
 /// END Register services
 

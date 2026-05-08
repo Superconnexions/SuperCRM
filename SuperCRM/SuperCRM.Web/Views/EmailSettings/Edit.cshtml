@@ -1,0 +1,18 @@
+@model SuperCRM.Web.ViewModels.EmailSettings.EmailSettingCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Email Setting";
+}
+
+<h1>Edit Email Setting</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="EmailSettingId" />
+    <partial name="_Form" model="Model" />
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
