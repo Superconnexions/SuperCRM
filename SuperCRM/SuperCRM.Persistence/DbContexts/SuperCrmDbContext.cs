@@ -53,6 +53,10 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<EmailSetting> EmailSettings => Set<EmailSetting>();
         public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
 
+
+        public DbSet<SalesOrderDraft> SalesOrderDrafts => Set<SalesOrderDraft>();
+        public DbSet<SalesOrderDraftLine> SalesOrderDraftLines => Set<SalesOrderDraftLine>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -728,6 +732,72 @@ namespace SuperCRM.Persistence.DbContexts
 
 
             // END Email Settings
+
+            // Start - Saled order Draft
+
+            builder.Entity<SalesOrderDraft>(entity =>
+            {
+                entity.ToTable("SalesOrderDrafts");
+                entity.HasKey(e => e.SalesOrderDraftId);
+                entity.Property(e => e.SalesOrderDraftId).ValueGeneratedNever();
+                entity.Property(e => e.DraftNo).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.DraftStatus).IsRequired();
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
+                entity.HasIndex(e => e.DraftNo).IsUnique().HasDatabaseName("UQ_SalesOrderDrafts_DraftNo");
+
+                entity.HasMany(e => e.DraftLines)
+                    .WithOne(e => e.SalesOrderDraft)
+                    .HasForeignKey(e => e.SalesOrderDraftId)
+                    .HasConstraintName("FK_SalesOrderDraftLines_Draft");
+            });
+
+            builder.Entity<SalesOrderDraftLine>(entity =>
+            {
+                entity.ToTable("SalesOrderDraftLines");
+                entity.HasKey(e => e.SalesOrderDraftLineId);
+                entity.Property(e => e.SalesOrderDraftLineId).ValueGeneratedNever();
+                entity.Property(e => e.ProductCode).HasMaxLength(50);
+                entity.Property(e => e.ProductName).HasMaxLength(200);
+                entity.Property(e => e.VariantCode).HasMaxLength(50);
+                entity.Property(e => e.VariantName).HasMaxLength(200);
+                entity.Property(e => e.ProviderName).HasMaxLength(200);
+                entity.Property(e => e.BasePrice).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.SalePrice).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.LineTotalAmount).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.CurrencyCode).HasMaxLength(10);
+                entity.Property(e => e.DownPaymentAmount).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MonthlyInstallmentAmount).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.FirstInstallmentDate).HasColumnType("date");
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2").IsRequired();
+                entity.Property(e => e.IsInstallmentSelected).IsRequired();
+                entity.Property(e => e.InstallmentApplicable).IsRequired();
+                entity.Property(e => e.NoOfInstallment).IsRequired();
+
+
+
+                entity.HasOne(e => e.Product)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProductId)
+                    .HasConstraintName("FK_SalesOrderDraftLines_Product");
+
+                entity.HasOne(e => e.ProductVariant)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProductVariantId)
+                    .HasConstraintName("FK_SalesOrderDraftLines_ProductVariant");
+
+                entity.HasOne(e => e.ProviderProduct)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProviderProductId)
+                    .HasConstraintName("FK_SalesOrderDraftLines_ProviderProduct");
+
+                entity.HasOne(e => e.Provider)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProviderId)
+                    .HasConstraintName("FK_SalesOrderDraftLines_Provider");
+            });
+
+            // END Sales Order Draft
 
 
             builder.ApplyConfigurationsFromAssembly(typeof(SuperCrmDbContext).Assembly);

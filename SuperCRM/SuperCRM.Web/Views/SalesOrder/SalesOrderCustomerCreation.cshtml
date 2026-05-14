@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Sales Order - Customer Selection";
+    var draftId = ViewBag.DraftId;
+
+}
+<h1>Sales Order Customer Creation</h1>
+<p>This placeholder page will be replaced by existing customer selection/new customer creation flow.</p>
+
+<div class="alert alert-info">
+    Draft ID: @draftId
+</div>
+
+<a asp-action="SalesOrderProductList"
+   asp-route-draftId="@draftId"
+   class="btn btn-secondary">
+    Back to Product List
+</a>
+
+<a asp-action="SalesOrderConfirmation" class="btn btn-primary">Save & Next</a>

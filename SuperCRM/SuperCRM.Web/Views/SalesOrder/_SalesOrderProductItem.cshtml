@@ -1,0 +1,245 @@
+@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderProductItemViewModel
+@{
+    var priceReadonly = Model.IsPriceEditable ? "" : "readonly";
+    var selectionPrice = Model.BasePriceType == 2 ? 0 : Model.BasePrice;
+    var dropdownVariants = Model.Variants.Where(x => x.DisplayStyle == 1).OrderBy(x => x.DisplayOrder).ToList();
+    var checkboxVariants = Model.Variants.Where(x => x.DisplayStyle == 2).OrderBy(x => x.DisplayOrder).ToList();
+
+    var isRollProduct =
+    Model.ProductCode.Contains("ROLL", StringComparison.OrdinalIgnoreCase) ||
+    Model.ProductName.Contains("ROLL", StringComparison.OrdinalIgnoreCase) ||
+    Model.ProductDisplayName.Contains("ROLL", StringComparison.OrdinalIgnoreCase);
+}
+
+<div class="order-product-item sales-order-product-item"
+     data-product-id="@Model.ProductId"
+     data-product-type="@Model.ProductType"
+     data-base-price-type="@Model.BasePriceType"
+     data-base-price="@Model.BasePrice"
+     data-is-price-editable="@Model.IsPriceEditable.ToString().ToLower()"
+     data-product-name="@Model.ProductDisplayName"
+     data-has-provider="@(Model.Providers.Any() ? "true" : "false")"
+     data-has-variant="@(Model.Variants.Any() ? "true" : "false")"
+     data-currency="@Model.CurrencyCode">
+
+    <label class="product-check-row">
+        <input type="checkbox"
+               name="SelectedProductIds"
+               value="@Model.ProductId"
+               class="product-select product-check"
+               id="product_check_@Model.ProductId" />
+        <span>@Model.ProductDisplayName</span>
+    </label>
+
+    @if (!string.IsNullOrWhiteSpace(Model.PrimaryImageUrl))
+    {
+        <img src="@Model.PrimaryImageUrl" alt="@Model.ProductDisplayName" class="product-image" />
+    }
+
+    @if (Model.Providers.Any())
+    {
+        <div class="field-block">
+            <label>Select Provider</label>
+            <select name="ProviderProduct_@Model.ProductId" class="form-control provider-select">
+                <option value="">Select one</option>
+                @foreach (var provider in Model.Providers)
+                {
+                    <option value="@provider.ProviderProductId" data-provider-id="@provider.ProviderId">@provider.ProviderName</option>
+                }
+            </select>
+        </div>
+    }
+
+    @if (dropdownVariants.Any())
+    {
+        <div class="field-block">
+            <label>Package</label>
+            <select name="Variant_@Model.ProductId" class="form-control variant-select">
+                <option value="">Select one</option>
+                @foreach (var variant in dropdownVariants)
+                {
+                    <option value="@variant.ProductVariantId" data-price="@(variant.BasePrice ?? 0)">@variant.VariantName</option>
+                }
+            </select>
+        </div>
+    }
+
+    @* @if (checkboxVariants.Any())
+    {
+        <div class="variant-checkbox-list">
+            @foreach (var variant in checkboxVariants)
+            {
+                <label class="small-check-row">
+                    <input type="checkbox" name="VariantCheckbox_@Model.ProductId" value="@variant.ProductVariantId" data-price="@(variant.BasePrice ?? 0)" />
+                    <span>@variant.VariantName</span>
+                </label>
+            }
+        </div>
+    } *@
+
+    @if (checkboxVariants.Any())
+    {
+        if (isRollProduct)
+        {
+            <div class="roll-variant-section mt-2">
+                @foreach (var variant in checkboxVariants)
+                {
+                    var rowId = $"{Model.ProductId}_{variant.ProductVariantId}";
+                    var unitPrice = variant.BasePrice ?? 0;
+
+                    <div class="roll-variant-row mb-3"
+                         data-product-id="@Model.ProductId"
+                         data-unit-price="@unitPrice">
+
+                        <label class="small-check-row">
+                            <input type="checkbox"
+                                   class="roll-variant-check variant-checkbox"
+                                   name="VariantCheckbox_@Model.ProductId"
+                                   value="@variant.ProductVariantId"
+                                   data-price="@unitPrice" />
+                            <span>@variant.VariantName</span>
+                        </label>
+
+                        <div class="row g-2 mt-1">
+                            <div class="col-4">
+                                <label class="small">Qty</label>
+                                <input type="number"
+                                       min="0"
+                                       value="0"
+                                       name="Qty_@Model.ProductId@("_")@variant.ProductVariantId"
+                                       class="form-control roll-qty"
+                                       disabled />
+                            </div>
+
+                            <div class="col-4">
+                                <label class="small">Unit Price</label>
+                                <input type="number"
+                                       step="0.01"
+                                       value="@unitPrice.ToString("0.00")"
+                                       class="form-control roll-unit-price"
+                                       readonly />
+                            </div>
+
+                            <div class="col-4">
+                                <label class="small">Total</label>
+                                <input type="number"
+                                       step="0.01"
+                                       value="0.00"
+                                       class="form-control roll-total"
+                                       readonly />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="variant-checkbox-list variant-checkbox-validation-target">
+                @foreach (var variant in checkboxVariants)
+                {
+                    <label class="small-check-row">
+                        <input type="checkbox"
+                               class="variant-checkbox"
+                               name="VariantCheckbox_@Model.ProductId"
+                               value="@variant.ProductVariantId"
+                               data-price="@(variant.BasePrice ?? 0)" />
+                        <span>@variant.VariantName</span>
+                    </label>
+                }
+            </div>
+        }
+    }
+
+    @if (Model.InstallmentApplicable)
+    {
+        <div class="payment-mode-block">
+            <label class="small-check-row">
+                <input type="radio" name="PaymentMode_@Model.ProductId" value="OneOff" checked />
+                <span>One-off Payment</span>
+            </label>
+            <label class="small-check-row">
+                <input type="radio" name="PaymentMode_@Model.ProductId" value="Installment" />
+                <span>Installment</span>
+            </label>
+
+            <div class="installment-fields" style="display:none;">
+                <label>Downpayment</label>
+                <input type="number" step="0.01" name="DownPayment_@Model.ProductId" value="@Model.DownPaymentAmount" class="form-control down-payment-amount" />
+                <label>No. of Installment</label>
+                <input type="number" name="NoOfInstallment_@Model.ProductId" value="@Model.NoOfInstallment" class="form-control no-of-installment" />
+                <label>Monthly Installment</label>
+                <input type="number" step="0.01" name="MonthlyInstallment_@Model.ProductId" value="@Model.MonthlyInstallmentAmount" class="form-control monthly-installment-amount" />
+            </div>
+        </div>
+    }
+
+    <div class="field-block">
+        <label>Total Price</label>
+        <input type="number" step="0.01" name="Price_@Model.ProductId" value="@selectionPrice" class="form-control price-input" id="product_total_@Model.ProductId" @priceReadonly />
+    </div>
+
+    <div class="more-info-row">
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#productInfoModal_@Model.ProductId">
+            More Info
+        </button>
+    </div>
+
+    <div class="modal fade"
+         id="productInfoModal_@Model.ProductId"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-light">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">@Model.ProductDisplayName</h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ProductDisplayNotes))
+                    {
+                        <div class="mb-4">
+                            <h6>Product Information</h6>
+                            <div>@Html.Raw(Model.ProductDisplayNotes)</div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.PaymentNotes))
+                    {
+                        <div class="mb-4">
+                            <h6>Payment Information</h6>
+                            <div>@Html.Raw(Model.PaymentNotes)</div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+                    {
+                        <div class="mb-4">
+                            <h6>Additional Notes</h6>
+                            <div>@Html.Raw(Model.Remarks)</div>
+                        </div>
+                    }
+
+                    @if (string.IsNullOrWhiteSpace(Model.ProductDisplayNotes)
+                                        && string.IsNullOrWhiteSpace(Model.PaymentNotes)
+                                        && string.IsNullOrWhiteSpace(Model.Remarks))
+                    {
+                        <div>No additional information available.</div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

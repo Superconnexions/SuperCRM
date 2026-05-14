@@ -1,0 +1,475 @@
+@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderProductListViewModel
+@{
+    ViewData["Title"] = "Sales Order - Product Selection";
+}
+<link rel="stylesheet" href="~/css/sales-order-product-list.css" />
+
+<form asp-action="SalesOrderProductList" method="post" id="salesOrderProductForm">
+    @Html.AntiForgeryToken()
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.DraftNo))
+    {
+    <div class="alert alert-info">
+        Draft No: <strong>@Model.DraftNo</strong>
+    </div>
+    }
+
+    <input type="hidden" name="SalesOrderDraftId" value="@Model.SalesOrderDraftId" />
+
+    <div id="draftLineContainer"></div>
+
+    <div class="sales-order-page">
+        <section class="product-section">
+            <h2>Business Product</h2>
+            <div class="row g-4">
+                @* @foreach (var category in Model.BusinessCategories)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <partial name="_SalesOrderCategoryCard" model="category" />
+                    </div>
+                } *@
+
+                @foreach (var category in Model.BusinessCategories)
+                {
+                    var isSuperCrmProducts = category.CategoryName == "Super CRM Products"
+                                             || category.CategoryName == "SUPER CRM PRODUCTS";
+
+                    <div class="@(isSuperCrmProducts ? "col-12" : "col-12 col-md-6 col-lg-4")">
+                        <partial name="_SalesOrderCategoryCard" model="category" />
+                    </div>
+                }
+
+            </div>
+        </section>
+
+        <section class="product-section residential-section">
+            <h2>Residential Product</h2>
+            <div class="row g-4">
+                @foreach (var category in Model.ResidentialCategories)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <partial name="_SalesOrderCategoryCard" model="category" />
+                    </div>
+                }
+            </div>
+        </section>
+
+        <div class="sales-order-actions">
+            <button type="submit"
+                    class="btn btn-primary sales-order-save"
+                    formaction="@Url.Action("SaveProductSelection", "SalesOrder")">
+                Save
+            </button>
+
+            <button type="submit"
+                    class="btn btn-success sales-order-next"
+                    formaction="@Url.Action("SaveProductSelectionAndNext", "SalesOrder")">
+                Save & Next
+            </button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/sales-order-product-list.js"></script>
+    <script src="~/js/sales-order-draft-submit.js"></script>
+
+    <script>
+        window.salesOrderDraftLines = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DraftLines));
+    </script>.
+
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // function autoSelectProduct(item) {
+            //     const productCheck = item.querySelector('.product-check');
+
+            //     if (productCheck) {
+            //         productCheck.checked = true;
+            //     }
+            // }
+
+
+            function calculateRollProductTotal(productId) {
+
+                let grandTotal = 0;
+
+                document.querySelectorAll(
+                    '.roll-variant-row[data-product-id="' + productId + '"]'
+                ).forEach(function (row) {
+
+                    const checkbox =
+                        row.querySelector('.roll-variant-check');
+
+                    if (!checkbox.checked)
+                        return;
+
+                    const unitPrice =
+                        parseFloat(row.getAttribute('data-unit-price')) || 0;
+
+                    const qty =
+                        parseInt(row.querySelector('.roll-qty').value) || 0;
+
+                    grandTotal += qty * unitPrice;
+                });
+
+                const totalBox =
+                    document.getElementById('product_total_' + productId);
+
+                if (totalBox) {
+                    totalBox.value = grandTotal.toFixed(2);
+                }
+
+                const mainCheckbox =
+                    document.getElementById('product_check_' + productId);
+
+                const checkedVariants =
+                    document.querySelectorAll(
+                        '.roll-variant-row[data-product-id="' + productId + '"] .roll-variant-check:checked'
+                    );
+
+                if (mainCheckbox) {
+                    mainCheckbox.checked = checkedVariants.length > 0;
+                }
+            }
+
+            document.querySelectorAll('.roll-variant-row')
+                .forEach(function (row) {
+
+                    const checkbox =
+                        row.querySelector('.roll-variant-check');
+
+                    const qtyInput =
+                        row.querySelector('.roll-qty');
+
+                    const productId =
+                        row.getAttribute('data-product-id');
+
+                    checkbox.addEventListener('change', function () {
+
+                        if (checkbox.checked) {
+
+                            qtyInput.disabled = false;
+
+                            if ((parseInt(qtyInput.value) || 0) <= 0) {
+                                qtyInput.value = 1;
+                            }
+
+                        } else {
+
+                            qtyInput.disabled = true;
+                            qtyInput.value = 0;
+                        }
+
+                        const unitPrice =
+                            parseFloat(row.getAttribute('data-unit-price')) || 0;
+
+                        const qty =
+                            parseInt(qtyInput.value) || 0;
+
+                        const total =
+                            checkbox.checked ? qty * unitPrice : 0;
+
+                        row.querySelector('.roll-total').value =
+                            total.toFixed(2);
+
+                        calculateRollProductTotal(productId);
+                    });
+
+                    qtyInput.addEventListener('input', function () {
+
+                        const unitPrice =
+                            parseFloat(row.getAttribute('data-unit-price')) || 0;
+
+                        const qty =
+                            parseInt(qtyInput.value) || 0;
+
+                        const total =
+                            qty * unitPrice;
+
+                        row.querySelector('.roll-total').value =
+                            total.toFixed(2);
+
+                        calculateRollProductTotal(productId);
+                    });
+
+                });
+
+
+            document.querySelectorAll('.sales-order-product-item').forEach(function (item) {
+
+                const productCheck = item.querySelector('.product-check');
+
+                item.querySelectorAll('.provider-select, .variant-select').forEach(function (select) {
+                    select.addEventListener('change', function () {
+                        if (select.value && productCheck) {
+                            productCheck.checked = true;
+                        }
+                    });
+                });
+
+            });
+
+
+        function restoreInstallmentFields(productItem, productId, line) {
+
+            const isInstallmentSelected =
+                line.IsInstallmentSelected === true ||
+                line.isInstallmentSelected === true ||
+                line.IsInstallmentSelected === "true" ||
+                line.isInstallmentSelected === "true";
+
+            const paymentModeValue = isInstallmentSelected ? "Installment" : "OneOff";
+
+            const paymentRadio = productItem.querySelector(
+                'input[name="PaymentMode_' + productId + '"][value="' + paymentModeValue + '"]'
+            );
+
+            if (paymentRadio) {
+                paymentRadio.checked = true;
+            }
+
+            const installmentFields = productItem.querySelector('.installment-fields');
+
+            if (installmentFields) {
+                installmentFields.style.display = isInstallmentSelected ? '' : 'none';
+            }
+
+            if (!isInstallmentSelected) {
+                return;
+            }
+
+            const downPayment = productItem.querySelector('.down-payment-amount');
+            const noOfInstallment = productItem.querySelector('.no-of-installment');
+            const monthlyInstallment = productItem.querySelector('.monthly-installment-amount');
+            const firstInstallmentDate = productItem.querySelector('.first-installment-date');
+
+            if (downPayment) {
+                downPayment.value = line.DownPaymentAmount ?? line.downPaymentAmount ?? '';
+            }
+
+            if (noOfInstallment) {
+                noOfInstallment.value = line.NoOfInstallment ?? line.noOfInstallment ?? '';
+            }
+
+            if (monthlyInstallment) {
+                monthlyInstallment.value = line.MonthlyInstallmentAmount ?? line.monthlyInstallmentAmount ?? '';
+            }
+
+            if (firstInstallmentDate) {
+                const rawDate = line.FirstInstallmentDate ?? line.firstInstallmentDate ?? '';
+                firstInstallmentDate.value = rawDate ? rawDate.toString().substring(0, 10) : '';
+            }
+        }
+           function applyDraftLines() {
+            if (!window.salesOrderDraftLines || window.salesOrderDraftLines.length === 0) {
+                return;
+            }
+
+            window.salesOrderDraftLines.forEach(function (line) {
+
+                const productId = line.ProductId || line.productId;
+                const variantId = line.ProductVariantId || line.productVariantId;
+                const providerProductId = line.ProviderProductId || line.providerProductId;
+                const quantity = line.Quantity || line.quantity || 1;
+                const salePrice = line.SalePrice || line.salePrice || 0;
+
+                const productCheck = document.getElementById('product_check_' + productId);
+                if (productCheck) {
+                    productCheck.checked = true;
+
+                    restoreInstallmentFields(productItem, productId, line);
+                
+                }
+
+                const productItem = productCheck
+                    ? productCheck.closest('.sales-order-product-item')
+                    : document.querySelector('.sales-order-product-item[data-product-id="' + productId + '"]');
+
+                if (!productItem) return;
+
+                const providerSelect = productItem.querySelector('.provider-select');
+                if (providerSelect && providerProductId) {
+                    providerSelect.value = providerProductId;
+                }
+
+                const variantSelect = productItem.querySelector('.variant-select');
+                if (variantSelect && variantId) {
+                    variantSelect.value = variantId;
+                    variantSelect.dispatchEvent(new Event('change'));
+                }
+
+                const variantCheckbox = productItem.querySelector(
+                    '.variant-checkbox[value="' + variantId + '"]'
+                );
+
+                if (variantCheckbox) {
+                    variantCheckbox.checked = true;
+                    variantCheckbox.dispatchEvent(new Event('change'));
+                }
+
+                const rollRow = productItem.querySelector(
+                    '.roll-variant-row input[value="' + variantId + '"]'
+                )?.closest('.roll-variant-row');
+
+                if (rollRow) {
+                    const rollCheck = rollRow.querySelector('.roll-variant-check');
+                    const qtyInput = rollRow.querySelector('.roll-qty');
+
+                    if (rollCheck) {
+                        rollCheck.checked = true;
+                    }
+
+                    if (qtyInput) {
+                        qtyInput.disabled = false;
+                        qtyInput.value = quantity;
+                        qtyInput.dispatchEvent(new Event('input'));
+                    }
+                }
+
+                const totalBox = document.getElementById('product_total_' + productId);
+                if (totalBox && !rollRow) {
+                    totalBox.value = parseFloat(salePrice).toFixed(2);
+                }
+            });
+        }
+
+        applyDraftLines();
+
+
+        });
+
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function () {
+
+            function clearValidation() {
+                document.querySelectorAll('.order-validation-message').forEach(x => x.remove());
+                document.querySelectorAll('.is-invalid').forEach(x => x.classList.remove('is-invalid'));
+            }
+
+            function addError(element, message) {
+                if (!element) return;
+
+                element.classList.add('is-invalid');
+
+                const error = document.createElement('div');
+                error.className = 'text-danger small order-validation-message mt-1';
+                error.innerText = message;
+
+                element.insertAdjacentElement('afterend', error);
+            }
+
+            function validateSelectedProducts() {
+                clearValidation();
+
+                let isValid = true;
+                let firstInvalid = null;
+
+                document.querySelectorAll('.sales-order-product-item').forEach(function (item) {
+
+                    const productCheck = item.querySelector('.product-check');
+
+                    const hasProviderOrPackageSelected =
+                        Array.from(item.querySelectorAll('.provider-select, .variant-select'))
+                            .some(x => x.value);
+
+                    if (!productCheck || !productCheck.checked) {
+                        if (hasProviderOrPackageSelected) {
+                            isValid = false;
+                            firstInvalid = firstInvalid || productCheck;
+                            addError(productCheck, 'Please select this product.');
+                        }
+
+                        return;
+                    }
+
+                    const productName = item.getAttribute('data-product-name') || 'Selected product';
+                    const hasProvider = item.getAttribute('data-has-provider') === 'true';
+                    const hasVariant = item.getAttribute('data-has-variant') === 'true';
+
+                    if (hasProvider) {
+                        const providerSelect = item.querySelector('.provider-select');
+
+                        if (providerSelect && !providerSelect.value) {
+                            isValid = false;
+                            firstInvalid = firstInvalid || providerSelect;
+                            addError(providerSelect, 'Please select provider for ' + productName + '.');
+                        }
+                    }
+
+                    if (hasVariant) {
+                        const variantSelect = item.querySelector('.variant-select');
+                        const variantCheckboxes = item.querySelectorAll('.variant-checkbox');
+
+                        if (variantSelect) {
+                            if (!variantSelect.value) {
+                                isValid = false;
+                                firstInvalid = firstInvalid || variantSelect;
+                                addError(variantSelect, 'Please select package for ' + productName + '.');
+                            }
+                        }
+                        else if (variantCheckboxes.length > 0) {
+                            const anyChecked = Array.from(variantCheckboxes).some(x => x.checked);
+
+                            if (!anyChecked) {
+                                isValid = false;
+                                firstInvalid = firstInvalid || variantCheckboxes[0];
+                                addError(variantCheckboxes[0].closest('.variant-checkbox-list') || variantCheckboxes[0],
+                                    'Please select at least one package for ' + productName + '.');
+                            }
+                        }
+                    }
+
+                    // Rolls qty validation
+                    const rollRows = item.querySelectorAll('.roll-variant-row');
+                    rollRows.forEach(function (row) {
+                        const rollCheck = row.querySelector('.roll-variant-check');
+                        const qty = row.querySelector('.roll-qty');
+
+                        if (rollCheck && rollCheck.checked) {
+                            if (!qty || (parseInt(qty.value) || 0) <= 0) {
+                                isValid = false;
+                                firstInvalid = firstInvalid || qty;
+                                addError(qty, 'Quantity must be greater than 0.');
+                            }
+                        }
+                    });
+                });
+
+                if (!isValid && firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+
+                return isValid;
+            }
+
+            document.querySelectorAll('.sales-order-save, .sales-order-next').forEach(function (button) {
+                button.addEventListener('click', function (e) {
+                    if (!validateSelectedProducts()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                });
+            });
+
+        });
+
+    </script>
+}

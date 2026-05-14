@@ -141,6 +141,14 @@ builder.Services.AddScoped<IEmailLogService, EmailLogService>();
 builder.Services.AddScoped<IEmailSenderService, MailKitEmailSenderService>();
 builder.Services.AddScoped<IEmailHelper, EmailHelper>();
 
+
+builder.Services.AddScoped<ISalesOrderProductRepository, SalesOrderProductRepository>();
+builder.Services.AddScoped<ISalesOrderService, SalesOrderService>();
+
+
+builder.Services.AddScoped<ISalesOrderDraftRepository, SalesOrderDraftRepository>();
+builder.Services.AddScoped<ISalesOrderDraftService, SalesOrderDraftService>();
+
 /// END Register services
 
 builder.Services.AddControllersWithViews();

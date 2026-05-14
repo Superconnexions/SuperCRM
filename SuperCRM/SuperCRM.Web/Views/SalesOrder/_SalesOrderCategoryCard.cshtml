@@ -1,0 +1,68 @@
+@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderProductCategoryViewModel
+
+<div class="order-category-card" data-category-id="@Model.CategoryId">
+    <div class="category-title">@Model.CategoryName</div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.HeaderImageUrl))
+    {
+        <img src="@Model.HeaderImageUrl" alt="@Model.CategoryName" class="category-image" />
+    }
+
+    <div class="category-product-list">
+        @* <div class="row g-3">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <partial name="_SalesOrderProductItem" model="product" />
+                </div>
+            }
+        </div> *@
+
+@* 
+        @{
+    var isTwoClummsProdduts =
+            Model.CategoryCode.Equals("CARD-MACINE", StringComparison.OrdinalIgnoreCase) ||
+            Model.CategoryName.Equals("TELEPHONE-AND-INTERNAET", StringComparison.OrdinalIgnoreCase) ||
+            Model.CategoryName.Equals("GAS-AND-ELECTRICITY", StringComparison.OrdinalIgnoreCase);
+        }
+
+        <div class="row g-3">
+            @foreach (var product in Model.Products)
+            {
+                <div class="@(isTwoClummsProdduts ? "col-12 col-md-6" : "col-12 col-md-6 col-lg-4")">
+                    <partial name="_SalesOrderProductItem" model="product" />
+                </div>
+            }
+        </div> *@
+
+
+        @{
+            var categoryCode = Model.CategoryCode ?? "";
+            var categoryName = Model.CategoryName ?? "";
+
+            var isCardMachine =
+            categoryCode.Equals("CARD-MACHINE", StringComparison.OrdinalIgnoreCase)
+            || categoryName.Contains("CARD MACHINE", StringComparison.OrdinalIgnoreCase);
+
+            var isGasOrTelephone =
+            categoryName.Contains("GAS", StringComparison.OrdinalIgnoreCase)
+            || categoryName.Contains("TELEPHONE", StringComparison.OrdinalIgnoreCase)
+            || categoryName.Contains("INTERNET", StringComparison.OrdinalIgnoreCase) || categoryName.Contains("SIM", StringComparison.OrdinalIgnoreCase);
+        }
+
+        <div class="row g-3 @(isGasOrTelephone ? "justify-content-center" : "")">
+            @foreach (var product in Model.Products)
+            {
+                <div class="@(
+                     isCardMachine
+                         ? "col-12 col-md-6"
+                         : isGasOrTelephone
+                             ? "col-12 col-md-5"
+                             : "col-12 col-md-6 col-lg-4"
+                )">
+                <partial name="_SalesOrderProductItem" model="product" />
+            </div>
+                        }
+        </div>
+    </div>
+</div>

@@ -55,6 +55,17 @@
 
                     }
 
+
+                    <li>
+                        
+
+                        <a asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="dropdown-item">
+                            Sales Order
+                        </a>
+
+                    </li>
+
+
                     <li>
                         <a class="dropdown-item" asp-controller="EmailSettings" asp-action="Index">
                             Email Settings
@@ -121,6 +132,13 @@
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-controller="AgentDashboard" asp-action="Index">Agent Dashboard</a>
             </li>
+
+            <li class="nav-item">
+                <a asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
+                    Sales Order
+                </a>
+            </li>
+
         }
 
         <li class="nav-item">

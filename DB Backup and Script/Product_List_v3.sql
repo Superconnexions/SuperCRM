@@ -4,9 +4,13 @@
     P.ProductCode,
     P.ProductName,
     P.ProductDisplayName,
-	
+	SU.UnitName as [Unit],
+	ISNULL(Pro.ProviderName, '') AS ProviderName,
 	ISNULL(P.ProductDisplayNotes, '') AS ProductDisplayNotes,
+	
 	ISNULL(P.PaymentNotes, '') AS PaymentNotes,
+	ISNULL(provar.VariantName, '') AS VariantName,
+	
     -- Product Type
     CASE P.ProductType
         WHEN 1 THEN 'SimpleProduct'
@@ -26,16 +30,18 @@
 
     ISNULL(P.ProductDescription, '') AS ProductDescription,
 
-    -- Base Price Type
+   
+	ISNULL(SU.UnitName, '') AS SalesUnitName,
+	ISNULL(P.CurrencyCode, '') AS CurrencyCode,
+    P.BasePrice as [Unit Price as Sales Unit],
+	 -- Base Price Type
     CASE P.BasePriceType
         WHEN 1 THEN 'SimplePrice'
         WHEN 2 THEN 'OpenPrice'
         WHEN 3 THEN 'VariantPrice'
         ELSE ''
     END AS BasePriceType,
-	ISNULL(SU.UnitName, '') AS SalesUnitName,
-	ISNULL(P.CurrencyCode, '') AS CurrencyCode,
-    P.BasePrice as [Unit Price as Sales Unit],
+	 ISNULL(provar.BasePrice,0) as 'Variant Price',
 	CASE WHEN P.InstallmentApplicable = 1 THEN 'Yes' ELSE 'No' END AS [Is Installment Applicable],
     ISNULL(P.DownPaymentAmount, 0) AS DownPaymentAmount,
 	[NoOfInstallment] as [No of Installment],
@@ -55,6 +61,7 @@
     
     ISNULL(P.DisplayOrder, 0) AS DisplayOrder,
     
+   ISNULL(PC.CategoryImageUrl, '') AS CategoryImageUrl,
    
     ISNULL(P.Remarks, '') AS Remarks
 	--,
@@ -67,7 +74,21 @@ LEFT JOIN ProductCategories PC
     ON P.CategoryId = PC.CategoryId
 LEFT JOIN SalesUnits SU 
     ON P.SalesUnitId = SU.SalesUnitId
-	where P.IsThirdPartyProduct = 1
+
+LEFT JOIN [dbo].[ProviderProducts] pp
+on P.ProductId = pp.ProductId
+
+LEFT JOIN  [dbo].[Providers] pro
+on pro.ProviderId = pp.ProviderId
+
+
+LEFT JOIN  [dbo].[ProductVariants] provar
+on provar.ProductId = P.ProductId
+
+
+	where 
+	 P.IsActive = 1
+	--AND P.IsThirdPartyProduct = 1
 	--AND P.ProductCode IN ('CARD-MACH-WORLDPAY-PKG2','CARD-MACH-ANYOTHER-PKG1')
 	--AND P.IsActive = 0
 	
