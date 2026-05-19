@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
 using SuperCRM.Application.DTOs.ProductBaseCommissions;
 using SuperCRM.Application.Interfaces.Services;
+using SuperCRM.Shared;
 using SuperCRM.Web.ViewModels.ProductBaseCommissions;
+using System.Security.Claims;
 
 namespace SuperCRM.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class ProductBaseCommissionsController : Controller
     {
         private readonly IProductBaseCommissionService _service;

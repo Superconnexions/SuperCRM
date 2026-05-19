@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using SuperCRM.Application.Interfaces.Services;
+using SuperCRM.Shared;
 using SuperCRM.Web.ViewModels.EmailSettings;
+using System.Security.Claims;
 
 namespace SuperCRM.Web.Controllers
 {
-    [Authorize(Roles = "SuperAdmin,SuperCRMAdmin")]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class EmailLogsController : Controller
     {
         private readonly IEmailLogService _emailLogService;

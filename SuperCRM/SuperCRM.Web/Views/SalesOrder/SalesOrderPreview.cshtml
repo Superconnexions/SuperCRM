@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Sales Order Preview";
+    var draftId = ViewBag.DraftId;
+}
+<h2>Sales Order Preview</h2>
+<div class="alert alert-info">
+    Preview page will be implemented in Step-2. Draft ID: @draftId
+</div>
+<a asp-action="SalesOrderCustomerCreation" asp-route-draftId="@draftId" class="btn btn-secondary">Back to Customer Page</a>

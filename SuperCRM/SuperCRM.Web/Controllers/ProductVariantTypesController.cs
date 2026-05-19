@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace SuperCRM.Web.Controllers
 {
-    [Authorize(Roles = AppRoles.SuperAdmin)]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class ProductVariantTypesController : Controller
     {
         private readonly IProductVariantTypeService _service;

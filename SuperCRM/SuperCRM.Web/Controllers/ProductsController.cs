@@ -15,7 +15,7 @@ namespace SuperCRM.Web.Controllers
     /// Controller keeps EF Core and business rules out of the web layer.
     /// File upload is converted to URL before calling the application service.
     /// </summary>
-    [Authorize(Roles = AppRoles.SuperAdmin)]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class ProductsController : Controller
     {
         private readonly IProductService _service;

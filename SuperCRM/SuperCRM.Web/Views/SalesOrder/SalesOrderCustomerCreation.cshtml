@@ -1,19 +1,278 @@
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderCustomerCreationViewModel
 @{
     ViewData["Title"] = "Sales Order - Customer Selection";
-    var draftId = ViewBag.DraftId;
-
 }
-<h1>Sales Order Customer Creation</h1>
-<p>This placeholder page will be replaced by existing customer selection/new customer creation flow.</p>
+<link rel="stylesheet" href="~/css/sales-order-customer-creation.css" asp-append-version="true" />
 
-<div class="alert alert-info">
-    Draft ID: @draftId
+
+
+<form asp-action="SaveCustomerAndPreview" method="post" id="salesOrderCustomerForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SalesOrderDraftId" />
+    <input type="hidden" asp-for="ExistingCustomerId" id="ExistingCustomerId" />
+    <input type="hidden" asp-for="IsBusinessFlow" />
+    <input type="hidden" asp-for="RequiresBankInformation" />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="sales-customer-page">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2>Customer Selection / Creation</h2>
+                <div class="text-muted">Draft No: <strong>@Model.DraftNo</strong></div>
+                <div class="badge bg-info text-dark mt-1">@Model.ScenarioName</div>
+            </div>
+            <a asp-action="SalesOrderProductList" asp-route-draftId="@Model.SalesOrderDraftId" class="btn btn-secondary">
+                Back to Product List
+            </a>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header"><strong>Selected Product Summary</strong></div>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead>
+                        <tr>
+                            <th>Provider</th>
+                            <th>Product</th>
+                            <th>Package</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Unit of Measure</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Total</th>
+                            <th>Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Products)
+                        {
+                            <tr>
+                                <td>@item.ProviderName</td>
+                                <td>@item.ProductName</td>
+                                <td>@item.VariantName</td>
+                                <td class="text-end">@item.Quantity</td>
+                                <td class="text-end">@item.SalesUnitCode</td>
+                                <td class="text-end">@item.CurrencyCode @item.SalePrice.ToString("0.00")</td>
+                                <td class="text-end">@item.CurrencyCode @item.LineTotalAmount.ToString("0.00")</td>
+                                <td>@item.InstallmentSummary</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Existing Customer Search</strong>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#customerSearchModal">
+                    Search Existing Customer
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="selectedCustomerBox" class="alert alert-info d-none"></div>
+                <div class="text-muted small">If customer is found, select from modal. If not found, complete the new customer form below.</div>
+            </div>
+        </div>
+
+        @if (Model.IsBusinessFlow)
+        {
+            <div class="card mb-4">
+                <div class="card-header"><strong>Business Type</strong></div>
+                <div class="card-body">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input business-type-radio" type="radio" asp-for="BusinessType" value="1" checked />
+                        <label class="form-check-label">SOLO</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input business-type-radio" type="radio" asp-for="BusinessType" value="2" />
+                        <label class="form-check-label">LTD Company</label>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card mb-4" id="personalInfoCard">
+            <div class="card-header"><strong>@(Model.IsBusinessFlow ? "Director / Personal Information" : "Personal Information")</strong></div>
+            <div class="card-body row g-3">
+                <div class="col-md-4"><label asp-for="Customer.FirstName" class="form-label"></label><input asp-for="Customer.FirstName" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Customer.LastName" class="form-label"></label><input asp-for="Customer.LastName" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Customer.DisplayName" class="form-label"></label><input asp-for="Customer.DisplayName" class="form-control" placeholder="Auto if blank" /></div>
+                <div class="col-md-4"><label asp-for="Customer.Email" class="form-label"></label><input asp-for="Customer.Email" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Customer.AlternativeEmail" class="form-label"></label><input asp-for="Customer.AlternativeEmail" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Customer.Phone" class="form-label"></label><input asp-for="Customer.Phone" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Customer.Mobile" class="form-label"></label><input asp-for="Customer.Mobile" class="form-control" /></div>
+            </div>
+        </div>
+
+        @if (Model.ShowPersonalAddress)
+        {
+        <div class="card mb-4" id="personalAddressCard">
+            <div class="card-header"><strong>Home Address</strong></div>
+            <input type="hidden" asp-for="ShowPersonalAddress" />
+            <div class="card-body row g-3">
+                    @{
+                        var personalAddressViewData = new ViewDataDictionary(ViewData);
+                        personalAddressViewData.TemplateInfo.HtmlFieldPrefix = "PersonalAddress";
+                    }
+
+                    @await Html.PartialAsync("_SalesOrderAddressFields", Model.PersonalAddress, personalAddressViewData)
+            </div>
+        </div>
+        }
+
+        @if (Model.IsBusinessFlow)
+        {
+            <div class="card mb-4" id="businessInfoCard">
+                <div class="card-header"><strong>Business Information</strong></div>
+                <div class="card-body row g-3">
+                    <div class="col-md-4"><label asp-for="Business.BusinessName" class="form-label"></label><input asp-for="Business.BusinessName" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.BusinessEmail" class="form-label"></label><input asp-for="Business.BusinessEmail" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.TradingName" class="form-label ltd-required-label"></label><input asp-for="Business.TradingName" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.RegistrationNo" class="form-label ltd-required-label"></label><input asp-for="Business.RegistrationNo" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.ContactPersonName" class="form-label"></label><input asp-for="Business.ContactPersonName" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.ContactPersonPhone" class="form-label"></label><input asp-for="Business.ContactPersonPhone" class="form-control" /></div>
+                </div>
+            </div>
+
+
+            <div class="card mb-4" id="businessAddressCard">
+                <div class="card-header"><strong>Business Address</strong></div>
+                <div class="card-body">
+                    @if (Model.ShowBusinessAddressSameCheckbox)
+                    {
+
+                        <div class="form-check mb-3">
+                            <input asp-for="IsBusinessAddressSameAsPersonal" class="form-check-input" id="IsBusinessAddressSameAsPersonal" />
+                            <label class="form-check-label" for="IsBusinessAddressSameAsPersonal">Business address is same as personal address</label>
+                        </div>
+
+                    }
+                    <div class="row g-3" id="businessAddressFields">
+                        @{
+                            var businessAddressViewData = new ViewDataDictionary(ViewData);
+                            businessAddressViewData.TemplateInfo.HtmlFieldPrefix = "BusinessAddress";
+                        }
+
+                        @await Html.PartialAsync("_SalesOrderAddressFields", Model.BusinessAddress, businessAddressViewData)
+                    </div>
+                </div>
+            </div>
+
+        }
+
+        @if (Model.RequiresBankInformation)
+        {
+            <div class="card mb-4" id="bankInfoCard">
+                <div class="card-header"><strong>Bank Information</strong></div>
+                <div class="card-body row g-3">
+                    <div class="col-md-3"><label asp-for="BankAccount.BankName" class="form-label"></label><input asp-for="BankAccount.BankName" class="form-control" /></div>
+                    <div class="col-md-3"><label asp-for="BankAccount.AccountName" class="form-label"></label><input asp-for="BankAccount.AccountName" class="form-control" /></div>
+                    <div class="col-md-3"><label asp-for="BankAccount.AccountNumber" class="form-label"></label><input asp-for="BankAccount.AccountNumber" class="form-control" /></div>
+                    <div class="col-md-3"><label asp-for="BankAccount.SortCode" class="form-label"></label><input asp-for="BankAccount.SortCode" class="form-control" /></div>
+                </div>
+            </div>
+        }
+
+        <div class="d-flex gap-2 justify-content-end mb-5">
+            <button type="submit"
+                    id="btnSaveCustomer"
+                    formaction="@Url.Action("SaveCustomer", "SalesOrder")"
+                    class="btn btn-primary">
+                Save Customer
+            </button>
+
+            <button type="submit"
+                    id="btnUpdateCustomer"
+                    formaction="@Url.Action("SaveCustomer", "SalesOrder")"
+                    class="btn btn-warning"
+                    style="display:none;">
+                Update Customer
+            </button>
+
+            <input type="hidden" name="draftId" value="@Model.SalesOrderDraftId" />
+
+            <button type="submit"
+                    id="btnCreateSalesOrder"
+                    formaction="@Url.Action("CreateSalesOrder", "SalesOrder")"
+                    formmethod="post"
+                    class="btn btn-success"
+                    @(Model.IsCustomerSavedForOrder ? "" : "disabled")>
+                Create Sales Order
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="customerSearchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Search Existing Customer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" id="customerSearchKeyword" class="form-control" placeholder="Search by code, name, email, phone, mobile" />
+                    <button type="button" id="btnCustomerSearch" class="btn btn-primary">Search</button>
+                </div>
+                <div id="customerSearchResults"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<a asp-action="SalesOrderProductList"
-   asp-route-draftId="@draftId"
-   class="btn btn-secondary">
-    Back to Product List
-</a>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/sales-order-customer-creation.js" asp-append-version="true"></script>
 
-<a asp-action="SalesOrderConfirmation" class="btn btn-primary">Save & Next</a>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const sameAddressCheckbox = document.getElementById('IsBusinessAddressSameAsPersonal');
+            const businessAddressSection = document.getElementById('businessAddressFields');
+
+            if (sameAddressCheckbox && businessAddressSection) {
+                sameAddressCheckbox.addEventListener('change', function () {
+                    businessAddressSection.style.display = this.checked ? 'none' : '';
+                });
+
+                businessAddressSection.style.display =
+                    sameAddressCheckbox.checked ? 'none' : '';
+            }
+
+            window.setCustomerButtonMode = function (mode) {
+            // mode: new | existingUnsaved | saved
+            const btnCreate = document.getElementById('btnCreateSalesOrder');
+            const btnSave = document.getElementById('btnSaveCustomer');
+            const btnUpdate = document.getElementById('btnUpdateCustomer');
+
+            if (btnSave) {
+                btnSave.style.display = mode === 'new' ? '' : 'none';
+            }
+
+            if (btnUpdate) {
+                btnUpdate.style.display = mode === 'new' ? 'none' : '';
+            }
+
+            if (btnCreate) {
+                btnCreate.disabled = mode !== 'saved';
+            }
+        };
+
+        window.setCustomerSavedMode = function (isSaved) {
+            window.setCustomerButtonMode(isSaved ? 'saved' : 'new');
+        };
+
+        setCustomerSavedMode(@Model.IsCustomerSavedForOrder.ToString().ToLower());
+
+        });
+    </script>
+}
+
+

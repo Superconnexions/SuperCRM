@@ -12,7 +12,7 @@ namespace SuperCRM.Web.Controllers
     /// MVC controller for Sales Unit master setup.
     /// Thin controller with no direct DbContext/EF logic.
     /// </summary>
-    [Authorize(Roles = AppRoles.SuperAdmin)]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class SalesUnitsController : Controller
     {
         private readonly ISalesUnitService _service;

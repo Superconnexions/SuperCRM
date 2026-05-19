@@ -85,12 +85,13 @@
 </form>
 
 @section Scripts {
-    <script src="~/js/sales-order-product-list.js"></script>
-    <script src="~/js/sales-order-draft-submit.js"></script>
+
+    <script src="~/js/sales-order-product-list.js" asp-append-version="true"></script>
+    <script src="~/js/sales-order-draft-submit.js" asp-append-version="true"></script>
 
     <script>
         window.salesOrderDraftLines = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DraftLines));
-    </script>.
+    </script>
 
     <script>
 
@@ -228,56 +229,49 @@
 
 
         function restoreInstallmentFields(productItem, productId, line) {
-
             const isInstallmentSelected =
                 line.IsInstallmentSelected === true ||
                 line.isInstallmentSelected === true ||
                 line.IsInstallmentSelected === "true" ||
                 line.isInstallmentSelected === "true";
 
-            const paymentModeValue = isInstallmentSelected ? "Installment" : "OneOff";
+            const radioValue = isInstallmentSelected ? "Installment" : "OneOff";
 
-            const paymentRadio = productItem.querySelector(
-                'input[name="PaymentMode_' + productId + '"][value="' + paymentModeValue + '"]'
+            const radio = productItem.querySelector(
+                'input[name="PaymentMode_' + productId + '"][value="' + radioValue + '"]'
             );
 
-            if (paymentRadio) {
-                paymentRadio.checked = true;
+            if (radio) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change'));
             }
 
-            const installmentFields = productItem.querySelector('.installment-fields');
-
-            if (installmentFields) {
-                installmentFields.style.display = isInstallmentSelected ? '' : 'none';
+            const fields = productItem.querySelector('.installment-fields');
+            if (fields) {
+                fields.style.display = isInstallmentSelected ? '' : 'none';
             }
 
-            if (!isInstallmentSelected) {
-                return;
-            }
+            if (!isInstallmentSelected) return;
 
             const downPayment = productItem.querySelector('.down-payment-amount');
             const noOfInstallment = productItem.querySelector('.no-of-installment');
             const monthlyInstallment = productItem.querySelector('.monthly-installment-amount');
             const firstInstallmentDate = productItem.querySelector('.first-installment-date');
 
-            if (downPayment) {
-                downPayment.value = line.DownPaymentAmount ?? line.downPaymentAmount ?? '';
-            }
-
-            if (noOfInstallment) {
-                noOfInstallment.value = line.NoOfInstallment ?? line.noOfInstallment ?? '';
-            }
-
-            if (monthlyInstallment) {
-                monthlyInstallment.value = line.MonthlyInstallmentAmount ?? line.monthlyInstallmentAmount ?? '';
-            }
+            if (downPayment) downPayment.value = line.DownPaymentAmount ?? line.downPaymentAmount ?? '';
+            if (noOfInstallment) noOfInstallment.value = line.NoOfInstallment ?? line.noOfInstallment ?? '';
+            if (monthlyInstallment) monthlyInstallment.value = line.MonthlyInstallmentAmount ?? line.monthlyInstallmentAmount ?? '';
 
             if (firstInstallmentDate) {
                 const rawDate = line.FirstInstallmentDate ?? line.firstInstallmentDate ?? '';
                 firstInstallmentDate.value = rawDate ? rawDate.toString().substring(0, 10) : '';
             }
         }
+        
+        // End of restoreInstallmentFields
+
            function applyDraftLines() {
+
             if (!window.salesOrderDraftLines || window.salesOrderDraftLines.length === 0) {
                 return;
             }
@@ -291,18 +285,18 @@
                 const salePrice = line.SalePrice || line.salePrice || 0;
 
                 const productCheck = document.getElementById('product_check_' + productId);
-                if (productCheck) {
-                    productCheck.checked = true;
-
-                    restoreInstallmentFields(productItem, productId, line);
-                
-                }
 
                 const productItem = productCheck
                     ? productCheck.closest('.sales-order-product-item')
                     : document.querySelector('.sales-order-product-item[data-product-id="' + productId + '"]');
 
                 if (!productItem) return;
+
+                if (productCheck) {
+                    productCheck.checked = true;
+                }
+
+                restoreInstallmentFields(productItem, productId, line);
 
                 const providerSelect = productItem.querySelector('.provider-select');
                 if (providerSelect && providerProductId) {
@@ -324,6 +318,24 @@
                     variantCheckbox.dispatchEvent(new Event('change'));
                 }
 
+                // Added for reseting total price
+
+                setTimeout(function () {
+                    const rollRow = productItem.querySelector(
+                        '.roll-variant-row input[value="' + variantId + '"]'
+                    )?.closest('.roll-variant-row');
+
+                    if (rollRow) return;
+
+                    const savedPrice = parseFloat(line.SalePrice ?? line.salePrice ?? 0);
+                    const totalBox = productItem.querySelector('.price-input');
+
+                    if (totalBox) {
+                        totalBox.value = savedPrice.toFixed(2);
+                    }
+                }, 100);
+                // END
+
                 const rollRow = productItem.querySelector(
                     '.roll-variant-row input[value="' + variantId + '"]'
                 )?.closest('.roll-variant-row');
@@ -343,12 +355,11 @@
                     }
                 }
 
-                const totalBox = document.getElementById('product_total_' + productId);
-                if (totalBox && !rollRow) {
-                    totalBox.value = parseFloat(salePrice).toFixed(2);
-                }
+
             });
         }
+
+
 
         applyDraftLines();
 

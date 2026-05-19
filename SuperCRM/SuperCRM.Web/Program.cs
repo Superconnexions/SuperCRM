@@ -149,6 +149,13 @@ builder.Services.AddScoped<ISalesOrderService, SalesOrderService>();
 builder.Services.AddScoped<ISalesOrderDraftRepository, SalesOrderDraftRepository>();
 builder.Services.AddScoped<ISalesOrderDraftService, SalesOrderDraftService>();
 
+builder.Services.AddScoped<ISalesOrderCustomerRepository, SalesOrderCustomerRepository>();
+builder.Services.AddScoped<ISalesOrderCustomerService, SalesOrderCustomerService>();
+
+
+builder.Services.AddScoped<ISalesOrderCreationRepository, SalesOrderCreationRepository>();
+builder.Services.AddScoped<ISalesOrderCreationService, SalesOrderCreationService>();
+
 /// END Register services
 
 builder.Services.AddControllersWithViews();

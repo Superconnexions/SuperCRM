@@ -57,6 +57,14 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<SalesOrderDraft> SalesOrderDrafts => Set<SalesOrderDraft>();
         public DbSet<SalesOrderDraftLine> SalesOrderDraftLines => Set<SalesOrderDraftLine>();
 
+        public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
+        public DbSet<CustomerBusiness> CustomerBusinesses => Set<CustomerBusiness>();
+        public DbSet<CustomerBankAccount> CustomerBankAccounts => Set<CustomerBankAccount>();
+        public DbSet<Sale> Sales { get; set; }
+        public DbSet<SaleLine> SaleLines { get; set; }
+        public DbSet<InstallmentSchedule> InstallmentSchedules { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -798,6 +806,185 @@ namespace SuperCRM.Persistence.DbContexts
             });
 
             // END Sales Order Draft
+
+            // Start Customer Creation--------
+
+            builder.Entity<Customer>(entity =>
+            {
+                entity.ToTable("Customers");
+                entity.HasKey(e => e.CustomerId);
+                entity.Property(e => e.CustomerId).ValueGeneratedNever();
+                entity.Property(e => e.CustomerCode).HasMaxLength(50);
+                entity.Property(e => e.DisplayName).HasMaxLength(200);
+                entity.Property(e => e.Email).HasMaxLength(150);
+                entity.Property(e => e.AlternativeEmail).HasMaxLength(150);
+                entity.Property(e => e.FirstName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.LastName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.Phone).HasMaxLength(50);
+                entity.Property(e => e.Mobile).HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2");
+            });
+
+            builder.Entity<CustomerAddress>(entity =>
+            {
+                entity.ToTable("CustomerAddresses");
+                entity.HasKey(e => e.CustomerAddressId);
+                entity.Property(e => e.CustomerAddressId).ValueGeneratedNever();
+                entity.Property(e => e.AddressLine).HasMaxLength(300);
+                entity.Property(e => e.HouseNo).HasMaxLength(100);
+                entity.Property(e => e.RoadName).HasMaxLength(150);
+                entity.Property(e => e.PostCode).HasMaxLength(20);
+                entity.Property(e => e.City).HasMaxLength(100);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2");
+                entity.HasOne(e => e.Customer).WithMany(e => e.Addresses).HasForeignKey(e => e.CustomerId).HasConstraintName("FK_CustomerAddresses_Customer");
+                entity.HasOne(e => e.CustomerBusiness).WithMany(e => e.Addresses).HasForeignKey(e => e.CustomerBusinessId).HasConstraintName("FK_CustomerAddresses_Business");
+            });
+
+            builder.Entity<CustomerBusiness>(entity =>
+            {
+                entity.ToTable("CustomerBusinesses");
+                entity.HasKey(e => e.CustomerBusinessId);
+                entity.Property(e => e.CustomerBusinessId).ValueGeneratedNever();
+                entity.Property(e => e.BusinessName).HasMaxLength(200);
+                entity.Property(e => e.BusinessEmail).HasMaxLength(150);
+                entity.Property(e => e.TradingName).HasMaxLength(200);
+                entity.Property(e => e.RegistrationNo).HasMaxLength(100);
+                entity.Property(e => e.ContactPersonName).HasMaxLength(150);
+                entity.Property(e => e.ContactPersonPhone).HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2");
+                entity.HasOne(e => e.Customer).WithMany(e => e.Businesses).HasForeignKey(e => e.CustomerId).HasConstraintName("FK_CustomerBusinesses_Customer");
+            });
+
+            builder.Entity<CustomerBankAccount>(entity =>
+            {
+                entity.ToTable("CustomerBankAccounts");
+                entity.HasKey(e => e.CustomerBankAccountId);
+                entity.Property(e => e.CustomerBankAccountId).ValueGeneratedNever();
+                entity.Property(e => e.BankName).HasMaxLength(150);
+                entity.Property(e => e.AccountName).HasMaxLength(150);
+                entity.Property(e => e.AccountNumber).HasMaxLength(100);
+                entity.Property(e => e.SortCode).HasMaxLength(50);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime2");
+                entity.HasOne(e => e.Customer).WithMany(e => e.BankAccounts).HasForeignKey(e => e.CustomerId).HasConstraintName("FK_CustomerBankAccounts_Customer");
+            });
+
+
+            // End Customer Creation
+
+            builder.Entity<Sale>(entity =>
+            {
+                entity.ToTable("Sales");
+
+                entity.HasKey(x => x.SaleId);
+
+                entity.Property(x => x.OrderStatus).HasMaxLength(50);
+                entity.Property(x => x.SoldByAgentCode).HasMaxLength(50);
+
+                entity.Property(x => x.ProviderCommissionEarned)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.AgentCommissionAmount)
+                    .HasColumnType("decimal(18,2)");
+
+                // RELATION: Sale -> SaleLines
+                entity.HasMany(x => x.SaleLines)
+                    .WithOne(x => x.Sale)
+                    .HasForeignKey(x => x.SaleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<SaleLine>(entity =>
+            {
+                entity.ToTable("SaleLines");
+
+                entity.HasKey(x => x.SaleLineId);
+
+                entity.Property(x => x.ProductCode).HasMaxLength(50);
+                entity.Property(x => x.ProductName).HasMaxLength(200);
+
+                entity.Property(x => x.VariantCode).HasMaxLength(50);
+                entity.Property(x => x.VariantName).HasMaxLength(200);
+
+                entity.Property(x => x.BasePrice)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.SalePrice)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.CommissionValue)
+                    .HasColumnType("decimal(18,4)");
+
+                entity.Property(x => x.CalculatedAgentCommission)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.FinalAgentCommission)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.SuperCRMCommissionEarned)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.SalesUnitCode)
+                    .HasMaxLength(50);
+
+                entity.Property(x => x.LineTotalAmount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.MonthlyInstallmentAmount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.FirstInstallmentDate)
+                    .HasColumnType("date");
+
+                // RELATION: SaleLine -> Sale
+                entity.HasOne(x => x.Sale)
+                    .WithMany(x => x.SaleLines)
+                    .HasForeignKey(x => x.SaleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // RELATION: SaleLine -> InstallmentSchedules
+                entity.HasMany(x => x.InstallmentSchedules)
+                    .WithOne(x => x.SaleLine)
+                    .HasForeignKey(x => x.SaleLineId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<InstallmentSchedule>(entity =>
+            {
+                entity.ToTable("InstallmentSchedules");
+
+                entity.HasKey(x => x.InstallmentScheduleId);
+
+                entity.Property(x => x.OrderNo)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.CustomerCode)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.InstallmentAmount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.DueDate)
+                    .HasColumnType("date");
+
+                entity.Property(x => x.PaidAmount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Remarks)
+                    .HasMaxLength(200);
+
+                entity.Property(x => x.PaymentNotes)
+                    .HasMaxLength(200);
+
+                // RELATION: InstallmentSchedule -> SaleLine
+                entity.HasOne(x => x.SaleLine)
+                    .WithMany(x => x.InstallmentSchedules)
+                    .HasForeignKey(x => x.SaleLineId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            /// END ALL
 
 
             builder.ApplyConfigurationsFromAssembly(typeof(SuperCrmDbContext).Assembly);

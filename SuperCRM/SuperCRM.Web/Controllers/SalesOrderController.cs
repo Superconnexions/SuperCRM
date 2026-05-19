@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Services;
 using SuperCRM.Web.ViewModels.SalesOrders;
@@ -12,13 +13,37 @@ namespace SuperCRM.Web.Controllers
     {
         private readonly ISalesOrderService _salesOrderService;
         private readonly ISalesOrderDraftService _salesOrderDraftService;
+        private readonly ISalesOrderCustomerService _salesOrderCustomerService;
+        private readonly ISalesOrderCreationService _salesOrderCreationService;
 
         public SalesOrderController(
             ISalesOrderService salesOrderService,
-            ISalesOrderDraftService salesOrderDraftService)
+            ISalesOrderDraftService salesOrderDraftService,
+            ISalesOrderCustomerService salesOrderCustomerService,
+            ISalesOrderCreationService salesOrderCreationService)
         {
             _salesOrderService = salesOrderService;
             _salesOrderDraftService = salesOrderDraftService;
+            _salesOrderCustomerService = salesOrderCustomerService;
+            _salesOrderCreationService = salesOrderCreationService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCustomerForSalesOrder(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var dto = await _salesOrderCustomerService.GetCustomerForSalesOrderAsync(customerId, cancellationToken);
+            if (dto == null || !dto.Success)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = dto?.Message ?? "Customer was not found."
+                });
+            }
+
+            return Json(dto);
         }
 
         [HttpPost]
@@ -77,15 +102,6 @@ namespace SuperCRM.Web.Controllers
                 SalesOrderDraftId = model.SalesOrderDraftId,
                 CurrentUserId = userId,
 
-                //Lines = model.Lines.Select(x => new SaveSalesOrderDraftLineDto
-                //{
-                //    ProductId = x.ProductId,
-                //    ProductVariantId = x.ProductVariantId,
-                //    ProviderProductId = x.ProviderProductId,
-                //    Quantity = x.Quantity <= 0 ? 1 : x.Quantity,
-                //    SalePrice = x.SalePrice,
-                //    FirstInstallmentDate = x.FirstInstallmentDate
-                //}).ToList()
 
                 Lines = (model.Lines ?? new List<SalesOrderProductSelectionLinePostViewModel>())
                 .Select(x => new SaveSalesOrderDraftLineDto
@@ -95,7 +111,7 @@ namespace SuperCRM.Web.Controllers
                     ProviderProductId = x.ProviderProductId,
                     Quantity = x.Quantity,
                     SalePrice = x.SalePrice,
-
+                    IsInstallmentSelected = x.IsInstallmentSelected,
                     InstallmentApplicable = x.InstallmentApplicable,
                     DownPaymentAmount = x.DownPaymentAmount,
                     NoOfInstallment = x.NoOfInstallment,
@@ -173,13 +189,13 @@ namespace SuperCRM.Web.Controllers
             return RedirectToAction(nameof(SalesOrderCustomerCreation));
         }
 
-        [HttpGet]
-        public IActionResult SalesOrderCustomerCreation(Guid draftId)
-        {
-            ViewBag.DraftId = draftId;
+        //[HttpGet]
+        //public IActionResult SalesOrderCustomerCreation(Guid draftId)
+        //{
+        //    ViewBag.DraftId = draftId;
 
-            return View();
-        }
+        //    return View();
+        //}
 
         [HttpGet]
         public IActionResult SalesOrderConfirmation()
@@ -248,5 +264,333 @@ namespace SuperCRM.Web.Controllers
                 }).ToList()
             };
         }
+
+
+        // Start Customer Creation and Sales Order
+
+        [HttpGet]
+        public async Task<IActionResult> SalesOrderCustomerCreation(Guid draftId, CancellationToken cancellationToken = default)
+        {
+            if (draftId == Guid.Empty)
+            {
+                TempData["ErrorMessage"] = "Draft was not found.";
+                return RedirectToAction(nameof(SalesOrderProductList));
+            }
+
+            var dto = await _salesOrderCustomerService.GetCustomerCreationPageAsync(draftId, cancellationToken);
+            if (dto == null)
+            {
+                TempData["ErrorMessage"] = "Draft was not found.";
+                return RedirectToAction(nameof(SalesOrderProductList));
+            }
+
+            return View(MapCustomerCreationViewModel(dto));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchCustomers(string keyword, CancellationToken cancellationToken = default)
+        {
+            var items = await _salesOrderCustomerService.SearchCustomersAsync(keyword ?? string.Empty, cancellationToken);
+            return Json(items);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveCustomerAndPreview(SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
+        {
+            var result = await SaveCustomerInternalAsync(model, cancellationToken);
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return RedirectToAction(nameof(SalesOrderCustomerCreation), new { draftId = model.SalesOrderDraftId });
+            }
+
+            TempData["SuccessMessage"] = result.Message;
+            return RedirectToAction(nameof(SalesOrderPreview), new { draftId = model.SalesOrderDraftId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveCustomer(SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
+        {
+            var result = await SaveCustomerInternalAsync(model, cancellationToken);
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(SalesOrderCustomerCreation), new { draftId = model.SalesOrderDraftId });
+        }
+
+        private async Task<SalesOrderCustomerSaveResultDto> SaveCustomerInternalAsync(
+            SalesOrderCustomerCreationViewModel model,
+            CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == Guid.Empty)
+            {
+                return new SalesOrderCustomerSaveResultDto
+                {
+                    Success = false,
+                    Message = "Invalid login session.",
+                    SalesOrderDraftId = model.SalesOrderDraftId
+                };
+            }
+
+            return await _salesOrderCustomerService.SaveCustomerAsync(new SaveSalesOrderCustomerDto
+            {
+                SalesOrderDraftId = model.SalesOrderDraftId,
+                CurrentUserId = userId,
+                ExistingCustomerId = model.ExistingCustomerId,
+                BusinessType = model.BusinessType,
+                IsBusinessFlow = model.IsBusinessFlow,
+                RequiresBankInformation = model.RequiresBankInformation,
+                IsBusinessAddressSameAsPersonal = model.IsBusinessAddressSameAsPersonal,
+                FirstName = model.Customer.FirstName,
+                LastName = model.Customer.LastName,
+                DisplayName = model.Customer.DisplayName,
+                Email = model.Customer.Email,
+                AlternativeEmail = model.Customer.AlternativeEmail,
+                Phone = model.Customer.Phone,
+                Mobile = model.Customer.Mobile,
+
+                //PersonalAddress = model.ShowPersonalAddress
+                //    ? new SaveSalesOrderAddressDto
+                //    {
+                //        HouseNo = model.PersonalAddress.HouseNo,
+                //        RoadName = model.PersonalAddress.RoadName,
+                //        PostCode = model.PersonalAddress.PostCode,
+                //        City = model.PersonalAddress.City,
+                //        CountryId = model.PersonalAddress.CountryId,
+                //        RegionId = model.PersonalAddress.RegionId,
+                //        AddressLine = model.PersonalAddress.AddressLine
+                //    }
+                //    : null,
+
+                PersonalAddress = new SaveSalesOrderAddressDto
+                {
+                    HouseNo = model.PersonalAddress.HouseNo,
+                    RoadName = model.PersonalAddress.RoadName,
+                    PostCode = model.PersonalAddress.PostCode,
+                    City = model.PersonalAddress.City,
+                    CountryId = model.PersonalAddress.CountryId,
+                    RegionId = model.PersonalAddress.RegionId,
+                    AddressLine = model.PersonalAddress.AddressLine
+                },
+
+                //PersonalAddress = new SaveSalesOrderAddressDto
+                //{
+                //    HouseNo = model.PersonalAddress.HouseNo,
+                //    RoadName = model.PersonalAddress.RoadName,
+                //    PostCode = model.PersonalAddress.PostCode,
+                //    City = model.PersonalAddress.City,
+                //    CountryId = model.PersonalAddress.CountryId,
+                //    RegionId = model.PersonalAddress.RegionId,
+                //    AddressLine = model.PersonalAddress.AddressLine
+                //},
+                Business = new SaveSalesOrderBusinessDto
+                {
+                    BusinessName = model.Business.BusinessName,
+                    BusinessEmail = model.Business.BusinessEmail,
+                    TradingName = model.Business.TradingName,
+                    RegistrationNo = model.Business.RegistrationNo,
+                    ContactPersonName = model.Business.ContactPersonName,
+                    ContactPersonPhone = model.Business.ContactPersonPhone
+                },
+                BusinessAddress = new SaveSalesOrderAddressDto
+                {
+                    HouseNo = model.BusinessAddress.HouseNo,
+                    RoadName = model.BusinessAddress.RoadName,
+                    PostCode = model.BusinessAddress.PostCode,
+                    City = model.BusinessAddress.City,
+                    CountryId = model.BusinessAddress.CountryId,
+                    RegionId = model.BusinessAddress.RegionId,
+                    AddressLine = model.BusinessAddress.AddressLine
+                },
+                BankAccount = new SaveSalesOrderBankAccountDto
+                {
+                    BankName = model.BankAccount.BankName,
+                    AccountName = model.BankAccount.AccountName,
+                    AccountNumber = model.BankAccount.AccountNumber,
+                    SortCode = model.BankAccount.SortCode
+                }
+            }, cancellationToken);
+        }
+
+        [HttpGet]
+        public IActionResult SalesOrderPreview(Guid draftId)
+        {
+            ViewBag.DraftId = draftId;
+            return View(); // Step-2 package will replace this placeholder.
+        }
+
+        private static SalesOrderCustomerCreationViewModel MapCustomerCreationViewModel(SalesOrderCustomerCreationPageDto dto)
+        {
+            var model = new SalesOrderCustomerCreationViewModel
+            {
+                SalesOrderDraftId = dto.SalesOrderDraftId,
+                DraftNo = dto.DraftNo,
+                HasResidentialProduct = dto.Requirement.HasResidentialProduct,
+                HasBusinessProduct = dto.Requirement.HasBusinessProduct,
+                HasMixedBusinessResidential = dto.Requirement.HasMixedBusinessResidential,
+                ShowPersonalAddress = dto.Requirement.IsResidentialOnly || dto.Requirement.HasMixedBusinessResidential,
+                ShowBusinessAddressSameCheckbox = dto.Requirement.HasMixedBusinessResidential,
+                IsResidentialOnly = dto.Requirement.IsResidentialOnly,
+                IsBusinessFlow = dto.Requirement.IsBusinessFlow,
+                RequiresBankInformation = dto.Requirement.RequiresBankInformation,
+                ScenarioName = dto.Requirement.ScenarioName,
+                ExistingCustomerId = dto.SelectedCustomerId,
+                IsCustomerSavedForOrder = dto.SelectedCustomerId.HasValue,
+                BusinessType = 1,
+                CountryOptions = dto.Countries.Select(x => new SelectListItem { Value = x.Value, Text = x.Text }).ToList(),
+                RegionOptions = dto.Regions.Select(x => new SelectListItem { Value = x.Value, Text = x.Text }).ToList(),
+                Products = dto.Products.Select(x => new SalesOrderSelectedProductSummaryViewModel
+                {
+                    ProductName = x.ProductName,
+                    VariantName = x.VariantName,
+                    ProviderName = x.ProviderName,
+                    Quantity = x.Quantity,
+                    SalePrice = x.SalePrice,
+                    LineTotalAmount = x.LineTotalAmount,
+                    CurrencyCode = x.CurrencyCode,
+                    IsInstallmentSelected = x.IsInstallmentSelected,
+                    SalesUnitCode = x.SalesUnitCode,
+                    InstallmentSummary = x.InstallmentApplicable
+                    ? (x.IsInstallmentSelected
+                        ? $"Installment: Down {x.DownPaymentAmount:0.00}, {x.NoOfInstallment} x {x.MonthlyInstallmentAmount:0.00} monthly"
+                        : "One-off")
+                    : ""
+                }).ToList()
+            };
+
+            // Added for Load Page with Existing Customer
+
+            if (dto.Customer != null)
+            {
+                model.Customer.FirstName = dto.Customer.FirstName;
+                model.Customer.LastName = dto.Customer.LastName;
+                model.Customer.DisplayName = dto.Customer.DisplayName;
+                model.Customer.Email = dto.Customer.Email;
+                model.Customer.AlternativeEmail = dto.Customer.AlternativeEmail;
+                model.Customer.Phone = dto.Customer.Phone;
+                model.Customer.Mobile = dto.Customer.Mobile;
+            }
+
+            if (dto.PersonalAddress != null)
+            {
+                model.PersonalAddress.HouseNo = dto.PersonalAddress.HouseNo;
+                model.PersonalAddress.RoadName = dto.PersonalAddress.RoadName;
+                model.PersonalAddress.PostCode = dto.PersonalAddress.PostCode;
+                model.PersonalAddress.City = dto.PersonalAddress.City;
+                model.PersonalAddress.CountryId = dto.PersonalAddress.CountryId;
+                model.PersonalAddress.RegionId = dto.PersonalAddress.RegionId;
+                model.PersonalAddress.AddressLine = dto.PersonalAddress.AddressLine;
+            }
+
+            if (dto.Business != null)
+            {
+                model.Business.BusinessName = dto.Business.BusinessName;
+                model.Business.BusinessEmail = dto.Business.BusinessEmail;
+                model.Business.TradingName = dto.Business.TradingName;
+                model.Business.RegistrationNo = dto.Business.RegistrationNo;
+                model.Business.ContactPersonName = dto.Business.ContactPersonName;
+                model.Business.ContactPersonPhone = dto.Business.ContactPersonPhone;
+            }
+
+            if (dto.BusinessAddress != null)
+            {
+                model.BusinessAddress.HouseNo = dto.BusinessAddress.HouseNo;
+                model.BusinessAddress.RoadName = dto.BusinessAddress.RoadName;
+                model.BusinessAddress.PostCode = dto.BusinessAddress.PostCode;
+                model.BusinessAddress.City = dto.BusinessAddress.City;
+                model.BusinessAddress.CountryId = dto.BusinessAddress.CountryId;
+                model.BusinessAddress.RegionId = dto.BusinessAddress.RegionId;
+                model.BusinessAddress.AddressLine = dto.BusinessAddress.AddressLine;
+            }
+
+            if (dto.BankAccount != null)
+            {
+                model.BankAccount.BankName = dto.BankAccount.BankName;
+                model.BankAccount.AccountName = dto.BankAccount.AccountName;
+                model.BankAccount.AccountNumber = dto.BankAccount.AccountNumber;
+                model.BankAccount.SortCode = dto.BankAccount.SortCode;
+            }
+            // END
+
+            model.PersonalAddress.CountryOptions = model.CountryOptions;
+            model.PersonalAddress.RegionOptions = model.RegionOptions;
+
+            model.BusinessAddress.CountryOptions = model.CountryOptions;
+            model.BusinessAddress.RegionOptions = model.RegionOptions;
+
+            return model;
+
+
+        }
+        // END Customer Creation
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateSalesOrder(Guid draftId, CancellationToken cancellationToken = default)
+        {
+            var userId = GetCurrentUserId();
+
+            var result = await _salesOrderCreationService.CreateSalesOrderFromDraftAsync(
+                new CreateSalesOrderFromDraftRequestDto
+                {
+                    SalesOrderDraftId = draftId,
+                    CurrentUserId = userId
+                },
+                cancellationToken);
+
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return RedirectToAction(nameof(SalesOrderCustomerCreation), new { draftId });
+            }
+
+            TempData["SuccessMessage"] = result.Message;
+            var saleIds = string.Join(",", result.SaleIds);
+            return RedirectToAction(nameof(SalesOrderCreatedSummary), new { saleIds });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SalesOrderCreatedSummary(string saleIds, CancellationToken cancellationToken = default)
+        {
+            var ids = (saleIds ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(x => Guid.TryParse(x, out var id) ? id : Guid.Empty)
+                .Where(x => x != Guid.Empty)
+                .ToList();
+
+            var dto = await _salesOrderCreationService.GetCreatedSalesOrderSummaryAsync(ids, cancellationToken);
+            if (dto == null)
+            {
+                TempData["ErrorMessage"] = "Created sales order was not found.";
+                return RedirectToAction(nameof(SalesOrderProductList));
+            }
+
+            return View(MapSalesOrderCreatedSummaryViewModel(dto));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendSalesOrderEmail(Guid saleId)
+        {
+            // Demo placeholder. Later this action can call EmailSettings module and email Provider.ContactEmail.
+            TempData["SuccessMessage"] = "Email sending placeholder executed. Provider email integration will be added next.";
+            return RedirectToAction(nameof(SalesOrderCreatedSummary), new { saleIds = saleId.ToString() });
+        }
+
+        private static SalesOrderCreatedSummaryViewModel MapSalesOrderCreatedSummaryViewModel(SalesOrderCreatedSummaryDto dto)
+        {
+            return new SalesOrderCreatedSummaryViewModel
+            {
+                Customer = dto.Customer,
+                Business = dto.Business,
+                HomeAddress = dto.HomeAddress,
+                BusinessAddress = dto.BusinessAddress,
+                BankAccount = dto.BankAccount,
+                Orders = dto.Orders
+            };
+        }
+
     }
 }

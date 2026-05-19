@@ -16,7 +16,7 @@ namespace SuperCRM.Web.Controllers
     /// - handles user messages/navigation.
     /// No DbContext/EF logic should be placed here.
     /// </summary>
-    [Authorize(Roles = AppRoles.SuperAdmin)]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class ProductCategoriesController : Controller
     {
         private readonly IProductCategoryService _service;

@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace SuperCRM.Web.Controllers;
 
-[Authorize(Roles = AppRoles.SuperAdmin)]
+[Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
 public class ProvidersController : Controller
 {
     private readonly SuperCrmDbContext _dbContext;

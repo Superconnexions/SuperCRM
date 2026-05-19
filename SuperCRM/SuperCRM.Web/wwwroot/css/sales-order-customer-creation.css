@@ -1,0 +1,47 @@
+.sales-customer-page .card { border-radius: 12px; }
+.sales-customer-page .card-header { background: #f8f9fa; }
+.required-label::after { content: " *"; color: #dc3545; }
+#selectedCustomerBox { margin-bottom: 0; }
+
+
+.sales-order-page {
+    background: #202124;
+    color: #fff;
+    padding: 30px;
+}
+
+.sales-order-card {
+    background: #151617;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+}
+
+    .sales-order-card h3 {
+        color: #6c4cff;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+.sales-order-page .form-control,
+.sales-order-page .form-select {
+    background: #111315;
+    color: #fff;
+    border: 1px solid #3b3d40;
+}
+
+    .sales-order-page .form-control:focus,
+    .sales-order-page .form-select:focus {
+        background: #111315;
+        color: #fff;
+        border-color: #6c4cff;
+        box-shadow: 0 0 0 .2rem rgba(108,76,255,.25);
+    }
+
+.sales-order-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}

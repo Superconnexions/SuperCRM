@@ -1,0 +1,187 @@
+@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderCreatedSummaryViewModel
+@{
+    ViewData["Title"] = "Sales Order Created Summary";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1">Sales Order Created Successfully</h2>
+            <div class="text-muted">Provider-wise split sales order summary</div>
+        </div>
+        <div class="alert alert-warning mb-0">
+            Back button is intentionally not available after sales order confirmation.
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-bold">Customer Information</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3"><strong>Customer Code:</strong> @Model.Customer.CustomerCode</div>
+                <div class="col-md-3"><strong>Name:</strong> @Model.Customer.DisplayName</div>
+                <div class="col-md-3"><strong>Email:</strong> @Model.Customer.Email</div>
+                <div class="col-md-3"><strong>Mobile:</strong> @Model.Customer.Mobile</div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Business != null)
+    {
+        <div class="card mb-4">
+            <div class="card-header fw-bold">Business Information</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3"><strong>Business:</strong> @Model.Business.BusinessName</div>
+                    <div class="col-md-3"><strong>Trading Name:</strong> @Model.Business.TradingName</div>
+                    <div class="col-md-3"><strong>Registration No:</strong> @Model.Business.RegistrationNo</div>
+                    <div class="col-md-3"><strong>Email:</strong> @Model.Business.BusinessEmail</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @foreach (var order in Model.Orders)
+    {
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@order.ProviderName</strong> | Order No: @order.OrderNo | Date: @order.OrderDate.ToString("dd-MMM-yyyy")
+                </div>
+                <form asp-action="SendSalesOrderEmail" asp-controller="SalesOrder" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="saleId" value="@order.SaleId" />
+                    <button type="submit" class="btn btn-light btn-sm">Send Email to Provider</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    @if (order.HasResidentialLines)
+                    {
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <h5>Home Address</h5>
+                                @if (Model.HomeAddress != null)
+                                {
+                                    <div>@Model.HomeAddress.HouseNo @Model.HomeAddress.RoadName</div>
+                                    <div>@Model.HomeAddress.AddressLine</div>
+                                    <div>@Model.HomeAddress.City @Model.HomeAddress.PostCode</div>
+                                    <div>@Model.HomeAddress.RegionName @Model.HomeAddress.CountryName</div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">Home address not available.</div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (order.HasBusinessLines)
+                    {
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <h5>Business Address</h5>
+                                @if (Model.BusinessAddress != null)
+                                {
+                                    <div>@Model.BusinessAddress.HouseNo @Model.BusinessAddress.RoadName</div>
+                                    <div>@Model.BusinessAddress.AddressLine</div>
+                                    <div>@Model.BusinessAddress.City @Model.BusinessAddress.PostCode</div>
+                                    <div>@Model.BusinessAddress.RegionName @Model.BusinessAddress.CountryName</div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">Business address not available.</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.BankAccount != null)
+                {
+                    <div class="alert alert-info">
+                        <strong>Bank:</strong> @Model.BankAccount.BankName |
+                        <strong>Account:</strong> @Model.BankAccount.AccountName |
+                        <strong>No:</strong> @Model.BankAccount.AccountNumber |
+                        <strong>Sort Code:</strong> @Model.BankAccount.SortCode
+                    </div>
+                }
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Package</th>
+                                <th class="text-end">Qty</th>
+                                <th>Unit</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-end">Commission</th>
+                                <th>Installment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var line in order.Lines)
+                            {
+                                <tr>
+                                    <td>@line.ProductName</td>
+                                    <td>@line.VariantName</td>
+                                    <td class="text-end">@line.Quantity</td>
+                                    <td>@line.SalesUnitCode</td>
+                                    <td class="text-end">@line.UnitPrice.ToString("0.00")</td>
+                                    <td class="text-end">@line.LineTotalAmount.ToString("0.00")</td>
+                                    <td class="text-end">@line.FinalAgentCommission.ToString("0.00")</td>
+                                    <td>
+                                        @if (line.IsInstallment)
+                                        {
+                                            <span>@line.NoOfInstallment x @line.MonthlyInstallmentAmount?.ToString("0.00") monthly</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5" class="text-end">Order Total</th>
+                                <th class="text-end">@order.OrderTotal.ToString("0.00")</th>
+                                <th class="text-end">@order.AgentCommissionAmount.ToString("0.00")</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                @if (order.Installments.Any())
+                {
+                    <h5 class="mt-4">Installment Schedule</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Installment No</th>
+                                    <th class="text-end">Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.Installments)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td class="text-end">@item.InstallmentNo</td>
+                                        <td class="text-end">@item.InstallmentAmount.ToString("0.00")</td>
+                                        <td>@item.DueDate.ToString("dd-MMM-yyyy")</td>
+                                        <td>Pending</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

@@ -16,10 +16,18 @@
             return;
         }
 
+        //if (basePriceType === 2) {
+        //    priceInput.value = '0.00';
+        //    return;
+        //}
+
         if (basePriceType === 2) {
-            priceInput.value = '0.00';
+            if (!priceInput.value || parseFloat(priceInput.value) === 0) {
+                priceInput.value = '0.00';
+            }
             return;
         }
+
 
         if (basePriceType === 3) {
             const selectedVariant = productItem.querySelector('.variant-select option:checked');

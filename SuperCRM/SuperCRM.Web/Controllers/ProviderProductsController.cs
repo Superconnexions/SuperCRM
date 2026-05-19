@@ -13,7 +13,7 @@ namespace SuperCRM.Web.Controllers
     /// MVC controller for ProviderProducts setup.
     /// Includes list search by provider/product and delete action.
     /// </summary>
-    [Authorize(Roles = AppRoles.SuperAdmin)]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class ProviderProductsController : Controller
     {
         private readonly IProviderProductService _service;

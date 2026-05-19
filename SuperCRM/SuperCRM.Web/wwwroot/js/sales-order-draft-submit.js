@@ -17,7 +17,13 @@ function buildSalesOrderDraftLines() {
         const productId = productCheck.value;
         const providerSelect = item.querySelector('.provider-select');
         const variantSelect = item.querySelector('.variant-select');
-        const salePriceInput = item.querySelector('.product-price');
+        
+        
+        const salePriceInput =
+            document.getElementById('product_total_' + productId)
+            || item.querySelector('.price-input');
+
+        //alert('ProductId: ' + productId + ' Price: ' + salePriceInput?.value);
 
         const installmentData = getInstallmentData(item, productId);
 
@@ -33,6 +39,9 @@ function buildSalesOrderDraftLines() {
 
                 const price = parseFloat(row.querySelector('.roll-unit-price')?.value || '0') || 0;
 
+                // For debugging: log product and price info for each selected roll variant
+                console.log('Saving Product:', productId, 'SalePrice:', salePriceInput?.value);
+
                 appendDraftLine(
                     container,
                     index++,
@@ -45,6 +54,7 @@ function buildSalesOrderDraftLines() {
                 );
             });
         } else {
+            //alert('ProductId2: ' + productId + ' Price2: ' + salePriceInput?.value);
             appendDraftLine(
                 container,
                 index++,
