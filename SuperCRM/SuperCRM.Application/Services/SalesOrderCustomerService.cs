@@ -65,6 +65,10 @@ namespace SuperCRM.Application.Services
                 SalesOrderDraftId = draft.SalesOrderDraftId,
                 DraftNo = draft.DraftNo,
                 Requirement = requirement,
+                BusinessType = savedBusiness == null
+                ? CustomerBusinessType.Solo
+                : (CustomerBusinessType)savedBusiness.BusinessType,
+
                 Products = draft.DraftLines
                     .OrderBy(x => x.ProviderName ?? "SuperCRM")
                     .ThenBy(x => x.ProductName)
@@ -95,7 +99,8 @@ namespace SuperCRM.Application.Services
                 SelectedCustomerBusinessId = draft.CustomerBusinessId,
                 SelectedCustomerAddressId = draft.CustomerAddressId,
                 SelectedCustomerBankAccountId = draft.CustomerBankAccountId,
-                
+
+
                 // Added to load Customer information
                 Customer = savedCustomer == null ? null : new SalesOrderCustomerDto
                 {

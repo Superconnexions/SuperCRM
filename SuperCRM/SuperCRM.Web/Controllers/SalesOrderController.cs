@@ -437,7 +437,7 @@ namespace SuperCRM.Web.Controllers
                 ScenarioName = dto.Requirement.ScenarioName,
                 ExistingCustomerId = dto.SelectedCustomerId,
                 IsCustomerSavedForOrder = dto.SelectedCustomerId.HasValue,
-                BusinessType = 1,
+                BusinessType = (byte)dto.BusinessType,
                 CountryOptions = dto.Countries.Select(x => new SelectListItem { Value = x.Value, Text = x.Text }).ToList(),
                 RegionOptions = dto.Regions.Select(x => new SelectListItem { Value = x.Value, Text = x.Text }).ToList(),
                 Products = dto.Products.Select(x => new SalesOrderSelectedProductSummaryViewModel

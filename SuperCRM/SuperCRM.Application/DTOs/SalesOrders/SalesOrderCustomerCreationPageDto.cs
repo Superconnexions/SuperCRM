@@ -1,3 +1,5 @@
+using SuperCRM.Domain.Enums;
+
 namespace SuperCRM.Application.DTOs.SalesOrders
 {
     public class SalesOrderCustomerCreationPageDto
@@ -17,6 +19,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public SalesOrderBusinessDto? Business { get; set; }
         public SalesOrderCustomerAddressDto? BusinessAddress { get; set; }
         public SalesOrderBankAccountDto? BankAccount { get; set; }
+        public CustomerBusinessType BusinessType { get; set; } = CustomerBusinessType.Solo;
 
     }
 

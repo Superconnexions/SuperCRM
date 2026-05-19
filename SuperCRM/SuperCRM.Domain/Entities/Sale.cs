@@ -22,7 +22,7 @@ namespace SuperCRM.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public Guid? UpdatedByUserId { get; set; }
-
+        public string OrderNo { get; set; } = string.Empty;
         public Customer? Customer { get; set; }
         public CustomerBusiness? CustomerBusiness { get; set; }
         public Provider? Provider { get; set; }

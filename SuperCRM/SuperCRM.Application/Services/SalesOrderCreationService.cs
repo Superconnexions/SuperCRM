@@ -61,6 +61,7 @@ namespace SuperCRM.Application.Services
                 var sale = new Sale
                 {
                     SaleId = saleId,
+                    OrderNo = await GenerateOrderNoAsync(cancellationToken),
                     CustomerId = draft.CustomerId.Value,
                     CustomerBusinessId = draft.CustomerBusinessId,
                     ProviderId = group.Key,
@@ -83,7 +84,7 @@ namespace SuperCRM.Application.Services
                 await _repository.AddSaleAsync(sale, cancellationToken);
 
                 var saleCommissionTotal = 0m;
-                var saleOrderNo = BuildOrderNo(sale);
+                var saleOrderNo = sale.OrderNo;
 
                 foreach (var draftLine in group)
                 {
@@ -179,6 +180,16 @@ namespace SuperCRM.Application.Services
             };
         }
 
+        private async Task<string> GenerateOrderNoAsync(CancellationToken cancellationToken)
+        {
+            var prefix = "SO";
+            var datePart = DateTime.UtcNow.ToString("yyMM");
+
+            var random = Random.Shared.Next(1000, 9999);
+
+            return $"{prefix}-{datePart}-{random}";
+        }
+
         public async Task<SalesOrderCreatedSummaryDto?> GetCreatedSalesOrderSummaryAsync(
             List<Guid> saleIds,
             CancellationToken cancellationToken = default)
@@ -260,7 +271,8 @@ namespace SuperCRM.Application.Services
                 summary.Orders.Add(new SalesOrderProviderSummaryDto
                 {
                     SaleId = sale.SaleId,
-                    OrderNo = BuildOrderNo(sale),
+                    //OrderNo = BuildOrderNo(sale),
+                    OrderNo = sale.OrderNo,
                     ProviderId = sale.ProviderId,
                     ProviderName = provider?.ProviderName ?? "SuperCRM",
                     ProviderEmail = provider?.ContactEmail,
@@ -367,10 +379,10 @@ namespace SuperCRM.Application.Services
             };
         }
 
-        public static string BuildOrderNo(Sale sale)
-        {
-            return $"SO-{sale.OrderDate:yyyyMMdd}-{sale.SaleId.ToString("N")[..8].ToUpper()}";
-        }
+        //public static string BuildOrderNo(Sale sale)
+        //{
+        //    return $"SO-{sale.OrderDate:yyyyMMdd}-{sale.SaleId.ToString("N")[..8].ToUpper()}";
+        //}
 
         private static CreateSalesOrderResultDto Fail(Guid draftId, string message)
         {

@@ -876,6 +876,13 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.ToTable("Sales");
 
                 entity.HasKey(x => x.SaleId);
+                entity.Property(x => x.OrderNo)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.HasIndex(x => x.OrderNo)
+                    .IsUnique()
+                    .HasDatabaseName("UQ_Sales_OrderNo");
 
                 entity.Property(x => x.OrderStatus).HasMaxLength(50);
                 entity.Property(x => x.SoldByAgentCode).HasMaxLength(50);
@@ -885,6 +892,7 @@ namespace SuperCRM.Persistence.DbContexts
 
                 entity.Property(x => x.AgentCommissionAmount)
                     .HasColumnType("decimal(18,2)");
+
 
                 // RELATION: Sale -> SaleLines
                 entity.HasMany(x => x.SaleLines)
