@@ -54,4 +54,11 @@
         <input asp-for="BasePrice" class="form-control" />
         <span asp-validation-for="BasePrice" class="text-danger"></span>
     </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="ExpiryInMonth" class="form-label"></label>
+        <input asp-for="ExpiryInMonth" type="number" min="0" class="form-control" />
+        <span asp-validation-for="ExpiryInMonth" class="text-danger"></span>
+        <small class="text-muted">0 means no expiry.</small>
+    </div>
 </div>

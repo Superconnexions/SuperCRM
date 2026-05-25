@@ -20,6 +20,7 @@ namespace SuperCRM.Web.ViewModels.ProductVariants
         public int DisplayOrder { get; set; }
 
         public decimal? BasePrice { get; set; }
+        public int ExpiryInMonth { get; set; }
 
     }
 }

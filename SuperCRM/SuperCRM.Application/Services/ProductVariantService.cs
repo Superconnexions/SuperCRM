@@ -84,6 +84,7 @@ namespace SuperCRM.Application.Services
                 DisplayStyle = request.DisplayStyle,
                 DisplayOrder = request.DisplayOrder,
                 BasePrice = request.BasePrice,
+                ExpiryInMonth = request.ExpiryInMonth < 0 ? 0 : request.ExpiryInMonth,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null,
                 UpdatedByUserId = request.UpdatedByUserId
@@ -115,6 +116,7 @@ namespace SuperCRM.Application.Services
             entity.DisplayStyle = request.DisplayStyle;
             entity.DisplayOrder = request.DisplayOrder;
             entity.BasePrice = request.BasePrice;
+            entity.ExpiryInMonth = request.ExpiryInMonth < 0 ? 0 : request.ExpiryInMonth;
             entity.UpdatedAt = DateTime.UtcNow;
             entity.UpdatedByUserId = request.UpdatedByUserId;
 
@@ -212,6 +214,7 @@ namespace SuperCRM.Application.Services
                 VariantName = entity.VariantName,
                 DisplayStyle = entity.DisplayStyle,
                 DisplayOrder = entity.DisplayOrder,
+                ExpiryInMonth = entity.ExpiryInMonth,
                 BasePrice = entity.BasePrice
             };
         }

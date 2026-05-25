@@ -51,6 +51,10 @@ namespace SuperCRM.Web.ViewModels.ProductVariants
         [Range(0, 999999999)]
         public decimal? BasePrice { get; set; }
 
+        [Display(Name = "Expiry In Month")]
+        [Range(0, 120, ErrorMessage = "Expiry month must be between 0 and 120.")]
+        public int ExpiryInMonth { get; set; } = 0;
+
         public bool IsEditMode { get; set; }
 
         public List<SelectListItem> ProductOptions { get; set; } = new();

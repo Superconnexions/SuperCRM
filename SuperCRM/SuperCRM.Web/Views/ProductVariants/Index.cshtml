@@ -24,6 +24,7 @@
             <th>Display Style</th>
             <th>Display Order</th>
             <th>Base Price</th>
+            <th>Expiry In Month</th>
             <th style="width:120px;">Action</th>
         </tr>
     </thead>
@@ -40,6 +41,7 @@
                 <td>@item.DisplayStyleName</td>
                 <td>@item.DisplayOrder</td>
                 <td>@(item.BasePrice.HasValue ? item.BasePrice.Value.ToString("0.00") : string.Empty)</td>
+                    <td>@(item.ExpiryInMonth>0? item.ExpiryInMonth : "No expiry date")</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ProductVariantId" class="btn btn-sm btn-warning">Edit</a>
                 </td>

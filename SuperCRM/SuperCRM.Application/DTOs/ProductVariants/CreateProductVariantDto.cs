@@ -17,5 +17,6 @@ namespace SuperCRM.Application.DTOs.ProductVariants
         public Guid? UpdatedByUserId { get; set; }
 
         public int DisplayOrder { get; set; }
+        public int ExpiryInMonth { get; set; } = 0;
     }
 }

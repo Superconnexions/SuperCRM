@@ -42,6 +42,7 @@ namespace SuperCRM.Web.Controllers
                 VariantName = x.VariantName,
                 DisplayStyle = x.DisplayStyle,
                 DisplayOrder = x.DisplayOrder,
+                ExpiryInMonth = x.ExpiryInMonth,
                 BasePrice = x.BasePrice
             }).ToList();
 
@@ -80,6 +81,7 @@ namespace SuperCRM.Web.Controllers
 
                 DisplayOrder = model.DisplayOrder,
                 BasePrice = model.BasePrice,
+                ExpiryInMonth = model.ExpiryInMonth,
                 UpdatedByUserId = GetCurrentUserId()
             };
 
@@ -111,6 +113,7 @@ namespace SuperCRM.Web.Controllers
                 DisplayStyle = dto.DisplayStyle,
                 DisplayOrder = dto.DisplayOrder,
                 BasePrice = dto.BasePrice,
+                ExpiryInMonth = dto.ExpiryInMonth,
                 IsEditMode = true
             };
 
@@ -144,6 +147,7 @@ namespace SuperCRM.Web.Controllers
                 DisplayStyle = model.DisplayStyle!.Value,
                 DisplayOrder = model.DisplayOrder,
                 BasePrice = model.BasePrice,
+                ExpiryInMonth = model.ExpiryInMonth,
                 UpdatedByUserId = GetCurrentUserId()
             };
 

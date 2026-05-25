@@ -25,5 +25,6 @@ namespace SuperCRM.Domain.Entities
 
         public Product? Product { get; set; }
         public ProductVariantType? VariantType { get; set; }
+        public int ExpiryInMonth { get; set; } = 0;
     }
 }

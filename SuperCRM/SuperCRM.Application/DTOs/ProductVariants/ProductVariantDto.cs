@@ -20,5 +20,6 @@ namespace SuperCRM.Application.DTOs.ProductVariants
         public decimal? BasePrice { get; set; }
 
         public int DisplayOrder { get; set; }
+        public int ExpiryInMonth { get; set; } 
     }
 }

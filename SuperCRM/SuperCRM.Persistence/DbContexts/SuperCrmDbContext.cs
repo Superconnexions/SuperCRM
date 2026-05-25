@@ -184,6 +184,10 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.HasIndex(e => new { e.ProductId, e.VariantCode })
                       .IsUnique()
                       .HasDatabaseName("UQ_ProductVariants_Product_VariantCode");
+
+                entity.Property(e => e.ExpiryInMonth)
+                      .IsRequired()
+                      .HasDefaultValue(0);
             });
 
             // END ProductVariant
