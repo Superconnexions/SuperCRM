@@ -250,6 +250,12 @@ namespace SuperCRM.Web.Controllers
                         ProductCode = pr.ProductCode,
                         ProductName = pr.ProductName
                     }).ToList(),
+                    ProviderLinks = p.ProviderLinks.Select(link => new SalesOrderProviderLinkDto
+                    {
+                        ProviderId = link.ProviderId,
+                        ProviderName = link.ProviderName,
+                        WebsiteUrl = link.WebsiteUrl
+                    }).ToList(),
                     Variants = p.Variants.Select(v => new SalesOrderProductVariantOptionViewModel
                     {
                         ProductVariantId = v.ProductVariantId,

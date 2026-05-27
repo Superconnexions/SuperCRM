@@ -115,11 +115,175 @@ function appendDraftLine(
     });
 }
 
+function validateSalesOrderSelection() {
+
+    let validationMessage = '';
+
+    const productItems =
+        document.querySelectorAll('.sales-order-product-item');
+
+    for (const item of productItems) {
+
+        const productCheck =
+            item.querySelector('.product-check');
+
+        if (!productCheck || !productCheck.checked) {
+            continue;
+        }
+
+        const productName =
+            item.querySelector('.product-title')?.innerText?.trim()
+            || 'Selected Product';
+
+        const providerSelect =
+            item.querySelector('.provider-select');
+
+        const variantSelect =
+            item.querySelector('.variant-select');
+
+        const salePriceInput =
+            item.querySelector('.price-input');
+
+        // ====================================================
+        // Validation-1
+        // Provider Product Validation
+        // ====================================================
+
+        if (providerSelect) {
+
+            const providerValue =
+                providerSelect.value || '';
+
+            if (!providerValue) {
+
+                alert('Please select Provider for ' + productName);
+                return false;
+            }
+        }
+
+        if (variantSelect) {
+
+            const variantValue =
+                variantSelect.value || '';
+
+            if (!variantValue) {
+
+                alert('Please select Package for ' + productName);
+                return false;
+            }
+        }
+
+        const totalPrice =
+            parseFloat(salePriceInput?.value || '0') || 0;
+
+        if (totalPrice <= 0) {
+
+            alert('Total Price must be greater than zero for ' + productName);
+            return false;
+        }
+
+        // ====================================================
+        // Validation-2
+        // Rolls Quantity Validation
+        // ====================================================
+
+        const rollRows =
+            item.querySelectorAll('.roll-variant-row');
+
+        if (rollRows.length > 0) {
+
+            let hasQty = false;
+
+            for (const row of rollRows) {
+
+                const rollCheck =
+                    row.querySelector('.roll-variant-check');
+
+                if (!rollCheck || !rollCheck.checked) {
+                    continue;
+                }
+
+                const qty =
+                    parseInt(row.querySelector('.roll-qty')?.value || '0') || 0;
+
+                if (qty <= 0) {
+
+                    alert('Quantity must be greater than zero for ' + productName);
+                    return false;
+                }
+
+                hasQty = true;
+            }
+
+            if (!hasQty) {
+
+                alert('Please select at least one roll/package for ' + productName);
+                return false;
+            }
+        }
+
+        // ====================================================
+        // Validation-3
+        // Installment Validation
+        // ====================================================
+
+        const installmentRadio =
+            item.querySelector('input[name^="PaymentMode_"][value="Installment"]:checked');
+
+        if (installmentRadio) {
+
+            const downPayment =
+                parseFloat(item.querySelector('.down-payment-amount')?.value || '0') || 0;
+
+            const noOfInstallment =
+                parseInt(item.querySelector('.no-of-installment')?.value || '0') || 0;
+
+            const monthlyInstallment =
+                parseFloat(item.querySelector('.monthly-installment-amount')?.value || '0') || 0;
+
+            if (noOfInstallment <= 0) {
+
+                alert('No of Installment must be greater than zero for ' + productName);
+                return false;
+            }
+
+            if (monthlyInstallment <= 0) {
+
+                alert('Monthly Installment must be greater than zero for ' + productName);
+                return false;
+            }
+
+            const installmentTotal =
+                (monthlyInstallment * noOfInstallment) + downPayment;
+
+            if (Math.abs(installmentTotal - totalPrice) > 0.01) {
+
+                alert(
+                    'Installment calculation mismatch for '
+                    + productName
+                    + '. Total Price should equal '
+                    + 'Down Payment + (No Of Installment × Monthly Installment).'
+                );
+
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('salesOrderProductForm');
     if (!form) return;
 
-    form.addEventListener('submit', function () {
+    form.addEventListener('submit', function (e) {
+
+        if (!validateSalesOrderSelection()) {
+            e.preventDefault();
+            return false;
+        }
+
         buildSalesOrderDraftLines();
     });
 });

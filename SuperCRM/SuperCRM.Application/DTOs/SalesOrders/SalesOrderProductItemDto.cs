@@ -29,5 +29,6 @@ namespace SuperCRM.Application.DTOs.SalesOrders
 
         public List<SalesOrderProviderOptionDto> Providers { get; set; } = new();
         public List<SalesOrderProductVariantOptionDto> Variants { get; set; } = new();
+        public List<SalesOrderProviderLinkDto> ProviderLinks { get; set; } = new();
     }
 }

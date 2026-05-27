@@ -1,3 +1,5 @@
+using SuperCRM.Application.DTOs.SalesOrders;
+
 namespace SuperCRM.Web.ViewModels.SalesOrders
 {
     public class SalesOrderProductItemViewModel
@@ -24,5 +26,6 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
         public string? Remarks { get; set; }
         public List<SalesOrderProviderOptionViewModel> Providers { get; set; } = new();
         public List<SalesOrderProductVariantOptionViewModel> Variants { get; set; } = new();
+        public List<SalesOrderProviderLinkDto> ProviderLinks { get; set; } = new();
     }
 }

@@ -87,6 +87,7 @@ namespace SuperCRM.Persistence.Repositories
                     x.ProviderProductId,
                     x.ProviderId,
                     ProviderName = x.Provider != null ? x.Provider.ProviderName : string.Empty,
+                    ProviderUrl = x.Provider != null ? x.Provider.ProviderUrl : null,
                     x.ProductCode,
                     x.ProductName
                 })
@@ -159,6 +160,17 @@ namespace SuperCRM.Persistence.Repositories
                                         ProductCode = pp.ProductCode,
                                         ProductName = pp.ProductName
                                     }).ToList(),
+                                ProviderLinks = providerProducts
+                                .Where(pp => pp.ProductId == p.ProductId && !string.IsNullOrWhiteSpace(pp.ProviderUrl))
+                                .GroupBy(pp => pp.ProviderId)
+                                .Select(g => g.First())
+                                .Select(pp => new SalesOrderProviderLinkDto
+                                {
+                                    ProviderId = pp.ProviderId,
+                                    ProviderName = pp.ProviderName,
+                                    WebsiteUrl = pp.ProviderUrl
+                                })
+                                .ToList(),
                                 Variants = variants
                                     .Where(v => v.ProductId == p.ProductId)
                                     .Select(v => new SalesOrderProductVariantOptionDto

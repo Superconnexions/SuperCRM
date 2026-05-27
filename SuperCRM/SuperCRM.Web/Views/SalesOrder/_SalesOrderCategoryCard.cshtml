@@ -61,8 +61,38 @@
                              : "col-12 col-md-6 col-lg-4"
                 )">
                 <partial name="_SalesOrderProductItem" model="product" />
-            </div>
-                        }
+                </div>
+            }
+
+
         </div>
+
+        @{
+            var categoryProviderLinks = Model.Products
+            .SelectMany(p => p.ProviderLinks)
+            .Where(p => !string.IsNullOrWhiteSpace(p.WebsiteUrl))
+            .GroupBy(p => p.ProviderId)
+            .Select(g => g.First())
+            .OrderBy(p => p.ProviderName)
+            .ToList();
+        }
+
+        @if (categoryProviderLinks.Any())
+        {
+            <div class="mt-3 small provider-link-box">
+                @foreach (var provider in categoryProviderLinks)
+                {
+                    <div>
+                        <a href="@provider.WebsiteUrl"
+                           target="_blank"
+                           class="text-info text-decoration-underline">
+                            Check price in @provider.ProviderName
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+
     </div>
+
 </div>
