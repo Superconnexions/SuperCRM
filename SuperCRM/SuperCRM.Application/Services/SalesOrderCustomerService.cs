@@ -124,6 +124,7 @@ namespace SuperCRM.Application.Services
                     PostCode = personalAddress.PostCode,
                     City = personalAddress.City,
                     CountryId = personalAddress.CountryId,
+                    CityId = personalAddress.CityId,
                     RegionId = personalAddress.RegionId,
                     AddressLine = personalAddress.AddressLine
                 },
@@ -147,6 +148,7 @@ namespace SuperCRM.Application.Services
                     RoadName = businessAddress.RoadName,
                     PostCode = businessAddress.PostCode,
                     City = businessAddress.City,
+                    CityId = businessAddress.CityId,
                     CountryId = businessAddress.CountryId,
                     RegionId = businessAddress.RegionId,
                     AddressLine = businessAddress.AddressLine
@@ -177,6 +179,17 @@ namespace SuperCRM.Application.Services
             if (draft == null)
                 return Fail(request.SalesOrderDraftId, "Sales order draft was not found.");
 
+            // Validaation----------------
+
+            //var productIds = draft.DraftLines.Select(x => x.ProductId).Distinct().ToList();
+            //var products = await _repository.GetProductsByIdsAsync(productIds, cancellationToken);
+            //var requirement = BuildRequirement(products);
+
+            //var validation = ValidateCustomerRequest(request, requirement);
+            //if (!validation.Success)
+            //    return Fail(request.SalesOrderDraftId, validation.Message);
+            // END Validation
+
             Guid customerId;
             Guid? customerBusinessId = null;
             Guid? customerAddressId = null;
@@ -192,8 +205,8 @@ namespace SuperCRM.Application.Services
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
-                    return Fail(request.SalesOrderDraftId, "First name and last name are required.");
+                //if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
+                //    return Fail(request.SalesOrderDraftId, "First name and last name are required.");
 
                 customerId = Guid.NewGuid();
                 var displayName = string.IsNullOrWhiteSpace(request.DisplayName)
@@ -204,7 +217,8 @@ namespace SuperCRM.Application.Services
                 {
                     CustomerId = customerId,
                     CustomerCode = await _repository.GenerateNextCustomerCodeAsync(cancellationToken),
-                    RegistrationSource = 1, // AgentCreated/AdminCreated for demo flow
+                    //RegistrationSource = 1, // AgentCreated/AdminCreated for demo flow
+                    RegistrationSource = (byte)request.RegistrationSource,
                     FirstName = request.FirstName.Trim(),
                     LastName = request.LastName.Trim(),
                     DisplayName = displayName,
@@ -222,50 +236,48 @@ namespace SuperCRM.Application.Services
 
                 var isDirectorPersonalAddress = request.IsBusinessFlow && request.BusinessType == (byte)CustomerBusinessType.Limited;
 
-                //var personalAddress = BuildAddress(
-                //    request.PersonalAddress,
-                //    customerId,
-                //    null,
-                //    (byte)CustomerAddressType.Personal,
-                //    isDefault: !isDirectorPersonalAddress,
-                //    isBusinessAddressSame: request.IsBusinessFlow && request.IsBusinessAddressSameAsPersonal,
-                //    request.CurrentUserId);
-                //customerAddressId = personalAddress.CustomerAddressId;
+            //var personalAddress = BuildAddress(
+            //    request.PersonalAddress,
+            //    customerId,
+            //    null,
+            //    (byte)CustomerAddressType.Personal,
+            //    isDefault: !isDirectorPersonalAddress,
+            //    isBusinessAddressSame: request.IsBusinessFlow && request.IsBusinessAddressSameAsPersonal,
+            //    request.CurrentUserId);
+            //customerAddressId = personalAddress.CustomerAddressId;
 
-                //await _repository.AddCustomerAddressAsync(personalAddress, cancellationToken);
+            //await _repository.AddCustomerAddressAsync(personalAddress, cancellationToken);
 
-                if (HasAddressValue(request.PersonalAddress))
+            var isBusinessAddressSame = request.IsBusinessAddressSameAsPersonal;
+
+                //if ((HasAddressValue(request.PersonalAddress) && !request.IsBusinessFlow) ||
+                //   (HasAddressValue(request.PersonalAddress) && request.IsBusinessFlow && request.IsBusinessAddressSameAsPersonal))
+
+                if ( HasAddressValue(request.PersonalAddress) )
                 {
-                    var personalAddress = new CustomerAddress
-                    {
-                        CustomerAddressId = Guid.NewGuid(),
-                        CustomerId = customer.CustomerId,
-                        AddressType = 1,
-                        HouseNo = request.PersonalAddress!.HouseNo,
-                        RoadName = request.PersonalAddress.RoadName,
-                        PostCode = request.PersonalAddress.PostCode,
-                        City = request.PersonalAddress.City,
-                        CountryId = request.PersonalAddress.CountryId,
-                        RegionId = request.PersonalAddress.RegionId,
-                        AddressLine = request.PersonalAddress.AddressLine,
-                        IsDefault = !request.IsBusinessFlow,
-                        IsBusinessAddressSame = false,
-                        CreatedAt = DateTime.UtcNow
-                    };
+                    var personalAddress = BuildAddress(
+                        request.PersonalAddress!,
+                        customerId,
+                        null,
+                        (byte)CustomerAddressType.Personal,
+                        isDefault: true,
+                        isBusinessAddressSame: request.IsBusinessAddressSameAsPersonal,
+                        request.CurrentUserId);
+
                     customerAddressId = personalAddress.CustomerAddressId;
                     await _repository.AddCustomerAddressAsync(personalAddress, cancellationToken);
+                    await _repository.SaveChangesAsync(cancellationToken);
                 }
 
                 if (request.IsBusinessFlow)
                 {
-                    if (string.IsNullOrWhiteSpace(request.Business.BusinessName))
-                        return Fail(request.SalesOrderDraftId, "Business name is required.");
+                    //if (string.IsNullOrWhiteSpace(request.Business.BusinessName))
+                    //    return Fail(request.SalesOrderDraftId, "Business name is required.");
 
-                    if (request.BusinessType == (byte)CustomerBusinessType.Limited &&
-                        (string.IsNullOrWhiteSpace(request.Business.TradingName) || string.IsNullOrWhiteSpace(request.Business.RegistrationNo)))
-                    {
-                        return Fail(request.SalesOrderDraftId, "Trading name and registration number are required for LTD company.");
-                    }
+                    //if (request.BusinessType == (byte)CustomerBusinessType.Limited && string.IsNullOrWhiteSpace(request.Business.RegistrationNo))
+                    //{
+                    //    return Fail(request.SalesOrderDraftId, "Registration number are required for LTD company.");
+                    //}
 
                     var business = new CustomerBusiness
                     {
@@ -287,26 +299,28 @@ namespace SuperCRM.Application.Services
                     // Save Customer + Business first so SalesOrderDrafts FK can reference valid rows
                     await _repository.SaveChangesAsync(cancellationToken);
 
-                    if (!request.IsBusinessAddressSameAsPersonal)
+                    var businessAddressDto = request.IsBusinessAddressSameAsPersonal? request.PersonalAddress: request.BusinessAddress;
+
+                    if (HasAddressValue(businessAddressDto))
                     {
                         var businessAddress = BuildAddress(
-                            request.BusinessAddress,
+                            businessAddressDto!,
                             customerId,
                             business.CustomerBusinessId,
                             (byte)CustomerAddressType.Business,
                             isDefault: true,
-                            isBusinessAddressSame: false,
+                            isBusinessAddressSame: request.IsBusinessAddressSameAsPersonal,
                             request.CurrentUserId);
 
                         customerAddressId = businessAddress.CustomerAddressId;
                         await _repository.AddCustomerAddressAsync(businessAddress, cancellationToken);
                         await _repository.SaveChangesAsync(cancellationToken);
                     }
-                }
+                } // Business Flow mean Business Product
 
                 if (request.RequiresBankInformation)
                 {
-                    if (!string.IsNullOrWhiteSpace(request.BankAccount.BankName) && !string.IsNullOrWhiteSpace(request.BankAccount.AccountName) && !string.IsNullOrWhiteSpace(request.BankAccount.AccountNumber) )
+                    if (!string.IsNullOrWhiteSpace(request.BankAccount.SortCode)  && !string.IsNullOrWhiteSpace(request.BankAccount.AccountNumber) )
                     {
                         var bankAccount = new CustomerBankAccount
                         {
@@ -350,19 +364,115 @@ namespace SuperCRM.Application.Services
                 CustomerBankAccountId = customerBankAccountId
             };
         }
+
+        private static (bool Success, string Message) ValidateCustomerRequest(
+                SaveSalesOrderCustomerDto request,
+                SalesOrderCustomerRequirementDto requirement)
+        {
+            if (string.IsNullOrWhiteSpace(request.FirstName))
+                return (false, "First name is required.");
+
+            if (string.IsNullOrWhiteSpace(request.LastName))
+                return (false, "Last name is required.");
+
+            if (string.IsNullOrWhiteSpace(request.Email))
+                return (false, "Email is required.");
+
+            if (string.IsNullOrWhiteSpace(request.Mobile))
+                return (false, "Mobile is required.");
+
+            if (requirement.HasResidentialProduct)
+            {
+                var homeValidation = ValidateAddress(request.PersonalAddress, "Home Address");
+                if (!homeValidation.Success)
+                    return homeValidation;
+            }
+
+            if (requirement.HasBusinessProduct)
+            {
+                if (request.Business == null || string.IsNullOrWhiteSpace(request.Business.BusinessName))
+                    return (false, "Business name is required.");
+
+                if (string.IsNullOrWhiteSpace(request.Business.BusinessEmail))
+                    return (false, "Business email is required.");
+
+                if (request.BusinessType == (byte)CustomerBusinessType.Limited &&
+                    string.IsNullOrWhiteSpace(request.Business.RegistrationNo))
+                {
+                    return (false, "Registration number is required for LTD company.");
+                }
+
+                if (request.BusinessType == (byte)CustomerBusinessType.Limited &&
+                    string.IsNullOrWhiteSpace(request.Business.ContactPersonName))
+                {
+                    return (false, "Contact person is required for LTD company.");
+                }
+
+                if (request.BusinessType == (byte)CustomerBusinessType.Limited &&
+                    string.IsNullOrWhiteSpace(request.Business.ContactPersonPhone))
+                {
+                    return (false, "Contact person phone number is required for LTD company.");
+                }
+
+                var businessAddressDto = request.IsBusinessAddressSameAsPersonal
+                    ? request.PersonalAddress
+                    : request.BusinessAddress;
+
+                var businessValidation = ValidateAddress(businessAddressDto, "Business Address");
+                if (!businessValidation.Success)
+                    return businessValidation;
+            }
+
+
+            //if (request.RequiresBankInformation)
+            //{
+            //    if (string.IsNullOrWhiteSpace(request.BankAccount?.SortCode))
+            //        return (false, "Sort code is required.");
+
+            //    if (string.IsNullOrWhiteSpace(request.BankAccount?.AccountNumber))
+            //        return (false, "Account number is required.");
+            //}
+
+
+            return (true, string.Empty);
+        }
+
+        private static (bool Success, string Message) ValidateAddress(
+            SaveSalesOrderAddressDto? address,
+            string addressTitle)
+        {
+            if (address == null)
+                return (false, $"{addressTitle} is required.");
+
+            if (string.IsNullOrWhiteSpace(address.HouseNo))
+                return (false, $"{addressTitle}: House No is required.");
+
+            if (string.IsNullOrWhiteSpace(address.PostCode))
+                return (false, $"{addressTitle}: Post Code is required.");
+
+            if (!address.CountryId.HasValue || address.CountryId.Value <= 0)
+                return (false, $"{addressTitle}: Country is required.");
+
+            //if (!address.RegionId.HasValue || address.RegionId.Value <= 0)
+            //    return (false, $"{addressTitle}: Region is required.");
+
+            if (!address.CityId.HasValue || address.CityId.Value <= 0)
+                return (false, $"{addressTitle}: City is required.");
+
+            return (true, string.Empty);
+        }
         private static bool HasAddressValue(SaveSalesOrderAddressDto? address)
         {
             if (address == null)
                 return false;
 
             return !string.IsNullOrWhiteSpace(address.HouseNo)
-                || !string.IsNullOrWhiteSpace(address.RoadName)
-                || !string.IsNullOrWhiteSpace(address.PostCode)
-                || !string.IsNullOrWhiteSpace(address.City)
-                || address.CountryId.HasValue
-                || address.RegionId.HasValue;
+                && !string.IsNullOrWhiteSpace(address.PostCode)
+                && address.CityId.HasValue
+                && address.CountryId.HasValue;
+                
         }
-        
+
 
         private static SalesOrderCustomerRequirementDto BuildRequirement(List<Product> products)
         {
@@ -402,6 +512,7 @@ namespace SuperCRM.Application.Services
                 RoadName = dto.RoadName,
                 PostCode = dto.PostCode,
                 City = dto.City,
+                CityId = dto.CityId,
                 CountryId = dto.CountryId,
                 RegionId = dto.RegionId,
                 AddressLine = dto.AddressLine,
@@ -412,6 +523,28 @@ namespace SuperCRM.Application.Services
             };
         }
 
+        private static void UpdateAddressEntity(
+        CustomerAddress address,
+        SaveSalesOrderAddressDto dto,
+        Guid? customerBusinessId,
+        bool isDefault,
+        bool isBusinessAddressSame,
+        Guid currentUserId)
+        {
+            address.CustomerBusinessId = customerBusinessId;
+            address.HouseNo = dto.HouseNo;
+            address.RoadName = dto.RoadName;
+            address.PostCode = dto.PostCode;
+            address.City = dto.City;
+            address.CityId = dto.CityId;
+            address.CountryId = dto.CountryId;
+            address.RegionId = dto.RegionId;
+            address.AddressLine = dto.AddressLine;
+            address.IsDefault = isDefault;
+            address.IsBusinessAddressSame = isBusinessAddressSame;
+            address.UpdatedAt = DateTime.UtcNow;
+            address.UpdatedByUserId = currentUserId;
+        }
         private static SalesOrderCustomerSaveResultDto Fail(Guid draftId, string message)
         {
             return new SalesOrderCustomerSaveResultDto
@@ -424,9 +557,7 @@ namespace SuperCRM.Application.Services
 
         // Search Customer
 
-        public async Task<SalesOrderCustomerLoadDto?> GetCustomerForSalesOrderAsync(
-     Guid customerId,
-     CancellationToken cancellationToken = default)
+        public async Task<SalesOrderCustomerLoadDto?> GetCustomerForSalesOrderAsync( Guid customerId, CancellationToken cancellationToken = default)
         {
             if (customerId == Guid.Empty)
             {
@@ -479,6 +610,7 @@ namespace SuperCRM.Application.Services
                     RoadName = personalAddress.RoadName,
                     PostCode = personalAddress.PostCode,
                     City = personalAddress.City,
+                    CityId = personalAddress.CityId,
                     CountryId = personalAddress.CountryId,
                     RegionId = personalAddress.RegionId,
                     AddressLine = personalAddress.AddressLine
@@ -500,6 +632,7 @@ namespace SuperCRM.Application.Services
                     HouseNo = businessAddress.HouseNo,
                     RoadName = businessAddress.RoadName,
                     PostCode = businessAddress.PostCode,
+                    CityId = businessAddress.CityId,
                     City = businessAddress.City,
                     CountryId = businessAddress.CountryId,
                     RegionId = businessAddress.RegionId,
@@ -513,6 +646,291 @@ namespace SuperCRM.Application.Services
                     AccountNumber = bankAccount.AccountNumber,
                     SortCode = bankAccount.SortCode
                 }
+            };
+        }
+
+        public async Task<int?>GetAnyRegionIdByCountryIdAsync(int countryId, CancellationToken cancellationToken = default) { 
+        
+            return await _repository.GetAnyRegionIdByCountryIdAsync(countryId, cancellationToken);
+        }
+
+        public async Task<string?> GetCityNameByCountryIdAsync(int? cityId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _repository.GetCityNameAsync(cityId, cancellationToken);
+        }
+
+        public async Task<List<SalesOrderLookupOptionDto>> GetCityOptionsByRegionIdAsync(int regionId,
+            CancellationToken cancellationToken = default)
+        { 
+            return await _repository.GetCityOptionsByRegionIdAsync(regionId, cancellationToken);
+        
+        }
+
+        public Task<List<CustomerSearchResultDto>> GetCustomersCreatedByUserAsync( Guid currentUserId, CancellationToken cancellationToken = default)
+        {
+            return _repository.GetCustomersCreatedByUserAsync(
+                currentUserId,
+                cancellationToken);
+        }
+
+        public async Task<(bool EmailExists, bool MobileExists)> CheckCustomerDuplicateAsync(
+        string? email,
+        string? mobile,
+        Guid? excludeCustomerId,
+        CancellationToken cancellationToken = default)
+        {
+            var emailExists = false;
+            var mobileExists = false;
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                emailExists = await _repository.CustomerEmailExistsAsync(
+                    email.Trim(),
+                    excludeCustomerId,
+                    cancellationToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(mobile))
+            {
+                mobileExists = await _repository.CustomerMobileExistsAsync(
+                    mobile.Trim(),
+                    excludeCustomerId,
+                    cancellationToken);
+            }
+
+            return (emailExists, mobileExists);
+        }
+
+        public async Task<(bool EmailExists, bool MobileExists, bool BankAccountExists)> CheckCustomerDuplicateForOrderAsync(
+        string? email,
+        string? mobile,
+        string? sortCode,
+        string? accountNumber,
+        Guid? excludeCustomerId,
+        Guid? excludeBankAccountId,
+        CancellationToken cancellationToken = default)
+        {
+            var emailExists = false;
+            var mobileExists = false;
+            var bankAccountExists = false;
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                emailExists = await _repository.CustomerEmailExistsAsync(
+                    email.Trim(),
+                    excludeCustomerId,
+                    cancellationToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(mobile))
+            {
+                mobileExists = await _repository.CustomerMobileExistsAsync(
+                    mobile.Trim(),
+                    excludeCustomerId,
+                    cancellationToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(sortCode) &&
+                !string.IsNullOrWhiteSpace(accountNumber))
+            {
+                bankAccountExists = await _repository.BankAccountExistsAsync(
+                    sortCode.Trim(),
+                    accountNumber.Trim(),
+                    excludeBankAccountId,
+                    cancellationToken);
+            }
+
+            return (emailExists, mobileExists, bankAccountExists);
+        }
+
+        public async Task<SalesOrderCustomerSaveResultDto> UpdateCustomerAsync(
+        SaveSalesOrderCustomerDto request,
+        CancellationToken cancellationToken = default)
+        {
+            if (request.CurrentUserId == Guid.Empty)
+                return Fail(request.SalesOrderDraftId, "Invalid login session.");
+
+            if (!request.ExistingCustomerId.HasValue || request.ExistingCustomerId.Value == Guid.Empty)
+                return Fail(request.SalesOrderDraftId, "Please select a customer before update.");
+
+            var draft = await _repository.GetDraftWithLinesAsync(request.SalesOrderDraftId, cancellationToken);
+            if (draft == null)
+                return Fail(request.SalesOrderDraftId, "Sales order draft was not found.");
+
+            var customer = await _repository.GetCustomerAsync(request.ExistingCustomerId.Value, cancellationToken);
+            if (customer == null)
+                return Fail(request.SalesOrderDraftId, "Selected customer was not found.");
+
+            var customerId = customer.CustomerId;
+
+            customer.FirstName = request.FirstName?.Trim() ?? "";
+            customer.LastName = request.LastName?.Trim() ?? "";
+            customer.DisplayName = string.IsNullOrWhiteSpace(request.DisplayName)
+                ? ((request.FirstName ?? "").Trim() + " " + (request.LastName ?? "").Trim()).Trim()
+                : request.DisplayName.Trim();
+
+            customer.Email = request.Email;
+            customer.AlternativeEmail = request.AlternativeEmail;
+            customer.Phone = request.Phone;
+            customer.Mobile = request.Mobile;
+            customer.IsCompanyDirector = request.IsBusinessFlow;
+            customer.UpdatedAt = DateTime.UtcNow;
+            customer.UpdatedByUserId = request.CurrentUserId;
+
+            Guid? customerAddressId = null;
+            Guid? customerBusinessId = null;
+            Guid? customerBankAccountId = null;
+
+            if (HasAddressValue(request.PersonalAddress))
+            {
+                var personalAddress = await _repository.GetPersonalAddressForUpdateAsync(customerId, cancellationToken);
+
+                if (personalAddress == null)
+                {
+                    personalAddress = BuildAddress(
+                        request.PersonalAddress!,
+                        customerId,
+                        null,
+                        (byte)CustomerAddressType.Personal,
+                        isDefault: true,
+                        isBusinessAddressSame: request.IsBusinessAddressSameAsPersonal,
+                        request.CurrentUserId);
+
+                    await _repository.AddCustomerAddressAsync(personalAddress, cancellationToken);
+                }
+                else
+                {
+                    UpdateAddressEntity(
+                        personalAddress,
+                        request.PersonalAddress!,
+                        null,
+                        isDefault: true,
+                        isBusinessAddressSame: request.IsBusinessAddressSameAsPersonal,
+                        request.CurrentUserId);
+                }
+
+                customerAddressId = personalAddress.CustomerAddressId;
+            }
+
+            CustomerBusiness? business = null;
+
+            if (request.IsBusinessFlow)
+            {
+                business = await _repository.GetCustomerBusinessForUpdateAsync(customerId, cancellationToken);
+
+                if (business == null)
+                {
+                    business = new CustomerBusiness
+                    {
+                        CustomerBusinessId = Guid.NewGuid(),
+                        CustomerId = customerId,
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
+                    };
+
+                    await _repository.AddCustomerBusinessAsync(business, cancellationToken);
+                }
+
+                business.BusinessType = request.BusinessType <= 0
+                    ? (byte)CustomerBusinessType.Solo
+                    : request.BusinessType;
+
+                business.BusinessName = request.Business.BusinessName;
+                business.BusinessEmail = request.Business.BusinessEmail;
+                business.TradingName = request.Business.TradingName;
+                business.RegistrationNo = request.Business.RegistrationNo;
+                business.ContactPersonName = request.Business.ContactPersonName;
+                business.ContactPersonPhone = request.Business.ContactPersonPhone;
+                business.IsActive = true;
+
+                customerBusinessId = business.CustomerBusinessId;
+
+                var businessAddressDto = request.IsBusinessAddressSameAsPersonal
+                    ? request.PersonalAddress
+                    : request.BusinessAddress;
+
+                if (HasAddressValue(businessAddressDto))
+                {
+                    var businessAddress = await _repository.GetBusinessAddressForUpdateAsync(
+                        business.CustomerBusinessId,
+                        cancellationToken);
+
+                    if (businessAddress == null)
+                    {
+                        businessAddress = BuildAddress(
+                            businessAddressDto!,
+                            customerId,
+                            business.CustomerBusinessId,
+                            (byte)CustomerAddressType.Business,
+                            isDefault: true,
+                            isBusinessAddressSame: request.IsBusinessAddressSameAsPersonal,
+                            request.CurrentUserId);
+
+                        await _repository.AddCustomerAddressAsync(businessAddress, cancellationToken);
+                    }
+                    else
+                    {
+                        UpdateAddressEntity(
+                            businessAddress,
+                            businessAddressDto!,
+                            business.CustomerBusinessId,
+                            isDefault: true,
+                            isBusinessAddressSame: request.IsBusinessAddressSameAsPersonal,
+                            request.CurrentUserId);
+                    }
+
+                    customerAddressId = businessAddress.CustomerAddressId;
+                }
+            }
+
+            if (request.RequiresBankInformation &&
+                !string.IsNullOrWhiteSpace(request.BankAccount.SortCode) &&
+                !string.IsNullOrWhiteSpace(request.BankAccount.AccountNumber))
+            {
+                var bankAccount = await _repository.GetCustomerBankAccountForUpdateAsync(
+                    customerId,
+                    cancellationToken);
+
+                if (bankAccount == null)
+                {
+                    bankAccount = new CustomerBankAccount
+                    {
+                        CustomerBankAccountId = Guid.NewGuid(),
+                        CustomerId = customerId,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    await _repository.AddCustomerBankAccountAsync(bankAccount, cancellationToken);
+                }
+
+                bankAccount.BankName = request.BankAccount.BankName;
+                bankAccount.AccountName = request.BankAccount.AccountName;
+                bankAccount.AccountNumber = request.BankAccount.AccountNumber;
+                bankAccount.SortCode = request.BankAccount.SortCode;
+
+                customerBankAccountId = bankAccount.CustomerBankAccountId;
+            }
+
+            draft.CustomerId = customerId;
+            draft.CustomerBusinessId = customerBusinessId;
+            draft.CustomerAddressId = customerAddressId;
+            draft.CustomerBankAccountId = request.RequiresBankInformation ? customerBankAccountId : null;
+            draft.DraftStatus = 2;
+            draft.UpdatedAt = DateTime.UtcNow;
+            draft.UpdatedByUserId = request.CurrentUserId;
+
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            return new SalesOrderCustomerSaveResultDto
+            {
+                Success = true,
+                Message = "Customer information updated successfully.",
+                SalesOrderDraftId = draft.SalesOrderDraftId,
+                CustomerId = customerId,
+                CustomerBusinessId = customerBusinessId,
+                CustomerAddressId = customerAddressId,
+                CustomerBankAccountId = customerBankAccountId
             };
         }
 

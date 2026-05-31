@@ -44,6 +44,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public string? RoadName { get; set; }
         public string? PostCode { get; set; }
         public string? City { get; set; }
+        public int? CityId { get; set; }
         public int? CountryId { get; set; }
         public int? RegionId { get; set; }
         public string? AddressLine { get; set; }

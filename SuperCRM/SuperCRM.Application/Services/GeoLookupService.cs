@@ -45,5 +45,10 @@ namespace SuperCRM.Application.Services
                 Name = x.CityName
             }).ToList();
         }
-    }
+
+        public Task<int?> GetAnyRegionIdByCountryIdAsync( int countryId, CancellationToken cancellationToken = default)
+            {
+                return _repository.GetAnyRegionIdByCountryIdAsync(countryId, cancellationToken);
+            }
+        }
 }

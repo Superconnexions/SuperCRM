@@ -41,5 +41,24 @@ namespace SuperCRM.Application.Interfaces.Persistence
             Guid customerId,
             CancellationToken cancellationToken = default);
 
+        Task<int?> GetAnyRegionIdByCountryIdAsync( int countryId, CancellationToken cancellationToken = default);
+
+        Task<List<SalesOrderLookupOptionDto>> GetCityOptionsByRegionIdAsync( int regionId, CancellationToken cancellationToken = default);
+
+        Task<string?> GetCityNameAsync(
+            int? cityId,
+            CancellationToken cancellationToken = default);
+
+        Task<List<CustomerSearchResultDto>> GetCustomersCreatedByUserAsync( Guid currentUserId, CancellationToken cancellationToken = default);
+        Task<bool> CustomerEmailExistsAsync(string email, Guid? excludeCustomerId, CancellationToken cancellationToken = default);
+
+        Task<bool> CustomerMobileExistsAsync( string mobile, Guid? excludeCustomerId, CancellationToken cancellationToken = default);
+
+        Task<bool> BankAccountExistsAsync(
+        string sortCode,
+        string accountNumber,
+        Guid? excludeBankAccountId,
+        CancellationToken cancellationToken = default);
+
     }
 }

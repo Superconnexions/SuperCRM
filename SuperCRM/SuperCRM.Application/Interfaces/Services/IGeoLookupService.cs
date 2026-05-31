@@ -7,5 +7,6 @@ namespace SuperCRM.Application.Interfaces.Services
         Task<List<CountryLookupDto>> GetCountriesAsync(CancellationToken cancellationToken = default);
         Task<List<RegionLookupDto>> GetRegionsByCountryIdAsync(int countryId, CancellationToken cancellationToken = default);
         Task<List<CityLookupDto>> GetCitiesByRegionIdAsync(int regionId, CancellationToken cancellationToken = default);
+        Task<int?> GetAnyRegionIdByCountryIdAsync( int countryId, CancellationToken cancellationToken = default);
     }
 }

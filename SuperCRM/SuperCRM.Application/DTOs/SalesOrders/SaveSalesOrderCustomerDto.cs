@@ -1,3 +1,5 @@
+using SuperCRM.Domain.Enums;
+
 namespace SuperCRM.Application.DTOs.SalesOrders
 {
     public class SaveSalesOrderCustomerDto
@@ -17,6 +19,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public string? AlternativeEmail { get; set; }
         public string? Phone { get; set; }
         public string? Mobile { get; set; }
+        public RegistrationSource RegistrationSource { get; set; }
 
         //public SaveSalesOrderAddressDto PersonalAddress { get; set; } = new();
         public SaveSalesOrderAddressDto? PersonalAddress { get; set; }
@@ -32,6 +35,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public string? PostCode { get; set; }
         public string? City { get; set; }
         public int? CountryId { get; set; }
+        public int? CityId { get; set; }
         public int? RegionId { get; set; }
         public string? AddressLine { get; set; }
     }

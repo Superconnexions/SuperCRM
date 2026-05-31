@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Services;
+using SuperCRM.Domain.Enums;
 using SuperCRM.Web.ViewModels.SalesOrders;
 using System.Security.Claims;
 
@@ -15,6 +16,8 @@ namespace SuperCRM.Web.Controllers
         private readonly ISalesOrderDraftService _salesOrderDraftService;
         private readonly ISalesOrderCustomerService _salesOrderCustomerService;
         private readonly ISalesOrderCreationService _salesOrderCreationService;
+       
+
 
         public SalesOrderController(
             ISalesOrderService salesOrderService,
@@ -290,7 +293,28 @@ namespace SuperCRM.Web.Controllers
                 return RedirectToAction(nameof(SalesOrderProductList));
             }
 
-            return View(MapCustomerCreationViewModel(dto));
+            var model = MapCustomerCreationViewModel(dto);
+
+            var ukCountry = model.CountryOptions
+                            .FirstOrDefault(x =>
+                                x.Text.Equals("United Kingdom", StringComparison.OrdinalIgnoreCase)
+                                || x.Text.Equals("UK", StringComparison.OrdinalIgnoreCase));
+
+            if (ukCountry != null
+                && int.TryParse(ukCountry.Value, out var ukCountryId))
+            {
+                if (!model.PersonalAddress.CountryId.HasValue)
+                {
+                    model.PersonalAddress.CountryId = ukCountryId;
+                }
+
+                if (!model.BusinessAddress.CountryId.HasValue)
+                {
+                    model.BusinessAddress.CountryId = ukCountryId;
+                }
+            }
+
+            return View(model);
         }
 
         [HttpGet]
@@ -300,28 +324,78 @@ namespace SuperCRM.Web.Controllers
             return Json(items);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetMyCustomers( CancellationToken cancellationToken = default)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (currentUserId == Guid.Empty)
+            {
+                return Json(new List<CustomerSearchResultDto>());
+            }
+
+            var items = await _salesOrderCustomerService
+                .GetCustomersCreatedByUserAsync(
+                    currentUserId,
+                    cancellationToken);
+
+            return Json(items);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveCustomerAndPreview(SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
         {
             var result = await SaveCustomerInternalAsync(model, cancellationToken);
-            if (!result.Success)
-            {
-                TempData["ErrorMessage"] = result.Message;
-                return RedirectToAction(nameof(SalesOrderCustomerCreation), new { draftId = model.SalesOrderDraftId });
-            }
 
-            TempData["SuccessMessage"] = result.Message;
-            return RedirectToAction(nameof(SalesOrderPreview), new { draftId = model.SalesOrderDraftId });
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+
+            return RedirectToAction(nameof(SalesOrderCustomerCreation),
+                new { draftId = model.SalesOrderDraftId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveCustomer(SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> SaveCustomer( SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
         {
             var result = await SaveCustomerInternalAsync(model, cancellationToken);
-            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(SalesOrderCustomerCreation), new { draftId = model.SalesOrderDraftId });
+
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return RedirectToAction(nameof(SalesOrderCustomerCreation),
+                    new { draftId = model.SalesOrderDraftId });
+            }
+
+
+            //if (!result.Success)
+            //{
+            //    ModelState.AddModelError("", result.Message);
+
+            //    var dto = await _salesOrderCustomerService.GetCustomerCreationPageAsync(
+            //        model.SalesOrderDraftId,
+            //        cancellationToken);
+
+            //    var vm = MapCustomerCreationViewModel(dto);
+
+            //    // Preserve user entered values
+            //    vm.Customer = model.Customer;
+            //    vm.PersonalAddress = model.PersonalAddress;
+            //    vm.Business = model.Business;
+            //    vm.BusinessAddress = model.BusinessAddress;
+            //    vm.BankAccount = model.BankAccount;
+
+            //    vm.BusinessType = model.BusinessType;
+            //    vm.IsBusinessAddressSameAsPersonal = model.IsBusinessAddressSameAsPersonal;
+            //    vm.ExistingCustomerId = model.ExistingCustomerId;
+
+            //    return View(nameof(SalesOrderCustomerCreation), vm);
+            //}
+
+
+            TempData["SuccessMessage"] = result.Message;
+            return RedirectToAction(nameof(SalesOrderCustomerCreation),
+                new { draftId = model.SalesOrderDraftId });
         }
 
         private async Task<SalesOrderCustomerSaveResultDto> SaveCustomerInternalAsync(
@@ -355,6 +429,7 @@ namespace SuperCRM.Web.Controllers
                 AlternativeEmail = model.Customer.AlternativeEmail,
                 Phone = model.Customer.Phone,
                 Mobile = model.Customer.Mobile,
+                RegistrationSource = GetRegistrationSource(),
 
                 //PersonalAddress = model.ShowPersonalAddress
                 //    ? new SaveSalesOrderAddressDto
@@ -375,6 +450,7 @@ namespace SuperCRM.Web.Controllers
                     RoadName = model.PersonalAddress.RoadName,
                     PostCode = model.PersonalAddress.PostCode,
                     City = model.PersonalAddress.City,
+                    CityId = model.PersonalAddress.CityId,
                     CountryId = model.PersonalAddress.CountryId,
                     RegionId = model.PersonalAddress.RegionId,
                     AddressLine = model.PersonalAddress.AddressLine
@@ -405,6 +481,7 @@ namespace SuperCRM.Web.Controllers
                     RoadName = model.BusinessAddress.RoadName,
                     PostCode = model.BusinessAddress.PostCode,
                     City = model.BusinessAddress.City,
+                    CityId = model.BusinessAddress.CityId,
                     CountryId = model.BusinessAddress.CountryId,
                     RegionId = model.BusinessAddress.RegionId,
                     AddressLine = model.BusinessAddress.AddressLine
@@ -418,6 +495,89 @@ namespace SuperCRM.Web.Controllers
                 }
             }, cancellationToken);
         }
+
+        // Start Update Customer
+        private async Task<SalesOrderCustomerSaveResultDto> UpdateCustomerInternalAsync(
+        SalesOrderCustomerCreationViewModel model,
+        CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+
+            if (userId == Guid.Empty)
+            {
+                return new SalesOrderCustomerSaveResultDto
+                {
+                    Success = false,
+                    Message = "Invalid login session.",
+                    SalesOrderDraftId = model.SalesOrderDraftId
+                };
+            }
+
+            return await _salesOrderCustomerService.UpdateCustomerAsync(new SaveSalesOrderCustomerDto
+            {
+                SalesOrderDraftId = model.SalesOrderDraftId,
+                CurrentUserId = userId,
+                ExistingCustomerId = model.ExistingCustomerId,
+
+                BusinessType = model.BusinessType,
+                IsBusinessFlow = model.IsBusinessFlow,
+                RequiresBankInformation = model.RequiresBankInformation,
+                IsBusinessAddressSameAsPersonal = model.IsBusinessAddressSameAsPersonal,
+
+                FirstName = model.Customer.FirstName,
+                LastName = model.Customer.LastName,
+                DisplayName = model.Customer.DisplayName,
+                Email = model.Customer.Email,
+                AlternativeEmail = model.Customer.AlternativeEmail,
+                Phone = model.Customer.Phone,
+                Mobile = model.Customer.Mobile,
+                RegistrationSource = GetRegistrationSource(),
+
+                PersonalAddress = new SaveSalesOrderAddressDto
+                {
+                    HouseNo = model.PersonalAddress.HouseNo,
+                    RoadName = model.PersonalAddress.RoadName,
+                    PostCode = model.PersonalAddress.PostCode,
+                    City = model.PersonalAddress.City,
+                    CityId = model.PersonalAddress.CityId,
+                    CountryId = model.PersonalAddress.CountryId,
+                    RegionId = model.PersonalAddress.RegionId,
+                    AddressLine = model.PersonalAddress.AddressLine
+                },
+
+                Business = new SaveSalesOrderBusinessDto
+                {
+                    BusinessName = model.Business.BusinessName,
+                    BusinessEmail = model.Business.BusinessEmail,
+                    TradingName = model.Business.TradingName,
+                    RegistrationNo = model.Business.RegistrationNo,
+                    ContactPersonName = model.Business.ContactPersonName,
+                    ContactPersonPhone = model.Business.ContactPersonPhone
+                },
+
+                BusinessAddress = new SaveSalesOrderAddressDto
+                {
+                    HouseNo = model.BusinessAddress.HouseNo,
+                    RoadName = model.BusinessAddress.RoadName,
+                    PostCode = model.BusinessAddress.PostCode,
+                    City = model.BusinessAddress.City,
+                    CityId = model.BusinessAddress.CityId,
+                    CountryId = model.BusinessAddress.CountryId,
+                    RegionId = model.BusinessAddress.RegionId,
+                    AddressLine = model.BusinessAddress.AddressLine
+                },
+
+                BankAccount = new SaveSalesOrderBankAccountDto
+                {
+                    BankName = model.BankAccount.BankName,
+                    AccountName = model.BankAccount.AccountName,
+                    AccountNumber = model.BankAccount.AccountNumber,
+                    SortCode = model.BankAccount.SortCode
+                }
+            }, cancellationToken);
+        }
+
+        // END Update Customer
 
         [HttpGet]
         public IActionResult SalesOrderPreview(Guid draftId)
@@ -484,6 +644,7 @@ namespace SuperCRM.Web.Controllers
                 model.PersonalAddress.RoadName = dto.PersonalAddress.RoadName;
                 model.PersonalAddress.PostCode = dto.PersonalAddress.PostCode;
                 model.PersonalAddress.City = dto.PersonalAddress.City;
+                model.PersonalAddress.CityId = dto.PersonalAddress.CityId;
                 model.PersonalAddress.CountryId = dto.PersonalAddress.CountryId;
                 model.PersonalAddress.RegionId = dto.PersonalAddress.RegionId;
                 model.PersonalAddress.AddressLine = dto.PersonalAddress.AddressLine;
@@ -505,6 +666,7 @@ namespace SuperCRM.Web.Controllers
                 model.BusinessAddress.RoadName = dto.BusinessAddress.RoadName;
                 model.BusinessAddress.PostCode = dto.BusinessAddress.PostCode;
                 model.BusinessAddress.City = dto.BusinessAddress.City;
+                model.BusinessAddress.CityId = dto.BusinessAddress.CityId;
                 model.BusinessAddress.CountryId = dto.BusinessAddress.CountryId;
                 model.BusinessAddress.RegionId = dto.BusinessAddress.RegionId;
                 model.BusinessAddress.AddressLine = dto.BusinessAddress.AddressLine;
@@ -524,6 +686,9 @@ namespace SuperCRM.Web.Controllers
 
             model.BusinessAddress.CountryOptions = model.CountryOptions;
             model.BusinessAddress.RegionOptions = model.RegionOptions;
+
+            model.PersonalAddress.CityOptions = new List<SelectListItem>();
+            model.BusinessAddress.CityOptions = new List<SelectListItem>();
 
             return model;
 
@@ -597,6 +762,102 @@ namespace SuperCRM.Web.Controllers
                 Orders = dto.Orders
             };
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAnyRegionByCountry(int countryId, CancellationToken cancellationToken)
+        {
+            var regionId = await _salesOrderCustomerService.GetAnyRegionIdByCountryIdAsync(countryId, cancellationToken);
+            return Json(new { regionId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCitiesByRegion(int regionId, CancellationToken cancellationToken)
+        {
+            var cities = await _salesOrderCustomerService.GetCityOptionsByRegionIdAsync(regionId, cancellationToken);
+
+            return Json(cities.Select(x => new
+            {
+                id = x.Value,
+                name = x.Text
+            }));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckCustomerDuplicate(
+        string? email,
+        string? mobile,
+        Guid? excludeCustomerId,
+        CancellationToken cancellationToken = default)
+        {
+            var result = await _salesOrderCustomerService.CheckCustomerDuplicateAsync(
+                email,
+                mobile,
+                excludeCustomerId,
+                cancellationToken);
+
+            return Json(new
+            {
+                emailExists = result.EmailExists,
+                mobileExists = result.MobileExists
+            });
+        }
+
+        private RegistrationSource GetRegistrationSource()
+        {
+            if (User.IsInRole("SuperAdmin") ||
+                User.IsInRole("SuperCRMAdmin"))
+            {
+                return RegistrationSource.AdminCreated;
+            }
+
+            if (User.IsInRole("Agent"))
+            {
+                return RegistrationSource.AgentCreated;
+            }
+
+            return RegistrationSource.SelfRegistration;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateCustomer( SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
+        {
+            var result = await UpdateCustomerInternalAsync(model, cancellationToken);
+
+            TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
+
+            return RedirectToAction(nameof(SalesOrderCustomerCreation),
+                new { draftId = model.SalesOrderDraftId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckCustomerDuplicateForOrder(
+        string? email,
+        string? mobile,
+        string? sortCode,
+        string? accountNumber,
+        Guid? excludeCustomerId,
+        Guid? excludeBankAccountId,
+        CancellationToken cancellationToken = default)
+        {
+            var result = await _salesOrderCustomerService.CheckCustomerDuplicateForOrderAsync(
+                email,
+                mobile,
+                sortCode,
+                accountNumber,
+                excludeCustomerId,
+                excludeBankAccountId,
+                cancellationToken);
+
+            return Json(new
+            {
+                emailExists = result.EmailExists,
+                mobileExists = result.MobileExists,
+                bankAccountExists = result.BankAccountExists
+            });
+        }
+
+        // END
 
     }
 }

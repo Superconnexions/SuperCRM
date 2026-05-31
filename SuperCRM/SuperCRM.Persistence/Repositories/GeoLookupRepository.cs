@@ -39,5 +39,17 @@ namespace SuperCRM.Persistence.Repositories
                 .OrderBy(x => x.CityName)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<int?> GetAnyRegionIdByCountryIdAsync( int countryId,CancellationToken cancellationToken = default)
+            {
+                return await _dbContext.Regions
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.CountryId == countryId &&
+                        x.IsActive &&
+                        x.RegionName == "Any")
+                    .Select(x => (int?)x.RegionId)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
     }
 }

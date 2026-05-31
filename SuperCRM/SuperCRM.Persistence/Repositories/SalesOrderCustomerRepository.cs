@@ -221,6 +221,122 @@ namespace SuperCRM.Persistence.Repositories
             .FirstOrDefaultAsync(cancellationToken);
             }
 
+        public Task<int?> GetAnyRegionIdByCountryIdAsync(
+        int countryId,
+        CancellationToken cancellationToken = default)
+            {
+            return _dbContext.Regions
+                .AsNoTracking()
+                .Where(x => x.CountryId == countryId
+                    && x.IsActive
+                    && x.RegionName == "Any")
+                .Select(x => (int?)x.RegionId)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public Task<List<SalesOrderLookupOptionDto>> GetCityOptionsByRegionIdAsync(
+            int regionId,
+            CancellationToken cancellationToken = default)
+        {
+            return _dbContext.Cities
+                .AsNoTracking()
+                .Where(x => x.RegionId == regionId && x.IsActive)
+                .OrderBy(x => x.CityName)
+                .Select(x => new SalesOrderLookupOptionDto
+                {
+                    Value = x.CityId.ToString(),
+                    Text = x.CityName
+                })
+                .ToListAsync(cancellationToken);
+        }
+
+        public Task<string?> GetCityNameAsync(
+            int? cityId,
+            CancellationToken cancellationToken = default)
+        {
+            if (!cityId.HasValue)
+                return Task.FromResult<string?>(null);
+
+            return _dbContext.Cities
+                .AsNoTracking()
+                .Where(x => x.CityId == cityId.Value)
+                .Select(x => (string?)x.CityName)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<List<CustomerSearchResultDto>> GetCustomersCreatedByUserAsync( Guid currentUserId, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Customers
+                .AsNoTracking()
+                .Where(x =>
+                    x.IsActive &&
+                    x.CreatedByUserId == currentUserId)
+                .OrderByDescending(x => x.CreatedAt)
+                .Take(50)
+                .Select(x => new CustomerSearchResultDto
+                {
+                    CustomerId = x.CustomerId,
+                    CustomerCode = x.CustomerCode ?? "",
+                    DisplayName = x.DisplayName ?? "",
+                    Email = x.Email ?? "",
+                    Phone = x.Phone ?? "",
+                    Mobile = x.Mobile ?? "",
+                    IsCompanyDirector = x.IsCompanyDirector ?? false
+                })
+                .ToListAsync(cancellationToken);
+        }
+
+        public Task<bool> CustomerEmailExistsAsync(
+        string email,
+        Guid? excludeCustomerId,
+        CancellationToken cancellationToken = default)
+        {
+            email = email.Trim();
+
+            return _dbContext.Customers
+                .AsNoTracking()
+                .AnyAsync(x =>
+                    x.IsActive &&
+                    x.Email != null &&
+                    x.Email == email &&
+                    (!excludeCustomerId.HasValue || x.CustomerId != excludeCustomerId.Value),
+                    cancellationToken);
+        }
+
+        public Task<bool> CustomerMobileExistsAsync(
+            string mobile,
+            Guid? excludeCustomerId,
+            CancellationToken cancellationToken = default)
+        {
+            mobile = mobile.Trim();
+
+            return _dbContext.Customers
+                .AsNoTracking()
+                .AnyAsync(x =>
+                    x.IsActive &&
+                    x.Mobile != null &&
+                    x.Mobile == mobile &&
+                    (!excludeCustomerId.HasValue || x.CustomerId != excludeCustomerId.Value),
+                    cancellationToken);
+        }
+
+        public Task<bool> BankAccountExistsAsync(
+        string sortCode,
+        string accountNumber,
+        Guid? excludeBankAccountId,
+        CancellationToken cancellationToken = default)
+        {
+            sortCode = sortCode.Trim();
+            accountNumber = accountNumber.Trim();
+
+            return _dbContext.CustomerBankAccounts
+                .AsNoTracking()
+                .AnyAsync(x =>
+                    x.SortCode == sortCode &&
+                    x.AccountNumber == accountNumber &&
+                    (!excludeBankAccountId.HasValue || x.CustomerBankAccountId != excludeBankAccountId.Value),
+                    cancellationToken);
+        }
         /// END
     }
 }

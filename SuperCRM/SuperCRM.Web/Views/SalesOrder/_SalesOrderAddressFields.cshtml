@@ -1,5 +1,8 @@
 @model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderCustomerAddressInputViewModel
 
+<input type="hidden" asp-for="RegionId" />
+<input type="hidden" asp-for="City" />
+
 <div class="col-md-3">
     <label asp-for="HouseNo" class="form-label"></label>
     <input asp-for="HouseNo" class="form-control" />
@@ -17,27 +20,27 @@
     <input asp-for="PostCode" class="form-control" />
     <span asp-validation-for="PostCode" class="text-danger"></span>
 </div>
-
+@* 
 <div class="col-md-3">
     <label asp-for="City" class="form-label"></label>
     <input asp-for="City" class="form-control" />
     <span asp-validation-for="City" class="text-danger"></span>
-</div>
+</div> *@
 
 <div class="col-md-3">
     <label asp-for="CountryId" class="form-label"></label>
-    <select asp-for="CountryId" asp-items="Model.CountryOptions" class="form-select">
+    <select asp-for="CountryId" asp-items="Model.CountryOptions" class="form-select country-select">
         <option value="">-- Select Country --</option>
     </select>
     <span asp-validation-for="CountryId" class="text-danger"></span>
 </div>
 
 <div class="col-md-3">
-    <label asp-for="RegionId" class="form-label"></label>
-    <select asp-for="RegionId" asp-items="Model.RegionOptions" class="form-select">
-        <option value="">-- Select Region --</option>
+    <label asp-for="CityId" class="form-label"></label>
+    <select asp-for="CityId" asp-items="Model.CityOptions" class="form-select city-select" data-selected-city-id="@Model.CityId">
+        <option value="">-- Select City --</option>
     </select>
-    <span asp-validation-for="RegionId" class="text-danger"></span>
+    <span asp-validation-for="CityId" class="text-danger"></span>
 </div>
 
 <div class="col-md-6">

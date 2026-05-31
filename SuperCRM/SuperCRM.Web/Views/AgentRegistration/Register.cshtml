@@ -39,25 +39,26 @@
 
                     <h5 class="mb-3">Personal Information</h5>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-6">
                             <label asp-for="FirstName" class="form-label"></label>
                             <input asp-for="FirstName" class="form-control" />
                             <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-6">
                             <label asp-for="LastName" class="form-label"></label>
                             <input asp-for="LastName" class="form-control" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
 
-                        <div class="col-md-2 mb-3">
+
+                        <div class="col-md-3 mb-6">
                             <label asp-for="PhoneNo" class="form-label"></label>
                             <input asp-for="PhoneNo" class="form-control" />
                             <span asp-validation-for="PhoneNo" class="text-danger"></span>
                         </div>
 
-                        <div class="col-md-2 mb-3">
+                        <div class="col-md-3 mb-6">
                             <label asp-for="MobileNo" class="form-label"></label>
                             <input asp-for="MobileNo" class="form-control" />
                             <span asp-validation-for="MobileNo" class="text-danger"></span>
@@ -75,14 +76,14 @@
                             </select>
                             <span asp-validation-for="CountryId" class="text-danger"></span>
                         </div>
-
-                        <div class="col-md-4 mb-3">
+                        <input type="hidden" asp-for="RegionId" />
+                        @* <div class="col-md-4 mb-3">
                             <label asp-for="RegionId" class="form-label"></label>
                             <select asp-for="RegionId" asp-items="Model.Regions" class="form-select" id="RegionId">
                                 <option value="">-- Select Region --</option>
                             </select>
                             <span asp-validation-for="RegionId" class="text-danger"></span>
-                        </div>
+                        </div> *@
 
                         <div class="col-md-4 mb-3">
                             <label asp-for="CityId" class="form-label"></label>
@@ -115,12 +116,12 @@
                             <input asp-for="AddressLine1" class="form-control" />
                             <span asp-validation-for="AddressLine1" class="text-danger"></span>
                         </div>
-
+@* 
                         <div class="col-md-6 mb-3">
                             <label asp-for="AddressLine2" class="form-label"></label>
                             <input asp-for="AddressLine2" class="form-control" />
                             <span asp-validation-for="AddressLine2" class="text-danger"></span>
-                        </div>
+                        </div> *@
                     </div>
 
                     <div class="mt-3">
@@ -138,50 +139,89 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             const countrySelect = document.getElementById('CountryId');
             const regionSelect = document.getElementById('RegionId');
             const citySelect = document.getElementById('CityId');
 
-            async function loadRegions(countryId) {
-                regionSelect.innerHTML = '<option value="">-- Select Region --</option>';
-                citySelect.innerHTML = '<option value="">-- Select City --</option>';
+            async function loadCitiesByCountry(countryId) {
 
-                if (!countryId) return;
+                citySelect.innerHTML =
+                    '<option value="">-- Select City --</option>';
 
-                const response = await fetch(`/AgentRegistration/GetRegions?countryId=${countryId}`);
-                const data = await response.json();
+                if (!countryId) {
+                    if (regionSelect) {
+                        regionSelect.value = '';
+                    }
+                    return;
+                }
 
-                data.forEach(item => {
-                    const option = document.createElement('option');
+                // STEP-1
+                // Load Any Region for selected Country
+
+                const regionResponse =
+                    await fetch(`/AgentRegistration/GetRegions?countryId=${countryId}`);
+
+                const regions =
+                    await regionResponse.json();
+
+                if (!regions || regions.length === 0) {
+
+                    if (regionSelect) {
+                        regionSelect.value = '';
+                    }
+
+                    return;
+                }
+
+                // Find Region = Any
+
+                const anyRegion =
+                    regions.find(x =>
+                        x.name &&
+                        x.name.toLowerCase() === 'any');
+
+                if (!anyRegion) {
+
+                    if (regionSelect) {
+                        regionSelect.value = '';
+                    }
+
+                    return;
+                }
+
+                // Set hidden RegionId
+
+                if (regionSelect) {
+                    regionSelect.value = anyRegion.id;
+                }
+
+                // STEP-2
+                // Load Cities using Any Region
+
+                const cityResponse =
+                    await fetch(`/AgentRegistration/GetCities?regionId=${anyRegion.id}`);
+
+                const cities =
+                    await cityResponse.json();
+
+                cities.forEach(item => {
+
+                    const option =
+                        document.createElement('option');
+
                     option.value = item.id;
                     option.text = item.name;
-                    regionSelect.appendChild(option);
-                });
-            }
 
-            async function loadCities(regionId) {
-                citySelect.innerHTML = '<option value="">-- Select City --</option>';
-
-                if (!regionId) return;
-
-                const response = await fetch(`/AgentRegistration/GetCities?regionId=${regionId}`);
-                const data = await response.json();
-
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.text = item.name;
                     citySelect.appendChild(option);
                 });
             }
 
             countrySelect.addEventListener('change', async function () {
-                await loadRegions(this.value);
+
+                await loadCitiesByCountry(this.value);
             });
 
-            regionSelect.addEventListener('change', async function () {
-                await loadCities(this.value);
-            });
         });
     </script>
 }

@@ -13,6 +13,7 @@ namespace SuperCRM.Domain.Entities
         public string? City { get; set; }
         public int? CountryId { get; set; }
         public int? RegionId { get; set; }
+        public int? CityId { get; set; }
         public bool IsBusinessAddressSame { get; set; }
         public bool IsDefault { get; set; }
         public DateTime CreatedAt { get; set; }

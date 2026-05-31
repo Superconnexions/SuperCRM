@@ -5,7 +5,7 @@
 }
 <link rel="stylesheet" href="~/css/sales-order-customer-creation.css" asp-append-version="true" />
 
-
+<div id="clientValidationMessage"></div>
 
 <form asp-action="SaveCustomerAndPreview" method="post" id="salesOrderCustomerForm">
     @Html.AntiForgeryToken()
@@ -13,17 +13,30 @@
     <input type="hidden" asp-for="ExistingCustomerId" id="ExistingCustomerId" />
     <input type="hidden" asp-for="IsBusinessFlow" />
     <input type="hidden" asp-for="RequiresBankInformation" />
+    <input type="hidden" name="SelectedCustomerBankAccountId" id="SelectedCustomerBankAccountId" value="@Model.SelectedCustomerBankAccountId" />
+    
+    @* <div asp-validation-summary="All"
+         class="alert alert-danger">
+    </div> *@
 
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">@TempData["SuccessMessage"]</div>
     }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-    }
+    
+    
 
     <div class="sales-customer-page">
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h2>Customer Selection / Creation</h2>
@@ -107,9 +120,10 @@
                 <div class="col-md-4"><label asp-for="Customer.LastName" class="form-label"></label><input asp-for="Customer.LastName" class="form-control" /></div>
                 <div class="col-md-4"><label asp-for="Customer.DisplayName" class="form-label"></label><input asp-for="Customer.DisplayName" class="form-control" placeholder="Auto if blank" /></div>
                 <div class="col-md-4"><label asp-for="Customer.Email" class="form-label"></label><input asp-for="Customer.Email" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="Customer.AlternativeEmail" class="form-label"></label><input asp-for="Customer.AlternativeEmail" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="Customer.Phone" class="form-label"></label><input asp-for="Customer.Phone" class="form-control" /></div>
+                @* <div class="col-md-4"><label asp-for="Customer.AlternativeEmail" class="form-label"></label><input asp-for="Customer.AlternativeEmail" class="form-control" /></div> *@
                 <div class="col-md-4"><label asp-for="Customer.Mobile" class="form-label"></label><input asp-for="Customer.Mobile" class="form-control" /></div>
+                <div class="col-md-4"><label asp-for="Customer.Phone" class="form-label"></label><input asp-for="Customer.Phone" class="form-control" /></div>
+                
             </div>
         </div>
 
@@ -134,12 +148,19 @@
             <div class="card mb-4" id="businessInfoCard">
                 <div class="card-header"><strong>Business Information</strong></div>
                 <div class="card-body row g-3">
-                    <div class="col-md-4"><label asp-for="Business.BusinessName" class="form-label"></label><input asp-for="Business.BusinessName" class="form-control" /></div>
-                    <div class="col-md-4"><label asp-for="Business.BusinessEmail" class="form-label"></label><input asp-for="Business.BusinessEmail" class="form-control" /></div>
-                    <div class="col-md-4"><label asp-for="Business.TradingName" class="form-label ltd-required-label"></label><input asp-for="Business.TradingName" class="form-control" /></div>
+                    <div class="col-md-4">
+                        <label asp-for="Business.BusinessName" class="form-label ltd-required-label"></label>
+                        <input asp-for="Business.BusinessName" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Business.BusinessEmail" class="form-label ltd-required-label"></label>
+                        <input asp-for="Business.BusinessEmail" class="form-control" />
+                        <span asp-validation-for="Business.BusinessEmail" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4"><label asp-for="Business.TradingName" class="form-label"></label><input asp-for="Business.TradingName" class="form-control" /></div>
                     <div class="col-md-4"><label asp-for="Business.RegistrationNo" class="form-label ltd-required-label"></label><input asp-for="Business.RegistrationNo" class="form-control" /></div>
-                    <div class="col-md-4"><label asp-for="Business.ContactPersonName" class="form-label"></label><input asp-for="Business.ContactPersonName" class="form-control" /></div>
-                    <div class="col-md-4"><label asp-for="Business.ContactPersonPhone" class="form-label"></label><input asp-for="Business.ContactPersonPhone" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.ContactPersonName" class="form-label ltd-required-label"></label><input asp-for="Business.ContactPersonName" class="form-control" /></div>
+                    <div class="col-md-4"><label asp-for="Business.ContactPersonPhone" class="form-label ltd-required-label"></label><input asp-for="Business.ContactPersonPhone" class="form-control" /></div>
                 </div>
             </div>
 
@@ -192,7 +213,8 @@
 
             <button type="submit"
                     id="btnUpdateCustomer"
-                    formaction="@Url.Action("SaveCustomer", "SalesOrder")"
+                    formaction="@Url.Action("UpdateCustomer", "SalesOrder")".
+                    formmethod="post"
                     class="btn btn-warning"
                     style="display:none;">
                 Update Customer
@@ -234,6 +256,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
+            const form = document.getElementById('salesOrderCustomerForm');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    syncCityText('PersonalAddress');
+                    syncCityText('BusinessAddress');
+                });
+            }
             const sameAddressCheckbox = document.getElementById('IsBusinessAddressSameAsPersonal');
             const businessAddressSection = document.getElementById('businessAddressFields');
 
@@ -270,6 +299,108 @@
         };
 
         setCustomerSavedMode(@Model.IsCustomerSavedForOrder.ToString().ToLower());
+
+
+
+        /// Start 
+            async function loadCitiesForAddress(prefix) {
+            const country = document.getElementById(prefix + '_CountryId');
+            const region = document.getElementById(prefix + '_RegionId');
+            const city = document.getElementById(prefix + '_CityId');
+            const cityText = document.getElementById(prefix + '_City');
+
+            if (!country || !region || !city) return;
+
+            city.innerHTML = '<option value="">-- Select City --</option>';
+
+            if (!country.value) {
+                region.value = '';
+                if (cityText) cityText.value = '';
+                return;
+            }
+
+            const regionResponse = await fetch('/SalesOrder/GetAnyRegionByCountry?countryId=' + encodeURIComponent(country.value));
+            const regionData = await regionResponse.json();
+
+            if (!regionData.regionId) {
+                region.value = '';
+                return;
+            }
+
+            region.value = regionData.regionId;
+
+            const cityResponse = await fetch('/SalesOrder/GetCitiesByRegion?regionId=' + encodeURIComponent(regionData.regionId));
+            const cities = await cityResponse.json();
+
+            cities.forEach(function (item) {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.text = item.name;
+                city.appendChild(option);
+            });
+
+            
+        }
+
+        function syncCityText(prefix) {
+            const city = document.getElementById(prefix + '_CityId');
+            const cityText = document.getElementById(prefix + '_City');
+
+            if (!city || !cityText) return;
+
+            const selected = city.options[city.selectedIndex];
+            cityText.value = selected && selected.value ? selected.text : '';
+        }
+
+        function wireAddress(prefix) {
+            const country = document.getElementById(prefix + '_CountryId');
+            const city = document.getElementById(prefix + '_CityId');
+            const cityText = document.getElementById(prefix + '_City');
+            const selectedCityId = city ? city.getAttribute('data-selected-city-id') : '';
+
+            if (country) {
+                country.addEventListener('change', function () {
+                    loadCitiesForAddress(prefix);
+                });
+
+                if (country.value) {
+                    loadCitiesForAddress(prefix).then(function () {
+                        if (selectedCityId && city) {
+                            city.value = selectedCityId;
+                            syncCityText(prefix);
+                        }
+                    });
+                }
+            }
+
+            if (city && cityText) {
+                city.addEventListener('change', function () {
+                    const selected = city.options[city.selectedIndex];
+                    cityText.value = selected && selected.value ? selected.text : '';
+                });
+            }
+
+
+        }
+
+        wireAddress('PersonalAddress');
+        wireAddress('BusinessAddress');
+
+        const personalCountry =
+            document.getElementById('PersonalAddress_CountryId');
+
+        if (personalCountry && personalCountry.value) {
+            loadCitiesForAddress('PersonalAddress');
+        }
+
+        const businessCountry =
+            document.getElementById('BusinessAddress_CountryId');
+
+        if (businessCountry && businessCountry.value) {
+            loadCitiesForAddress('BusinessAddress');
+        }
+
+        /// END
 
         });
     </script>

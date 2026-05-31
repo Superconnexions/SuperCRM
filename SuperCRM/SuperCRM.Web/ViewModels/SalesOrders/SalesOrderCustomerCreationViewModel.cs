@@ -14,6 +14,7 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
         public bool IsBusinessFlow { get; set; }
         public bool RequiresBankInformation { get; set; }
         public string ScenarioName { get; set; } = string.Empty;
+        public string SelectedCustomerBankAccountId { get; set; } = string.Empty;
 
         public Guid? ExistingCustomerId { get; set; }
         public string? ExistingCustomerDisplayText { get; set; }
@@ -38,17 +39,24 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
 
     public class SalesOrderCustomerPersonInputViewModel
     {
-        [Required]
+        
         [Display(Name = "First Name")]
         public string FirstName { get; set; } = string.Empty;
-        [Required]
+        
         [Display(Name = "Last Name")]
         public string LastName { get; set; } = string.Empty;
+
+        [Display(Name = "Display/Full Name")]
         public string? DisplayName { get; set; }
+
+       
         public string? Email { get; set; }
+
         [Display(Name = "Alternate Email")]
         public string? AlternativeEmail { get; set; }
         public string? Phone { get; set; }
+
+        
         public string? Mobile { get; set; }
     }
 
@@ -61,10 +69,17 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
         [Display(Name = "Post Code")]
         public string? PostCode { get; set; }
         public string? City { get; set; }
+
+        [Display(Name = "Country")]
         public int? CountryId { get; set; }
         public int? RegionId { get; set; }
         [Display(Name = "Address Line")]
         public string? AddressLine { get; set; }
+
+        [Display(Name = "City")]
+        public int? CityId { get; set; }
+
+        public List<SelectListItem> CityOptions { get; set; } = new();
 
         public List<SelectListItem> CountryOptions { get; set; } = new();
         public List<SelectListItem> RegionOptions { get; set; } = new();

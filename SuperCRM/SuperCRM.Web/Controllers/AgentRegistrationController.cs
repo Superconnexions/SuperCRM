@@ -39,6 +39,27 @@ namespace SuperCRM.Web.Controllers
         {
             var model = new AgentRegistrationViewModel();
             await PopulateCountriesAsync(model, cancellationToken);
+
+            var ukCountry = model.Countries.FirstOrDefault(x =>
+                            x.Text.Equals("United Kingdom", StringComparison.OrdinalIgnoreCase)
+                            || x.Text.Equals("UK", StringComparison.OrdinalIgnoreCase)
+                            || x.Text.Contains("United Kingdom", StringComparison.OrdinalIgnoreCase));
+
+            if (ukCountry != null && int.TryParse(ukCountry.Value, out var ukCountryId))
+            {
+                model.CountryId = ukCountryId;
+
+                var anyRegionId = await _geoLookupService.GetAnyRegionIdByCountryIdAsync(
+                    ukCountryId,
+                    cancellationToken);
+
+                model.RegionId = anyRegionId;
+
+                if (anyRegionId.HasValue)
+                    await PopulateCitiesAsync(model, anyRegionId.Value, cancellationToken);
+            }
+
+
             return View(model);
         }
 
@@ -54,11 +75,23 @@ namespace SuperCRM.Web.Controllers
         {
             await PopulateCountriesAsync(model, cancellationToken);
 
-            if (model.CountryId.HasValue)
-                await PopulateRegionsAsync(model, model.CountryId.Value, cancellationToken);
+            //if (model.CountryId.HasValue)
+            //    await PopulateRegionsAsync(model, model.CountryId.Value, cancellationToken);
 
-            if (model.RegionId.HasValue)
-                await PopulateCitiesAsync(model, model.RegionId.Value, cancellationToken);
+            //if (model.RegionId.HasValue)
+            //    await PopulateCitiesAsync(model, model.RegionId.Value, cancellationToken);
+
+            if (model.CountryId.HasValue)
+            {
+                var anyRegionId = await _geoLookupService.GetAnyRegionIdByCountryIdAsync(
+                    model.CountryId.Value,
+                    cancellationToken);
+
+                model.RegionId = anyRegionId;
+
+                if (anyRegionId.HasValue)
+                    await PopulateCitiesAsync(model, anyRegionId.Value, cancellationToken);
+            }
 
             if (!ModelState.IsValid)
                 return View(model);

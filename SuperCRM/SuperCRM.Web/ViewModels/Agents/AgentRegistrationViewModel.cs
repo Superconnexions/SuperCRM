@@ -43,10 +43,12 @@ namespace SuperCRM.Web.ViewModels.AgentRegistration
         [Display(Name = "Phone No")]
         public string? PhoneNo { get; set; }
 
+        [Required]
         [StringLength(50)]
         [Display(Name = "Mobile No")]
         public string? MobileNo { get; set; }
 
+        [Required]
         [StringLength(100)]
         [Display(Name = "House No")]
         public string? HouseNo { get; set; }
@@ -56,13 +58,14 @@ namespace SuperCRM.Web.ViewModels.AgentRegistration
         public string? RoadName { get; set; }
 
         [StringLength(200)]
-        [Display(Name = "Address Line 1")]
+        [Display(Name = "Address Line")]
         public string? AddressLine1 { get; set; }
 
         [StringLength(200)]
         [Display(Name = "Address Line 2")]
         public string? AddressLine2 { get; set; }
 
+        [Required]
         [StringLength(20)]
         [Display(Name = "Post Code")]
         public string? PostCode { get; set; }
@@ -71,7 +74,7 @@ namespace SuperCRM.Web.ViewModels.AgentRegistration
         [Display(Name = "Country")]
         public int? CountryId { get; set; }
 
-        [Required]
+        
         [Display(Name = "Region")]
         public int? RegionId { get; set; }
 

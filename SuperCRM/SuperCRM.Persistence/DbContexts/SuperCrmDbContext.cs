@@ -840,6 +840,11 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(e => e.PostCode).HasMaxLength(20);
                 entity.Property(e => e.City).HasMaxLength(100);
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime2");
+                entity.HasOne<City>()
+                    .WithMany()
+                    .HasForeignKey(e => e.CityId)
+                    .HasConstraintName("FK_CustomerAddresses_City");
+
                 entity.HasOne(e => e.Customer).WithMany(e => e.Addresses).HasForeignKey(e => e.CustomerId).HasConstraintName("FK_CustomerAddresses_Customer");
                 entity.HasOne(e => e.CustomerBusiness).WithMany(e => e.Addresses).HasForeignKey(e => e.CustomerBusinessId).HasConstraintName("FK_CustomerAddresses_Business");
             });
