@@ -39,6 +39,18 @@ namespace SuperCRM.Application.Services
             if (customer == null)
                 return Fail(request.SalesOrderDraftId, "Selected customer was not found.");
 
+            Guid? soldByAgentId = null;
+            string? soldByAgentCode = null;
+
+            var agent = await _repository.GetAgentByUserIdAsync( request.CurrentUserId, cancellationToken);
+
+            if (agent != null)
+            {
+
+                soldByAgentId = agent.AgentId;
+                soldByAgentCode = agent.AgentCode;
+            }
+
             var orderDate = DateTime.UtcNow;
             var productIds = draft.DraftLines.Select(x => x.ProductId).Distinct().ToList();
             var products = await _repository.GetProductsByIdsAsync(productIds, cancellationToken);
@@ -50,26 +62,55 @@ namespace SuperCRM.Application.Services
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(c => c.EffectiveFrom ?? DateTime.MinValue).First());
 
             var createdSaleIds = new List<Guid>();
+
+            // Sales order split by Provdier product wise
+
+            //var salesGroups = draft.DraftLines
+            //    .GroupBy(x => x.ProviderId)
+            //    .OrderBy(x => x.Key.HasValue ? 1 : 0)
+            //    .ThenBy(x => x.First().ProviderName ?? "SuperCRM");
+
+            // Sales order split by each product of Provdier product except SuperCRM
+
             var salesGroups = draft.DraftLines
-                .GroupBy(x => x.ProviderId)
-                .OrderBy(x => x.Key.HasValue ? 1 : 0)
-                .ThenBy(x => x.First().ProviderName ?? "SuperCRM");
+                            .Select((line, index) => new
+                            {
+                                Line = line,
+                                Index = index
+                            })
+                            .GroupBy(x => new
+                            {
+                                // Provider product: each selected item creates separate Sale
+                                GroupKey = x.Line.ProviderProductId.HasValue
+                                    ? x.Line.SalesOrderDraftLineId
+                                    : x.Line.ProviderId,
+
+                                ProviderId = x.Line.ProviderId
+                            })
+                            .OrderBy(x => x.Key.ProviderId.HasValue ? 1 : 0)
+                            .ThenBy(x => x.First().Line.ProviderName ?? "SuperCRM")
+                            .ThenBy(x => x.First().Index);
+
 
             foreach (var group in salesGroups)
             {
                 var saleId = Guid.NewGuid();
+
+                var groupLines = group.Select(x => x.Line).ToList();
+
                 var sale = new Sale
                 {
                     SaleId = saleId,
                     OrderNo = await GenerateOrderNoAsync(cancellationToken),
                     CustomerId = draft.CustomerId.Value,
                     CustomerBusinessId = draft.CustomerBusinessId,
-                    ProviderId = group.Key,
-                    OrderSourceType = 1,     // Demo default: Agent/Admin entry
-                    SaleChannelType = 1,     // Demo default: Web/Admin portal
+                    //ProviderId = group.Key,
+                    ProviderId = group.Key.ProviderId,
+                    OrderSourceType = (byte)request.OrderSourceType,     // From Controller
+                    SoldByAgentId = soldByAgentId,
+                    SoldByAgentCode = soldByAgentCode,
+                    SaleChannelType = (byte)OrderChannel.WebPortal, // default:
                     SoldByUserId = request.CurrentUserId,
-                    SoldByAgentId = null,
-                    SoldByAgentCode = null,
                     IsCommissionApplicable = false,
                     OrderDate = orderDate,
                     OrderStatus = "Created",
@@ -86,8 +127,10 @@ namespace SuperCRM.Application.Services
                 var saleCommissionTotal = 0m;
                 var saleOrderNo = sale.OrderNo;
 
-                foreach (var draftLine in group)
-                {
+
+                //foreach (var draftLine in group)
+                  foreach (var draftLine in groupLines)
+                  {
                     productMap.TryGetValue(draftLine.ProductId, out var product);
                     commissionMap.TryGetValue(draftLine.ProductId, out var commission);
 
@@ -129,9 +172,12 @@ namespace SuperCRM.Application.Services
                             ? commission.FixedAmount
                             : commission?.Percentage,
                         CalculatedAgentCommission = commissionAmount,
-                        FinalAgentCommission = commissionAmount,
-                        SuperCRMCommissionEarned = commissionAmount,
-                        IsCommissionFinalized = commission != null,
+                        //FinalAgentCommission = commissionAmount,
+                        //SuperCRMCommissionEarned = commissionAmount,
+                        FinalAgentCommission = 0, // finalyze by admin
+                        SuperCRMCommissionEarned = 0, // finalyze by admin
+                        //IsCommissionFinalized = commission != null,
+                        IsCommissionFinalized = false, // Commission finalyze by admin
                         CreatedAt = orderDate,
                         SalesUnitId = product?.SalesUnitId ?? 0,
                         SalesUnitCode = product?.SalesUnitCode ?? string.Empty,
@@ -141,7 +187,9 @@ namespace SuperCRM.Application.Services
                         FirstInstallmentDate = firstInstallmentDate
                     };
 
+
                     await _repository.AddSaleLineAsync(saleLine, cancellationToken);
+
 
                     if (draftLine.IsInstallmentSelected &&
                         draftLine.NoOfInstallment.HasValue && draftLine.NoOfInstallment.Value > 0 &&
@@ -158,8 +206,10 @@ namespace SuperCRM.Application.Services
                     }
                 }
 
+                
+                sale.ProviderCommissionEarned = 0;  // Default = 0
+
                 sale.AgentCommissionAmount = saleCommissionTotal;
-                sale.ProviderCommissionEarned = saleCommissionTotal;
                 sale.IsCommissionApplicable = saleCommissionTotal > 0;
 
                 createdSaleIds.Add(sale.SaleId);
@@ -245,7 +295,8 @@ namespace SuperCRM.Application.Services
                     TradingName = business.TradingName,
                     RegistrationNo = business.RegistrationNo,
                     ContactPersonName = business.ContactPersonName,
-                    ContactPersonPhone = business.ContactPersonPhone
+                    ContactPersonPhone = business.ContactPersonPhone,
+                    BusinessType = (byte)business.BusinessType
                 },
                 HomeAddress = await MapAddressAsync(homeAddress, cancellationToken),
                 BusinessAddress = await MapAddressAsync(businessAddress, cancellationToken),
@@ -294,7 +345,7 @@ namespace SuperCRM.Application.Services
                         IsInstallment = x.NoOfInstallment.HasValue && x.NoOfInstallment.Value > 0,
                         MonthlyInstallmentAmount = x.MonthlyInstallmentAmount,
                         NoOfInstallment = x.NoOfInstallment,
-                        FinalAgentCommission = x.FinalAgentCommission
+                        FinalAgentCommission = x.CalculatedAgentCommission
                     }).ToList(),
                     Installments = installments
                         .Where(i => saleLineIds.Contains(i.SaleLineId))

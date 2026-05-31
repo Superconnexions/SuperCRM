@@ -26,5 +26,9 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task<string?> GetRegionNameAsync(int? regionId, CancellationToken cancellationToken = default);
 
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
+
+        Task<Agent?> GetAgentByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
     }
 }

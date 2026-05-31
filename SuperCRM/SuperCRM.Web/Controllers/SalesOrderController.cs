@@ -707,7 +707,8 @@ namespace SuperCRM.Web.Controllers
                 new CreateSalesOrderFromDraftRequestDto
                 {
                     SalesOrderDraftId = draftId,
-                    CurrentUserId = userId
+                    CurrentUserId = userId,
+                    OrderSourceType = GetOrderSourceType()
                 },
                 cancellationToken);
 
@@ -817,6 +818,23 @@ namespace SuperCRM.Web.Controllers
 
             return RegistrationSource.SelfRegistration;
         }
+
+        private OrderSourceType GetOrderSourceType()
+        {
+            if (User.IsInRole("SuperAdmin") ||
+                User.IsInRole("SuperCRMAdmin"))
+            {
+                return OrderSourceType.Admin;
+            }
+
+            if (User.IsInRole("Agent"))
+            {
+                return OrderSourceType.Agent;
+            }
+
+            return OrderSourceType.Unknown;
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

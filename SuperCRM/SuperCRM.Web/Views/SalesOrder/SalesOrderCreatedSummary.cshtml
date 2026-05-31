@@ -41,6 +41,8 @@
         </div>
     }
 
+
+
     @foreach (var order in Model.Orders)
     {
         <div class="card mb-4 border-primary">
@@ -66,7 +68,7 @@
                                     <div>@Model.HomeAddress.HouseNo @Model.HomeAddress.RoadName</div>
                                     <div>@Model.HomeAddress.AddressLine</div>
                                     <div>@Model.HomeAddress.City @Model.HomeAddress.PostCode</div>
-                                    <div>@Model.HomeAddress.RegionName @Model.HomeAddress.CountryName</div>
+                                    <div>@Model.HomeAddress.CountryName</div>
                                 }
                                 else
                                 {
@@ -86,7 +88,7 @@
                                     <div>@Model.BusinessAddress.HouseNo @Model.BusinessAddress.RoadName</div>
                                     <div>@Model.BusinessAddress.AddressLine</div>
                                     <div>@Model.BusinessAddress.City @Model.BusinessAddress.PostCode</div>
-                                    <div>@Model.BusinessAddress.RegionName @Model.BusinessAddress.CountryName</div>
+                                    <div>@Model.BusinessAddress.CountryName</div>
                                 }
                                 else
                                 {
@@ -117,7 +119,7 @@
                                 <th>Unit</th>
                                 <th class="text-end">Unit Price</th>
                                 <th class="text-end">Total</th>
-                                <th class="text-end">Commission</th>
+                                <th class="text-end">Commission(Draft)</th>
                                 <th>Installment</th>
                             </tr>
                         </thead>

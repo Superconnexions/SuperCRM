@@ -1,9 +1,13 @@
+using SuperCRM.Domain.Enums;
+
 namespace SuperCRM.Application.DTOs.SalesOrders
 {
     public class CreateSalesOrderFromDraftRequestDto
     {
         public Guid SalesOrderDraftId { get; set; }
         public Guid CurrentUserId { get; set; }
+
+        public OrderSourceType OrderSourceType { get; set; }
     }
 
     public class CreateSalesOrderResultDto
@@ -90,6 +94,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public string? RegistrationNo { get; set; }
         public string? ContactPersonName { get; set; }
         public string? ContactPersonPhone { get; set; }
+        public byte BusinessType { get; set; }
     }
 
     public class SalesOrderAddressSummaryDto
