@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using SuperCRM.Application.DTOs.Agents;
 using SuperCRM.Application.Interfaces.Persistence;
 using SuperCRM.Domain.Entities;
+using SuperCRM.Domain.Enums;
 using SuperCRM.Persistence.DbContexts;
 
 namespace SuperCRM.Persistence.Repositories
@@ -141,8 +142,9 @@ namespace SuperCRM.Persistence.Repositories
                     //Email = u.Email ?? string.Empty,
                     IsApproved = a.IsApproved,
                     IsCommissionEligible = a.IsCommissionEligible,
-                    JoinedAt = a.JoinedAt,
-                    RegistrationStatus = a.RegistrationStatus
+                    JoinedAt = a.CreatedAt,
+                    RegistrationStatus = a.RegistrationStatus,
+                    RegistrationStatusText = ((AgentRegistrationStatus)a.RegistrationStatus).ToString()
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

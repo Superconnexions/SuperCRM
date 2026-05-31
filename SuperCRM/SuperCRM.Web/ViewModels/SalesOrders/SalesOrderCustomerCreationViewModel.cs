@@ -14,7 +14,7 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
         public bool IsBusinessFlow { get; set; }
         public bool RequiresBankInformation { get; set; }
         public string ScenarioName { get; set; } = string.Empty;
-        public string SelectedCustomerBankAccountId { get; set; } = string.Empty;
+        public Guid? SelectedCustomerBankAccountId { get; set; }
 
         public Guid? ExistingCustomerId { get; set; }
         public string? ExistingCustomerDisplayText { get; set; }

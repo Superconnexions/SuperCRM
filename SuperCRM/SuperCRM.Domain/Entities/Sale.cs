@@ -26,6 +26,41 @@ namespace SuperCRM.Domain.Entities
         public Customer? Customer { get; set; }
         public CustomerBusiness? CustomerBusiness { get; set; }
         public Provider? Provider { get; set; }
+        public byte SalesOrderStatus { get; set; }
+
+        public DateTime? SentToProviderDate { get; set; }
+        public Guid? SentToProviderUserId { get; set; }
+
+        public DateTime? ProviderAcceptedDate { get; set; }
+        public Guid? ProviderAcceptedUserId { get; set; }
+
+        public DateTime? ProviderRejectedDate { get; set; }
+        public Guid? ProviderRejectedUserId { get; set; }
+
+        public DateTime? DeliveredDate { get; set; }
+        public Guid? DeliveredDateUpdatedBy { get; set; }
+
+        public DateTime? CancelledDate { get; set; }
+        public string? CancelledReason { get; set; }
+        public Guid? CancelledByUserId { get; set; }
+
+        public DateTime? OnHoldDate { get; set; }
+        public string? OnHoldReason { get; set; }
+        public Guid? OnHoldByUserId { get; set; }
+
+        public string? SpecialNotes { get; set; }
+
+        public bool EmailSentToCustomer { get; set; }
+        public bool EmailSentToProvider { get; set; }
+
+        public DateTime? CompletedDate { get; set; }
+        public DateTime? ServiceStartDate { get; set; }
+        public DateTime? NextRenewDate { get; set; }
+
+        public int NoOfRenew { get; set; }
+        public string? RenewNotes { get; set; }
+
+        public Guid? ManagerUserId { get; set; }
         public ICollection<SaleLine> SaleLines { get; set; } = new List<SaleLine>();
     }
 }

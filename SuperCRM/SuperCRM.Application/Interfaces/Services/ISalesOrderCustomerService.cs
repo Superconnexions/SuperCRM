@@ -19,7 +19,7 @@ namespace SuperCRM.Application.Interfaces.Services
         Task<(bool EmailExists, bool MobileExists, bool BankAccountExists)> CheckCustomerDuplicateForOrderAsync(
         string? email,
         string? mobile,
-        string? sortCode,
+        
         string? accountNumber,
         Guid? excludeCustomerId,
         Guid? excludeBankAccountId,

@@ -43,6 +43,8 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public decimal AgentCommissionAmount { get; set; }
         public bool HasResidentialLines { get; set; }
         public bool HasBusinessLines { get; set; }
+        public byte SalesOrderStatus { get; set; }
+        public string SalesOrderStatusText { get; set; } = string.Empty;
         public List<SalesOrderLineSummaryDto> Lines { get; set; } = new();
         public List<SalesOrderInstallmentScheduleSummaryDto> Installments { get; set; } = new();
     }

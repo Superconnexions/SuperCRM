@@ -109,7 +109,7 @@
         const bank = data.bankAccount || data.BankAccount;
 
         setValue('ExistingCustomerId', customerId);
-
+        setValue('SelectedCustomerBankAccountId',getProp(bank, 'customerBankAccountId', 'CustomerBankAccountId'));
         setValue('Customer_FirstName', getProp(customer, 'firstName', 'FirstName'));
         setValue('Customer_LastName', getProp(customer, 'lastName', 'LastName'));
         setValue('Customer_DisplayName', getProp(customer, 'displayName', 'DisplayName'));
@@ -344,7 +344,7 @@
     async function validateCustomerDuplicateAsync() {
         const email = qs('Customer_Email')?.value?.trim() || '';
         const mobile = qs('Customer_Mobile')?.value?.trim() || '';
-        const sortCode = qs('BankAccount_SortCode')?.value?.trim() || '';
+        
         const accountNumber = qs('BankAccount_AccountNumber')?.value?.trim() || '';
 
         const existingCustomerId = qs('ExistingCustomerId')?.value || '';
@@ -354,7 +354,7 @@
             '/SalesOrder/CheckCustomerDuplicateForOrder'
             + '?email=' + encodeURIComponent(email)
             + '&mobile=' + encodeURIComponent(mobile)
-            + '&sortCode=' + encodeURIComponent(sortCode)
+            
             + '&accountNumber=' + encodeURIComponent(accountNumber)
             + '&excludeCustomerId=' + encodeURIComponent(existingCustomerId)
             + '&excludeBankAccountId=' + encodeURIComponent(existingBankAccountId);
@@ -376,7 +376,7 @@
         }
 
         if (result.bankAccountExists) {
-            showCustomerValidationError('Bank account already exists for this Sort Code and Account Number.');
+            showCustomerValidationError('Bank account already exists for this Account Number.');
             return false;
         }
 

@@ -30,5 +30,9 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task<Agent?> GetAgentByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
+
+        Task<bool> IsApprovedAgentAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
     }
 }

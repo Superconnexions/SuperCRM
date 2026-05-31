@@ -55,7 +55,6 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task<bool> CustomerMobileExistsAsync( string mobile, Guid? excludeCustomerId, CancellationToken cancellationToken = default);
 
         Task<bool> BankAccountExistsAsync(
-        string sortCode,
         string accountNumber,
         Guid? excludeBankAccountId,
         CancellationToken cancellationToken = default);

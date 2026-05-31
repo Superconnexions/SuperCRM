@@ -114,6 +114,12 @@ namespace SuperCRM.Application.Services
                     IsCommissionApplicable = false,
                     OrderDate = orderDate,
                     OrderStatus = "Created",
+
+                    SalesOrderStatus = (byte)SalesOrderStatus.Created,
+                    EmailSentToCustomer = false,
+                    EmailSentToProvider = false,
+                    NoOfRenew = 0,
+
                     ProviderCommissionEarned = 0,
                     AgentCommissionAmount = 0,
                     IsProviderCommissionReceived = false,
@@ -150,6 +156,12 @@ namespace SuperCRM.Application.Services
                     {
                         SaleLineId = Guid.NewGuid(),
                         SaleId = sale.SaleId,
+                        
+                        Completed = false,
+                        CompletedDate = null,
+                        CancelledOrRejected = false,
+                        CancelledOrRejectedDate = null,
+
                         ProductId = draftLine.ProductId,
                         ProductCode = draftLine.ProductCode,
                         ProductName = draftLine.ProductName,
@@ -329,6 +341,11 @@ namespace SuperCRM.Application.Services
                     ProviderEmail = provider?.ContactEmail,
                     OrderDate = sale.OrderDate,
                     OrderStatus = sale.OrderStatus ?? string.Empty,
+
+                    
+                    SalesOrderStatus = sale.SalesOrderStatus,
+                    SalesOrderStatusText = ((SalesOrderStatus)sale.SalesOrderStatus).ToString(),
+
                     OrderTotal = saleLines.Sum(x => x.LineTotalAmount),
                     AgentCommissionAmount = sale.AgentCommissionAmount,
                     HasResidentialLines = hasResidentialLines,
@@ -443,6 +460,17 @@ namespace SuperCRM.Application.Services
                 Message = message,
                 SalesOrderDraftId = draftId
             };
+        }
+
+        public async Task<bool> CanCreateSalesOrderAsync(
+        Guid userId,
+        bool isAgent,
+        CancellationToken cancellationToken = default)
+        {
+            if (!isAgent)
+                return true;
+
+            return await _repository.IsApprovedAgentAsync(userId, cancellationToken);
         }
     }
 }

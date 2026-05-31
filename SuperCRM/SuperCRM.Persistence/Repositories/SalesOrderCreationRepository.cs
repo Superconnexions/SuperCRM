@@ -178,5 +178,17 @@ namespace SuperCRM.Persistence.Repositories
                     x.IsApproved )
                 .FirstOrDefaultAsync(cancellationToken);
         }
+
+        public Task<bool> IsApprovedAgentAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+        {
+            return _dbContext.Agents
+                .AsNoTracking()
+                .AnyAsync(x =>
+                    x.UserId == userId &&
+                    x.IsApproved,
+                    cancellationToken);
+        }
     }
 }

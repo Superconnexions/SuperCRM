@@ -321,18 +321,18 @@ namespace SuperCRM.Persistence.Repositories
         }
 
         public Task<bool> BankAccountExistsAsync(
-        string sortCode,
+        
         string accountNumber,
         Guid? excludeBankAccountId,
         CancellationToken cancellationToken = default)
         {
-            sortCode = sortCode.Trim();
+            
             accountNumber = accountNumber.Trim();
 
             return _dbContext.CustomerBankAccounts
                 .AsNoTracking()
                 .AnyAsync(x =>
-                    x.SortCode == sortCode &&
+                    
                     x.AccountNumber == accountNumber &&
                     (!excludeBankAccountId.HasValue || x.CustomerBankAccountId != excludeBankAccountId.Value),
                     cancellationToken);

@@ -13,7 +13,7 @@
     <input type="hidden" asp-for="ExistingCustomerId" id="ExistingCustomerId" />
     <input type="hidden" asp-for="IsBusinessFlow" />
     <input type="hidden" asp-for="RequiresBankInformation" />
-    <input type="hidden" name="SelectedCustomerBankAccountId" id="SelectedCustomerBankAccountId" value="@Model.SelectedCustomerBankAccountId" />
+    <input type="hidden" asp-for="SelectedCustomerBankAccountId" id="SelectedCustomerBankAccountId" />
     
     @* <div asp-validation-summary="All"
          class="alert alert-danger">

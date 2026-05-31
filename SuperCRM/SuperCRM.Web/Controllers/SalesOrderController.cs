@@ -140,10 +140,30 @@ namespace SuperCRM.Web.Controllers
         Guid? draftId,
         CancellationToken cancellationToken = default)
         {
+            var currentUserId = GetCurrentUserId();
+
+            if (User.IsInRole("Agent"))
+            {
+                var canCreateOrder = await _salesOrderCreationService.CanCreateSalesOrderAsync(
+                    currentUserId,
+                    isAgent: true,
+                    cancellationToken);
+
+                if (!canCreateOrder)
+                {
+                    //TempData["ErrorMessage"] =
+                    //    "Your agent account is not approved yet. Please wait for approval before creating a sales order.";
+
+                    return RedirectToAction("Index", "AgentDashboard");
+                }
+            }
+
             if (!draftId.HasValue)
             {
                 TempData.Remove("ErrorMessage");
             }
+
+
 
             var dto = await _salesOrderService.GetProductListForOrderAsync(cancellationToken);
             var model = MapToViewModel(dto);
@@ -429,6 +449,7 @@ namespace SuperCRM.Web.Controllers
                 AlternativeEmail = model.Customer.AlternativeEmail,
                 Phone = model.Customer.Phone,
                 Mobile = model.Customer.Mobile,
+                
                 RegistrationSource = GetRegistrationSource(),
 
                 //PersonalAddress = model.ShowPersonalAddress
@@ -488,6 +509,7 @@ namespace SuperCRM.Web.Controllers
                 },
                 BankAccount = new SaveSalesOrderBankAccountDto
                 {
+                    SelectedCustomerBankAccountId = model.SelectedCustomerBankAccountId,
                     BankName = model.BankAccount.BankName,
                     AccountName = model.BankAccount.AccountName,
                     AccountNumber = model.BankAccount.AccountNumber,
@@ -602,6 +624,7 @@ namespace SuperCRM.Web.Controllers
                 RequiresBankInformation = dto.Requirement.RequiresBankInformation,
                 ScenarioName = dto.Requirement.ScenarioName,
                 ExistingCustomerId = dto.SelectedCustomerId,
+                SelectedCustomerBankAccountId = dto.SelectedCustomerBankAccountId,
                 IsCustomerSavedForOrder = dto.SelectedCustomerId.HasValue,
                 BusinessType = (byte)dto.BusinessType,
                 CountryOptions = dto.Countries.Select(x => new SelectListItem { Value = x.Value, Text = x.Text }).ToList(),
@@ -852,7 +875,7 @@ namespace SuperCRM.Web.Controllers
         public async Task<IActionResult> CheckCustomerDuplicateForOrder(
         string? email,
         string? mobile,
-        string? sortCode,
+        
         string? accountNumber,
         Guid? excludeCustomerId,
         Guid? excludeBankAccountId,
@@ -861,7 +884,7 @@ namespace SuperCRM.Web.Controllers
             var result = await _salesOrderCustomerService.CheckCustomerDuplicateForOrderAsync(
                 email,
                 mobile,
-                sortCode,
+                
                 accountNumber,
                 excludeCustomerId,
                 excludeBankAccountId,

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using SuperCRM.Domain.Entities;
+using SuperCRM.Domain.Enums;
+
 //using SuperCRM.Domain.Entities;
 using SuperCRM.Persistence.Identity;
 using System;
@@ -902,6 +905,31 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(x => x.AgentCommissionAmount)
                     .HasColumnType("decimal(18,2)");
 
+                // Added new fields
+
+                entity.Property(x => x.SalesOrderStatus).HasDefaultValue((byte)SalesOrderStatus.Unknown);
+
+                entity.Property(x => x.SentToProviderDate).HasColumnType("date");
+                entity.Property(x => x.ProviderAcceptedDate).HasColumnType("date");
+                entity.Property(x => x.ProviderRejectedDate).HasColumnType("date");
+                entity.Property(x => x.DeliveredDate).HasColumnType("date");
+                entity.Property(x => x.CancelledDate).HasColumnType("date");
+                entity.Property(x => x.OnHoldDate).HasColumnType("date");
+                entity.Property(x => x.CompletedDate).HasColumnType("date");
+                entity.Property(x => x.ServiceStartDate).HasColumnType("date");
+                entity.Property(x => x.NextRenewDate).HasColumnType("date");
+
+                entity.Property(x => x.CancelledReason).HasMaxLength(300);
+                entity.Property(x => x.OnHoldReason).HasMaxLength(300);
+                entity.Property(x => x.SpecialNotes).HasMaxLength(500);
+                entity.Property(x => x.RenewNotes).HasMaxLength(300);
+
+                entity.Property(x => x.EmailSentToCustomer).HasDefaultValue(false);
+                entity.Property(x => x.EmailSentToProvider).HasDefaultValue(false);
+                entity.Property(x => x.NoOfRenew).HasDefaultValue(0);
+
+                // END New Fields
+
 
                 // RELATION: Sale -> SaleLines
                 entity.HasMany(x => x.SaleLines)
@@ -952,6 +980,14 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(x => x.FirstInstallmentDate)
                     .HasColumnType("date");
 
+                // New Col
+                entity.Property(x => x.Completed).HasDefaultValue(false);
+                entity.Property(x => x.CompletedDate).HasColumnType("date");
+
+                entity.Property(x => x.CancelledOrRejected).HasDefaultValue(false);
+                entity.Property(x => x.CancelledOrRejectedDate).HasColumnType("date");
+                /// END New Col
+                
                 // RELATION: SaleLine -> Sale
                 entity.HasOne(x => x.Sale)
                     .WithMany(x => x.SaleLines)

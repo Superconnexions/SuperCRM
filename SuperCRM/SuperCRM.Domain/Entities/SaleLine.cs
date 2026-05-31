@@ -38,7 +38,11 @@ namespace SuperCRM.Domain.Entities
         public decimal? MonthlyInstallmentAmount { get; set; }
         public int? NoOfInstallment { get; set; }
         public DateTime? FirstInstallmentDate { get; set; }
+        public bool Completed { get; set; }
+        public DateTime? CompletedDate { get; set; }
 
+        public bool CancelledOrRejected { get; set; }
+        public DateTime? CancelledOrRejectedDate { get; set; }
         public Sale? Sale { get; set; }
         public Product? Product { get; set; }
         public ProductVariant? ProductVariant { get; set; }

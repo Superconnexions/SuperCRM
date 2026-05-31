@@ -11,5 +11,10 @@ namespace SuperCRM.Application.Interfaces.Services
         Task<SalesOrderCreatedSummaryDto?> GetCreatedSalesOrderSummaryAsync(
             List<Guid> saleIds,
             CancellationToken cancellationToken = default);
+
+        Task<bool> CanCreateSalesOrderAsync(
+        Guid userId,
+        bool isAgent,
+        CancellationToken cancellationToken = default);
     }
 }

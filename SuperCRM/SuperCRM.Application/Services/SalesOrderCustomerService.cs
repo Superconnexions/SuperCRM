@@ -705,7 +705,7 @@ namespace SuperCRM.Application.Services
         public async Task<(bool EmailExists, bool MobileExists, bool BankAccountExists)> CheckCustomerDuplicateForOrderAsync(
         string? email,
         string? mobile,
-        string? sortCode,
+        
         string? accountNumber,
         Guid? excludeCustomerId,
         Guid? excludeBankAccountId,
@@ -731,11 +731,11 @@ namespace SuperCRM.Application.Services
                     cancellationToken);
             }
 
-            if (!string.IsNullOrWhiteSpace(sortCode) &&
+            if (
                 !string.IsNullOrWhiteSpace(accountNumber))
             {
                 bankAccountExists = await _repository.BankAccountExistsAsync(
-                    sortCode.Trim(),
+                    
                     accountNumber.Trim(),
                     excludeBankAccountId,
                     cancellationToken);
