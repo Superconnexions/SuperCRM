@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Persistence;
 using SuperCRM.Domain.Entities;
+using SuperCRM.Domain.Enums;
 using SuperCRM.Persistence.DbContexts;
 
 namespace SuperCRM.Persistence.Repositories
@@ -190,5 +192,75 @@ namespace SuperCRM.Persistence.Repositories
                     x.IsApproved,
                     cancellationToken);
         }
+
+
+        // Sales Order History
+
+        public async Task<List<SalesOrderHistoryDto>> GetSalesOrderHistoryAsync(
+        Guid? soldByUserId,
+        CancellationToken cancellationToken = default)
+        {
+            var query =
+                from s in _dbContext.Sales.AsNoTracking()
+                join c in _dbContext.Customers.AsNoTracking()
+                    on s.CustomerId equals c.CustomerId
+                join sl in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals sl.SaleId into saleLines
+                join p in _dbContext.Providers.AsNoTracking()
+                    on s.ProviderId equals p.ProviderId into providers
+                from provider in providers.DefaultIfEmpty()
+                where !soldByUserId.HasValue || s.SoldByUserId == soldByUserId.Value
+                select new
+                {
+                    Sale = s,
+                    Customer = c,
+                    Provider = provider,
+                    Lines = saleLines
+                };
+
+            var result = await query
+                .OrderByDescending(x => x.Sale.OrderDate)
+                .Select(x => new SalesOrderHistoryDto
+                {
+                    SaleId = x.Sale.SaleId,
+                    OrderNo = x.Sale.OrderNo,
+                    OrderDate = x.Sale.OrderDate,
+
+                    CustomerId = x.Customer.CustomerId,
+                    CustomerCode = x.Customer.CustomerCode ?? "",
+                    CustomerName = x.Customer.DisplayName
+                        ?? ((x.Customer.FirstName ?? "") + " " + (x.Customer.LastName ?? "")).Trim(),
+                    CustomerEmail = x.Customer.Email,
+                    CustomerMobile = x.Customer.Mobile,
+
+                    ProviderId = x.Sale.ProviderId,
+                    ProviderName = x.Provider != null ? x.Provider.ProviderName : "SuperCRM",
+
+                    SalesOrderStatus = x.Sale.SalesOrderStatus,
+                    SalesOrderStatusText = ((SalesOrderStatus)x.Sale.SalesOrderStatus).ToString(),
+                    OrderStatus = x.Sale.OrderStatus ?? "",
+
+                    OrderTotal = x.Lines.Sum(l => l.LineTotalAmount),
+                    AgentCommissionAmount = x.Sale.AgentCommissionAmount,
+
+                    TotalLines = x.Lines.Count(),
+                    CompletedLines = x.Lines.Count(l => l.Completed),
+                    CancelledOrRejectedLines = x.Lines.Count(l => l.CancelledOrRejected),
+
+                    SoldByUserId = (Guid)x.Sale.SoldByUserId,
+                    SoldByAgentId = x.Sale.SoldByAgentId,
+                    SoldByAgentCode = x.Sale.SoldByAgentCode,
+
+                    EmailSentToCustomer = x.Sale.EmailSentToCustomer,
+                    EmailSentToProvider = x.Sale.EmailSentToProvider
+                })
+                .Take(500)
+                .ToListAsync(cancellationToken);
+
+            return result;
+        }
+
+
+
     }
 }

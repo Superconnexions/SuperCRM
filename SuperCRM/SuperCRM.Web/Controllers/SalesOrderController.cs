@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NuGet.Protocol.Core.Types;
 using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Services;
 using SuperCRM.Domain.Enums;
@@ -899,6 +900,38 @@ namespace SuperCRM.Web.Controllers
         }
 
         // END
+
+
+        // Start Agents Activities
+
+        [HttpGet]
+        public async Task<IActionResult> SalesOrderHistory(CancellationToken cancellationToken = default) {
+
+            var currentUserId = GetCurrentUserId();
+
+            Guid? soldByUserId = null;
+            var isAgentView = false;
+
+            if (User.IsInRole("Agent"))
+            {
+                soldByUserId = currentUserId;
+                isAgentView = true;
+            }
+
+            var orders = await _salesOrderCreationService.GetSalesOrderHistoryAsync(
+                soldByUserId,
+                cancellationToken);
+
+            var model = new SalesOrderHistoryViewModel
+            {
+                IsAgentView = isAgentView,
+                Orders = orders
+            };
+
+            return View(model);
+        }
+
+        // END Agents Activities
 
     }
 }

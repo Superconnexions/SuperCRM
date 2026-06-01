@@ -249,7 +249,7 @@ namespace SuperCRM.Application.Services
 
             var random = Random.Shared.Next(1000, 9999);
 
-            return $"{prefix}-{datePart}-{random}";
+            return  $"{prefix}-{datePart}-{random}";
         }
 
         public async Task<SalesOrderCreatedSummaryDto?> GetCreatedSalesOrderSummaryAsync(
@@ -471,6 +471,23 @@ namespace SuperCRM.Application.Services
                 return true;
 
             return await _repository.IsApprovedAgentAsync(userId, cancellationToken);
+        }
+
+        public async Task<Agent?> GetAgentByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+        {
+            return await _repository.GetAgentByUserIdAsync(userId, cancellationToken);
+
+        }
+
+        public Task<List<SalesOrderHistoryDto>> GetSalesOrderHistoryAsync(
+        Guid? soldByUserId,
+        CancellationToken cancellationToken = default)
+        {
+            return _repository.GetSalesOrderHistoryAsync(
+                soldByUserId,
+                cancellationToken);
         }
     }
 }

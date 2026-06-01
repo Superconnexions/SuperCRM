@@ -1,0 +1,77 @@
+﻿@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderHistoryViewModel
+
+@{
+    ViewData["Title"] = "Sales Order History";
+}
+
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Sales Order History</h4>
+
+    </div>
+
+    <div class="card">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order No</th>
+                        <th>Order Date</th>
+                        <th>Customer</th>
+                        <th>Mobile</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th class="text-end">Order Total</th>
+                        <th class="text-end">Commission</th>
+                        <th>Lines</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Orders.Any())
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">
+                                No sales order found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Orders)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.OrderNo</strong>
+                                </td>
+                                <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
+                                <td>
+                                    <div>@item.CustomerName</div>
+                                    <small class="text-muted">@item.CustomerCode</small>
+                                </td>
+                                <td>@item.CustomerMobile</td>
+                                <td>@item.ProviderName</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        @item.SalesOrderStatusText
+                                    </span>
+                                </td>
+                                <td class="text-end">@item.OrderTotal.ToString("N2")</td>
+                                <td class="text-end">@item.AgentCommissionAmount.ToString("N2")</td>
+                                <td>
+                                    @item.CompletedLines / @item.TotalLines completed
+                                </td>
+                                <td>
+                                    <small>
+                                        Customer: @(item.EmailSentToCustomer ? "Yes" : "No")<br />
+                                        Provider: @(item.EmailSentToProvider ? "Yes" : "No")
+                                    </small>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

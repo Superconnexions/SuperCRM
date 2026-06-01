@@ -129,14 +129,55 @@
 
         @if (User.IsInRole(AppRoles.Agent))
         {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="AgentDashboard" asp-action="Index">Agent Dashboard</a>
-            </li>
 
-            <li class="nav-item">
-                <a asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
-                    Sales Order
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-dark"
+                   href="#"
+                   id="masterSetupDropdown"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    Agents
                 </a>
+                <ul class="dropdown-menu" aria-labelledby="masterSetupDropdown">
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="AgentDashboard" asp-action="Index">Agent Dashboard</a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
+                            Sales Order Creation
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderHistory" class="nav-link">
+                            Sales Order History
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
+                            Customer List
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
+                            Pending Sales Commission
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
+                            Sales Commission History
+                        </a>
+                    </li>
+
+
+
+                </ul>
             </li>
 
         }

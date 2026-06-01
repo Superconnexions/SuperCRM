@@ -1,3 +1,4 @@
+using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Domain.Entities;
 
 namespace SuperCRM.Application.Interfaces.Persistence
@@ -33,6 +34,10 @@ namespace SuperCRM.Application.Interfaces.Persistence
 
         Task<bool> IsApprovedAgentAsync(
         Guid userId,
+        CancellationToken cancellationToken = default);
+
+        Task<List<SalesOrderHistoryDto>> GetSalesOrderHistoryAsync(
+        Guid? soldByUserId,
         CancellationToken cancellationToken = default);
     }
 }
