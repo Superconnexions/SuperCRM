@@ -2,76 +2,347 @@
 
 @{
     ViewData["Title"] = "Sales Order History";
+    var startRecord = Model.TotalRecords == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    var endRecord = Math.Min(Model.Page * Model.PageSize, Model.TotalRecords);
 }
 
-<div class="container-fluid mt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4>Sales Order History</h4>
+<style>
+    .sales-history-page {
+        background: #f8fafc;
+        padding: 18px;
+        border-radius: 14px;
+    }
 
+    .sales-history-card {
+        border: 0;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    .sales-history-title {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .sales-history-filter {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+        margin-bottom: 16px;
+    }
+
+    .sales-history-table-wrap {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .sales-history-table {
+        min-width: 1650px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+        .sales-history-table thead th {
+            background: #1e3a8a;
+            color: #ffffff;
+            vertical-align: middle;
+            border-color: #1e40af;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .sales-history-table tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
+
+        .sales-history-table tbody tr:nth-child(even) {
+            background: #f1f5f9;
+        }
+
+        .sales-history-table tbody tr:hover {
+            background: #e0f2fe;
+        }
+
+    .badge-soft-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+    }
+
+    .badge-soft-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fcd34d;
+    }
+
+    .badge-soft-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+
+    .badge-soft-info {
+        background: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #93c5fd;
+    }
+
+    .small-muted {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 2px;
+    }
+</style>
+
+<div class="container-fluid mt-3 sales-history-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="sales-history-title mb-1">Sales Order History</h4>
+            <div class="small-muted">
+                Showing @startRecord - @endRecord of @Model.TotalRecords records
+            </div>
+        </div>
+
+        @if (Model.IsAgentView)
+        {
+            <span class="badge badge-soft-info px-3 py-2">My Sales Orders</span>
+        }
+        else
+        {
+            <span class="badge badge-soft-success px-3 py-2">All Sales Orders</span>
+        }
     </div>
 
-    <div class="card">
-        <div class="card-body table-responsive">
-            <table class="table table-bordered table-sm align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Order No</th>
-                        <th>Order Date</th>
-                        <th>Customer</th>
-                        <th>Mobile</th>
-                        <th>Provider</th>
-                        <th>Status</th>
-                        <th class="text-end">Order Total</th>
-                        <th class="text-end">Commission</th>
-                        <th>Lines</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.Orders.Any())
+    <form asp-action="SalesOrderHistory"
+          asp-controller="SalesOrder"
+          method="get"
+          class="sales-history-filter">
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-3">
+                <label class="form-label">Order Date From</label>
+                <input type="date"
+                       name="orderDateFrom"
+                       value="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Order Date To</label>
+                <input type="date"
+                       name="orderDateTo"
+                       value="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Sales Order Status</label>
+                <select name="salesOrderStatus" class="form-select">
+                    <option value="">All Status</option>
+                    @foreach (var item in Model.StatusOptions)
                     {
-                        <tr>
-                            <td colspan="10" class="text-center text-muted">
-                                No sales order found.
-                            </td>
-                        </tr>
+                        <option value="@item.Value" selected="@(Model.SalesOrderStatus?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
                     }
-                    else
-                    {
-                        foreach (var item in Model.Orders)
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Page Size</label>
+                <select name="pageSize" class="form-select">
+                    <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                    <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                    <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                    <option value="100" selected="@(Model.PageSize == 100)">100</option>
+                </select>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <input type="hidden" name="page" value="1" />
+                <button type="submit" class="btn btn-primary">
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="card sales-history-card">
+        <div class="card-body p-0">
+            <div class="sales-history-table-wrap">
+                <table class="table table-bordered table-hover align-middle mb-0 sales-history-table">
+                    <thead>
+                        <tr>
+                            <th>Order No</th>
+                            <th>Order Date</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Provider</th>
+                            <th>Status</th>
+                            <th>Commission Applicable</th>
+                            <th>Commission Finalized</th>
+                            <th>Service Start</th>
+                            <th>Next Renew</th>
+                            <th>No Of Renew</th>
+                            <th class="text-end">Order Total</th>
+                            <th class="text-end">Agent Commission</th>
+                            <th>Lines</th>
+                            <th>Email Sent</th>
+                            <th>Agent Code</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (!Model.Orders.Any())
                         {
                             <tr>
-                                <td>
-                                    <strong>@item.OrderNo</strong>
-                                </td>
-                                <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
-                                <td>
-                                    <div>@item.CustomerName</div>
-                                    <small class="text-muted">@item.CustomerCode</small>
-                                </td>
-                                <td>@item.CustomerMobile</td>
-                                <td>@item.ProviderName</td>
-                                <td>
-                                    <span class="badge bg-secondary">
-                                        @item.SalesOrderStatusText
-                                    </span>
-                                </td>
-                                <td class="text-end">@item.OrderTotal.ToString("N2")</td>
-                                <td class="text-end">@item.AgentCommissionAmount.ToString("N2")</td>
-                                <td>
-                                    @item.CompletedLines / @item.TotalLines completed
-                                </td>
-                                <td>
-                                    <small>
-                                        Customer: @(item.EmailSentToCustomer ? "Yes" : "No")<br />
-                                        Provider: @(item.EmailSentToProvider ? "Yes" : "No")
-                                    </small>
+                                <td colspan="17" class="text-center text-muted py-4">
+                                    No sales order found.
                                 </td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                        else
+                        {
+                            foreach (var item in Model.Orders)
+                            {
+                                var commissionClass = item.IsCommissionApplicable
+                                ? "badge-soft-success"
+                                : "badge-soft-danger";
+
+                                var finalizedClass = item.CommissionFinalizedText == "Yes"
+                                ? "badge-soft-success"
+                                : item.CommissionFinalizedText == "Partial"
+                                ? "badge-soft-warning"
+                                : "badge-soft-danger";
+
+                                <tr>
+                                    <td>
+                                        <strong>@item.OrderNo</strong>
+                                    </td>
+
+                                    <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
+
+                                    <td>
+                                        <div>@item.CustomerName</div>
+                                        <small class="small-muted">@item.CustomerCode</small>
+                                    </td>
+
+                                    <td>@item.CustomerEmail</td>
+                                    <td>@item.CustomerMobile</td>
+                                    <td>@item.ProviderName</td>
+
+                                    <td>
+                                        <span class="badge badge-soft-info">
+                                            @item.SalesOrderStatusText
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @commissionClass">
+                                            @item.CommissionApplicableText
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @finalizedClass">
+                                            @item.CommissionFinalizedText
+                                        </span>
+                                    </td>
+
+                                    <td>@(item.ServiceStartDate?.ToString("dd-MMM-yyyy") ?? "-")</td>
+                                    <td>@(item.NextRenewDate?.ToString("dd-MMM-yyyy") ?? "-")</td>
+                                    <td>@item.NoOfRenew</td>
+
+                                    <td class="text-end">
+                                        @item.OrderTotal.ToString("N2")
+                                    </td>
+
+                                    <td class="text-end">
+                                        @item.AgentCommissionAmount.ToString("N2")
+                                    </td>
+
+                                    <td>
+                                        <small>
+                                            Total: @item.TotalLines<br />
+                                            Completed: @item.CompletedLines<br />
+                                            Cancel/Reject: @item.CancelledOrRejectedLines
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <small>
+                                            Customer: @(item.EmailSentToCustomer ? "Yes" : "No")<br />
+                                            Provider: @(item.EmailSentToProvider ? "Yes" : "No")
+                                        </small>
+                                    </td>
+
+                                    <td>@(item.SoldByAgentCode ?? "-")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-end">
+
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="SalesOrderHistory"
+                       asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                       asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                       asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-pageSize="@Model.PageSize">
+                        Previous
+                    </a>
+                </li>
+
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="SalesOrderHistory"
+                               asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                               asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                               asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                               asp-route-page="@i"
+                               asp-route-pageSize="@Model.PageSize">
+                                @i
+                            </a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="SalesOrderHistory"
+                       asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                       asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                       asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-pageSize="@Model.PageSize">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    }
 </div>

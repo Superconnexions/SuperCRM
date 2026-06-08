@@ -1,5 +1,4 @@
-﻿
-namespace SuperCRM.Application.DTOs.SalesOrders
+﻿namespace SuperCRM.Application.DTOs.SalesOrders
 {
     public class SalesOrderHistoryDto
     {
@@ -18,7 +17,14 @@ namespace SuperCRM.Application.DTOs.SalesOrders
 
         public byte SalesOrderStatus { get; set; }
         public string SalesOrderStatusText { get; set; } = string.Empty;
-        public string OrderStatus { get; set; } = string.Empty;
+
+        public bool IsCommissionApplicable { get; set; }
+        public string CommissionApplicableText => IsCommissionApplicable ? "Yes" : "No";
+        public string CommissionFinalizedText { get; set; } = "No";
+
+        public DateTime? ServiceStartDate { get; set; }
+        public DateTime? NextRenewDate { get; set; }
+        public int NoOfRenew { get; set; }
 
         public decimal OrderTotal { get; set; }
         public decimal AgentCommissionAmount { get; set; }
@@ -27,12 +33,11 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public int CompletedLines { get; set; }
         public int CancelledOrRejectedLines { get; set; }
 
-        public Guid SoldByUserId { get; set; }
+        public Guid? SoldByUserId { get; set; }
         public Guid? SoldByAgentId { get; set; }
         public string? SoldByAgentCode { get; set; }
 
         public bool EmailSentToCustomer { get; set; }
         public bool EmailSentToProvider { get; set; }
-
     }
 }

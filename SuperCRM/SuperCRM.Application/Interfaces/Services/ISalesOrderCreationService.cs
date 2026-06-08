@@ -22,8 +22,13 @@ namespace SuperCRM.Application.Interfaces.Services
         Guid userId,
         CancellationToken cancellationToken = default);
 
-        Task<List<SalesOrderHistoryDto>> GetSalesOrderHistoryAsync(
+        Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderHistoryAsync(
         Guid? soldByUserId,
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default);
-    }
+        }
 }

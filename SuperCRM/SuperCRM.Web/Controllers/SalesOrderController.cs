@@ -905,8 +905,14 @@ namespace SuperCRM.Web.Controllers
         // Start Agents Activities
 
         [HttpGet]
-        public async Task<IActionResult> SalesOrderHistory(CancellationToken cancellationToken = default) {
-
+        public async Task<IActionResult> SalesOrderHistory(
+    DateTime? orderDateFrom,
+    DateTime? orderDateTo,
+    byte? salesOrderStatus,
+    int page = 1,
+    int pageSize = 20,
+    CancellationToken cancellationToken = default)
+        {
             var currentUserId = GetCurrentUserId();
 
             Guid? soldByUserId = null;
@@ -918,14 +924,40 @@ namespace SuperCRM.Web.Controllers
                 isAgentView = true;
             }
 
-            var orders = await _salesOrderCreationService.GetSalesOrderHistoryAsync(
+            if (!orderDateFrom.HasValue && !orderDateTo.HasValue)
+            {
+                orderDateFrom = DateTime.UtcNow.Date.AddDays(-30);
+                orderDateTo = DateTime.UtcNow.Date;
+            }
+
+            var result = await _salesOrderCreationService.GetSalesOrderHistoryAsync(
                 soldByUserId,
+                orderDateFrom,
+                orderDateTo,
+                salesOrderStatus,
+                page,
+                pageSize,
                 cancellationToken);
 
             var model = new SalesOrderHistoryViewModel
             {
                 IsAgentView = isAgentView,
-                Orders = orders
+                OrderDateFrom = orderDateFrom,
+                OrderDateTo = orderDateTo,
+                SalesOrderStatus = salesOrderStatus,
+                Orders = result.Items,
+                TotalRecords = result.TotalRecords,
+                Page = page,
+                PageSize = pageSize,
+                StatusOptions = Enum.GetValues(typeof(SalesOrderStatus))
+                    .Cast<SalesOrderStatus>()
+                    .Where(x => x != SalesOrderStatus.Unknown)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = ((byte)x).ToString(),
+                        Text = x.ToString()
+                    })
+                    .ToList()
             };
 
             return View(model);

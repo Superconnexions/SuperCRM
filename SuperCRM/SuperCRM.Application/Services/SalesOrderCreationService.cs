@@ -481,13 +481,23 @@ namespace SuperCRM.Application.Services
 
         }
 
-        public Task<List<SalesOrderHistoryDto>> GetSalesOrderHistoryAsync(
+        public Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderHistoryAsync(
         Guid? soldByUserId,
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default)
-        {
-            return _repository.GetSalesOrderHistoryAsync(
-                soldByUserId,
-                cancellationToken);
+            {
+                return _repository.GetSalesOrderHistoryAsync(
+                    soldByUserId,
+                    orderDateFrom,
+                    orderDateTo,
+                    salesOrderStatus,
+                    page,
+                    pageSize,
+                    cancellationToken);
+            }
         }
-    }
 }
