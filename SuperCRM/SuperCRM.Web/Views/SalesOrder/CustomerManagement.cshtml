@@ -1,0 +1,403 @@
+﻿@model SuperCRM.Web.ViewModels.SalesOrders.CustomerManagementViewModel
+
+@{
+    ViewData["Title"] = "Customer Management";
+    var startRecord = Model.TotalRecords == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    var endRecord = Math.Min(Model.Page * Model.PageSize, Model.TotalRecords);
+}
+
+<div class="container-fluid mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-1">Customer Management</h4>
+            <small class="text-muted">
+                Showing @startRecord - @endRecord of @Model.TotalRecords records
+            </small>
+        </div>
+
+        @if (Model.IsAgentView)
+        {
+            <span class="badge bg-info px-3 py-2">My Customers</span>
+        }
+        else
+        {
+            <span class="badge bg-primary px-3 py-2">All Customers</span>
+        }
+    </div>
+
+    <form asp-action="CustomerManagement"
+          asp-controller="SalesOrder"
+          method="get"
+          class="card mb-3 shadow-sm">
+
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label">Created Date From</label>
+                    <input type="date"
+                           name="createdDateFrom"
+                           value="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Created Date To</label>
+                    <input type="date"
+                           name="createdDateTo"
+                           value="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Customer Code</label>
+                    <input type="text"
+                           name="customerCode"
+                           value="@Model.CustomerCode"
+                           class="form-control"
+                           placeholder="CUS-..." />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Page Size</label>
+                    <select name="pageSize" class="form-select">
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                        <option value="100" selected="@(Model.PageSize == 100)">100</option>
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-grid">
+                    <input type="hidden" name="page" value="1" />
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-striped table-hover align-middle customer-grid">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="text-nowrap">Customer Code</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Registration Source</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Mobile</th>
+                        <th class="text-nowrap">Created At</th>
+                        <th>Sales Orders</th>
+                        <th>Address</th>
+                        <th>Business</th>
+                        <th>Bank</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Customers.Any())
+                    {
+                        <tr>
+                            <td colspan="12" class="text-center text-muted py-4">
+                                No customer found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Customers)
+                        {
+                            var customerName = $"{item.FirstName} {item.LastName}".Trim();
+
+                            <tr>
+                                <td class="text-nowrap"><strong>@item.CustomerCode</strong></td>
+                                <td>@item.FirstName</td>
+                                <td>@item.LastName</td>
+                                <td>@item.RegistrationSourceText</td>
+                                <td>@item.Email</td>
+                                <td>@item.Phone</td>
+                                <td>@item.Mobile</td>
+                                <td class="text-nowrap">@item.CreatedAt.ToString("dd-MMM-yyyy")</td>
+
+                                <td>
+                                    <a asp-controller="SalesOrder"
+                                       asp-action="CustomerSalesOrders"
+                                       asp-route-customerId="@item.CustomerId"
+                                       asp-route-customerName="@customerName"
+                                       class="badge bg-primary fs-6 text-decoration-none px-3 py-2">
+                                        @item.SalesOrderCount Orders
+                                    </a>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary btn-view-address"
+                                            data-customer-id="@item.CustomerId"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#customerAddressModal">
+                                        View Address
+                                    </button>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-success btn-view-business"
+                                            data-customer-id="@item.CustomerId"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#customerBusinessModal"
+                                            @(item.HasBusiness ? "" : "disabled")>
+                                        View Business
+                                    </button>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-warning btn-view-bank"
+                                            data-customer-id="@item.CustomerId"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#customerBankModal"
+                                            @(item.HasBank ? "" : "disabled")>
+                                        View Bank
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-end">
+
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="CustomerManagement"
+                       asp-route-createdDateFrom="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
+                       asp-route-createdDateTo="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
+                       asp-route-customerCode="@Model.CustomerCode"
+                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-pageSize="@Model.PageSize">
+                        Previous
+                    </a>
+                </li>
+
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="CustomerManagement"
+                               asp-route-createdDateFrom="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
+                               asp-route-createdDateTo="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
+                               asp-route-customerCode="@Model.CustomerCode"
+                               asp-route-page="@i"
+                               asp-route-pageSize="@Model.PageSize">
+                                @i
+                            </a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="CustomerManagement"
+                       asp-route-createdDateFrom="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
+                       asp-route-createdDateTo="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
+                       asp-route-customerCode="@Model.CustomerCode"
+                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-pageSize="@Model.PageSize">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    }
+</div>
+
+<div class="modal fade" id="customerAddressModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Customer Addresses</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customerAddressModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="customerBusinessModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Business Information</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customerBusinessModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="customerBankModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">Bank Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customerBankModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .customer-grid tbody tr:nth-child(odd) {
+        background-color: #f8f9fa;
+    }
+
+    .customer-grid tbody tr:nth-child(even) {
+        background-color: #ffffff;
+    }
+
+    .customer-grid tbody tr:hover {
+        background-color: #e8f4ff !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('click', async function (e) {
+            const addressBtn = e.target.closest('.btn-view-address');
+            const businessBtn = e.target.closest('.btn-view-business');
+            const bankBtn = e.target.closest('.btn-view-bank');
+
+            if (addressBtn) {
+                await loadCustomerAddresses(addressBtn.dataset.customerId);
+            }
+
+            if (businessBtn) {
+                await loadCustomerBusiness(businessBtn.dataset.customerId);
+            }
+
+            if (bankBtn) {
+                await loadCustomerBank(bankBtn.dataset.customerId);
+            }
+        });
+
+        async function loadCustomerAddresses(customerId) {
+            const box = document.getElementById('customerAddressModalBody');
+            box.innerHTML = '<div class="text-muted">Loading...</div>';
+
+            const response = await fetch('/SalesOrder/GetCustomerAddresses?customerId=' + encodeURIComponent(customerId));
+            const items = await response.json();
+
+            if (!items || items.length === 0) {
+                box.innerHTML = '<div class="alert alert-info">No address found.</div>';
+                return;
+            }
+
+            let html = `
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Type</th>
+                            <th>House No</th>
+                            <th>Road Name</th>
+                            <th>Post Code</th>
+                            <th>City</th>
+                            <th>Country</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            items.forEach(x => {
+                html += `
+                    <tr>
+                        <td>${x.addressTypeText || ''}</td>
+                        <td>${x.houseNo || ''}</td>
+                        <td>${x.roadName || ''}</td>
+                        <td>${x.postCode || ''}</td>
+                        <td>${x.city || ''}</td>
+                        <td>${x.countryName || ''}</td>
+                    </tr>`;
+            });
+
+            html += '</tbody></table>';
+            box.innerHTML = html;
+        }
+
+        async function loadCustomerBusiness(customerId) {
+            const box = document.getElementById('customerBusinessModalBody');
+            box.innerHTML = '<div class="text-muted">Loading...</div>';
+
+            const response = await fetch('/SalesOrder/GetCustomerBusiness?customerId=' + encodeURIComponent(customerId));
+            const x = await response.json();
+
+            if (!x) {
+                box.innerHTML = '<div class="alert alert-info">No business information found.</div>';
+                return;
+            }
+
+            box.innerHTML = `
+                <table class="table table-bordered table-sm">
+                    <tr><th>Business Name</th><td>${x.businessName || ''}</td></tr>
+                    <tr><th>Business Type</th><td>${x.businessTypeText || ''}</td></tr>
+                    <tr><th>Business Email</th><td>${x.businessEmail || ''}</td></tr>
+                    <tr><th>Trading Name</th><td>${x.tradingName || ''}</td></tr>
+                    <tr><th>Registration No</th><td>${x.registrationNo || ''}</td></tr>
+                    <tr><th>Contact Person</th><td>${x.contactPersonName || ''}</td></tr>
+                    <tr><th>Contact Phone</th><td>${x.contactPersonPhone || ''}</td></tr>
+                </table>`;
+        }
+
+        async function loadCustomerBank(customerId) {
+            const box = document.getElementById('customerBankModalBody');
+            box.innerHTML = '<div class="text-muted">Loading...</div>';
+
+            const response = await fetch('/SalesOrder/GetCustomerBankAccounts?customerId=' + encodeURIComponent(customerId));
+            const items = await response.json();
+
+            if (!items || items.length === 0) {
+                box.innerHTML = '<div class="alert alert-info">No bank information found.</div>';
+                return;
+            }
+
+            let html = `
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Bank Name</th>
+                            <th>Account Name</th>
+                            <th>Account Number</th>
+                            <th>Sort Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            items.forEach(x => {
+                html += `
+                    <tr>
+                        <td>${x.bankName || ''}</td>
+                        <td>${x.accountName || ''}</td>
+                        <td>${x.accountNumber || ''}</td>
+                        <td>${x.sortCode || ''}</td>
+                    </tr>`;
+            });
+
+            html += '</tbody></table>';
+            box.innerHTML = html;
+        }
+    </script>
+}

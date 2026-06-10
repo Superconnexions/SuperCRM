@@ -197,95 +197,229 @@ namespace SuperCRM.Persistence.Repositories
         // Sales Order History
 
         public async Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderHistoryAsync(
-    Guid? soldByUserId,
-    DateTime? orderDateFrom,
-    DateTime? orderDateTo,
-    byte? salesOrderStatus,
-    int page,
-    int pageSize,
-    CancellationToken cancellationToken = default)
+        Guid? soldByUserId,
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+            {
+                page = page <= 0 ? 1 : page;
+                pageSize = pageSize <= 0 ? 20 : pageSize;
+
+                var salesQuery = _dbContext.Sales
+                    .AsNoTracking()
+                    .Where(s =>
+                        (!soldByUserId.HasValue || s.SoldByUserId == soldByUserId.Value) &&
+                        (!orderDateFrom.HasValue || s.OrderDate.Date >= orderDateFrom.Value.Date) &&
+                        (!orderDateTo.HasValue || s.OrderDate.Date <= orderDateTo.Value.Date) &&
+                        (!salesOrderStatus.HasValue || s.SalesOrderStatus == salesOrderStatus.Value));
+
+                var totalRecords = await salesQuery.CountAsync(cancellationToken);
+
+                var query =
+                    from s in salesQuery
+                    join c in _dbContext.Customers.AsNoTracking()
+                        on s.CustomerId equals c.CustomerId
+                    join p in _dbContext.Providers.AsNoTracking()
+                        on s.ProviderId equals p.ProviderId into providers
+                    from provider in providers.DefaultIfEmpty()
+                    join sl in _dbContext.SaleLines.AsNoTracking()
+                        on s.SaleId equals sl.SaleId into saleLines
+                    orderby s.OrderDate descending
+                    select new SalesOrderHistoryDto
+                    {
+                        SaleId = s.SaleId,
+                        OrderNo = s.OrderNo,
+                        OrderDate = s.OrderDate,
+
+                        CustomerId = c.CustomerId,
+                        CustomerCode = c.CustomerCode ?? "",
+                        CustomerName = c.DisplayName
+                            ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+                        CustomerEmail = c.Email,
+                        CustomerMobile = c.Mobile,
+
+                        ProviderId = s.ProviderId,
+                        ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+
+                        SalesOrderStatus = s.SalesOrderStatus,
+                        SalesOrderStatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+
+                        IsCommissionApplicable = s.IsCommissionApplicable,
+
+                        CommissionFinalizedText =
+                            !saleLines.Any()
+                                ? "No"
+                                : saleLines.All(l => l.IsCommissionFinalized)
+                                    ? "Yes"
+                                    : saleLines.All(l => !l.IsCommissionFinalized)
+                                        ? "No"
+                                        : "Partial",
+
+                        ServiceStartDate = s.ServiceStartDate,
+                        NextRenewDate = s.NextRenewDate,
+                        NoOfRenew = s.NoOfRenew,
+
+                        OrderTotal = saleLines.Sum(l => l.LineTotalAmount),
+                        AgentCommissionAmount = s.AgentCommissionAmount,
+
+                        TotalLines = saleLines.Count(),
+                        CompletedLines = saleLines.Count(l => l.Completed),
+                        CancelledOrRejectedLines = saleLines.Count(l => l.CancelledOrRejected),
+
+                        SoldByUserId = s.SoldByUserId,
+                        SoldByAgentId = s.SoldByAgentId,
+                        SoldByAgentCode = s.SoldByAgentCode,
+
+                        EmailSentToCustomer = s.EmailSentToCustomer,
+                        EmailSentToProvider = s.EmailSentToProvider
+                    };
+
+                var items = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync(cancellationToken);
+
+                return (items, totalRecords);
+            }
+
+        public Task<Sale?> GetSaleForUpdateAsync(
+        Guid saleId,
+        CancellationToken cancellationToken = default)
         {
-            page = page <= 0 ? 1 : page;
-            pageSize = pageSize <= 0 ? 20 : pageSize;
+            return _dbContext.Sales
+                .FirstOrDefaultAsync(x => x.SaleId == saleId, cancellationToken);
+        }
 
-            var salesQuery = _dbContext.Sales
-                .AsNoTracking()
-                .Where(s =>
-                    (!soldByUserId.HasValue || s.SoldByUserId == soldByUserId.Value) &&
-                    (!orderDateFrom.HasValue || s.OrderDate.Date >= orderDateFrom.Value.Date) &&
-                    (!orderDateTo.HasValue || s.OrderDate.Date <= orderDateTo.Value.Date) &&
-                    (!salesOrderStatus.HasValue || s.SalesOrderStatus == salesOrderStatus.Value));
+        public Task<List<SaleLine>> GetSaleLinesForUpdateAsync(
+            Guid saleId,
+            CancellationToken cancellationToken = default)
+        {
+            return _dbContext.SaleLines
+                .Where(x => x.SaleId == saleId)
+                .ToListAsync(cancellationToken);
+        }
 
-            var totalRecords = await salesQuery.CountAsync(cancellationToken);
+        public async Task AddSalesOrderStatusHistoryAsync(
+            SalesOrderStatusHistory history,
+            CancellationToken cancellationToken = default)
+        {
+            await _dbContext.SalesOrderStatusHistories.AddAsync(history, cancellationToken);
+        }
 
+        public async Task<List<AdminUserOptionDto>> GetAdminUsersAsync(
+        CancellationToken cancellationToken = default)
+        {
             var query =
-                from s in salesQuery
-                join c in _dbContext.Customers.AsNoTracking()
-                    on s.CustomerId equals c.CustomerId
-                join p in _dbContext.Providers.AsNoTracking()
-                    on s.ProviderId equals p.ProviderId into providers
-                from provider in providers.DefaultIfEmpty()
-                join sl in _dbContext.SaleLines.AsNoTracking()
-                    on s.SaleId equals sl.SaleId into saleLines
-                orderby s.OrderDate descending
-                select new SalesOrderHistoryDto
+                from user in _dbContext.Users.AsNoTracking()
+
+                join profile in _dbContext.UserProfiles.AsNoTracking()
+                    on user.Id equals profile.UserId into profileJoin
+                from profile in profileJoin.DefaultIfEmpty()
+
+                join userRole in _dbContext.UserRoles.AsNoTracking()
+                    on user.Id equals userRole.UserId
+
+                join role in _dbContext.Roles.AsNoTracking()
+                    on userRole.RoleId equals role.Id
+
+                where role.Name == "SuperAdmin"
+                   || role.Name == "SuperCRMAdmin"
+
+                orderby user.Email
+
+                select new AdminUserOptionDto
                 {
-                    SaleId = s.SaleId,
-                    OrderNo = s.OrderNo,
-                    OrderDate = s.OrderDate,
-
-                    CustomerId = c.CustomerId,
-                    CustomerCode = c.CustomerCode ?? "",
-                    CustomerName = c.DisplayName
-                        ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
-                    CustomerEmail = c.Email,
-                    CustomerMobile = c.Mobile,
-
-                    ProviderId = s.ProviderId,
-                    ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
-
-                    SalesOrderStatus = s.SalesOrderStatus,
-                    SalesOrderStatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
-
-                    IsCommissionApplicable = s.IsCommissionApplicable,
-
-                    CommissionFinalizedText =
-                        !saleLines.Any()
-                            ? "No"
-                            : saleLines.All(l => l.IsCommissionFinalized)
-                                ? "Yes"
-                                : saleLines.All(l => !l.IsCommissionFinalized)
-                                    ? "No"
-                                    : "Partial",
-
-                    ServiceStartDate = s.ServiceStartDate,
-                    NextRenewDate = s.NextRenewDate,
-                    NoOfRenew = s.NoOfRenew,
-
-                    OrderTotal = saleLines.Sum(l => l.LineTotalAmount),
-                    AgentCommissionAmount = s.AgentCommissionAmount,
-
-                    TotalLines = saleLines.Count(),
-                    CompletedLines = saleLines.Count(l => l.Completed),
-                    CancelledOrRejectedLines = saleLines.Count(l => l.CancelledOrRejected),
-
-                    SoldByUserId = s.SoldByUserId,
-                    SoldByAgentId = s.SoldByAgentId,
-                    SoldByAgentCode = s.SoldByAgentCode,
-
-                    EmailSentToCustomer = s.EmailSentToCustomer,
-                    EmailSentToProvider = s.EmailSentToProvider
+                    UserId = user.Id,
+                    FullName =
+                        profile != null &&
+                        (!string.IsNullOrWhiteSpace(profile.FirstName) ||
+                         !string.IsNullOrWhiteSpace(profile.LastName))
+                            ? ((profile.FirstName ?? "") + " " + (profile.LastName ?? "")).Trim()
+                            : user.Email ?? user.UserName ?? user.Id.ToString()
                 };
 
-            var items = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            return await query
+                .Distinct()
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
+            Guid saleId,
+            CancellationToken cancellationToken = default)
+        {
+            var sale = await _dbContext.Sales
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.SaleId == saleId, cancellationToken);
+
+            if (sale == null)
+                return null;
+
+            var lines = await _dbContext.SaleLines
+                .AsNoTracking()
+                .Where(x => x.SaleId == saleId)
+                .OrderBy(x => x.ProductName)
+                .Select(x => new SalesOrderManagementLineDto
+                {
+                    SaleLineId = x.SaleLineId,
+                    ProductName = x.ProductName ?? "",
+                    VariantName = x.VariantName,
+                    Quantity = x.Quantity,
+                    LineTotalAmount = x.LineTotalAmount,
+                    CalculatedAgentCommission = x.CalculatedAgentCommission,
+                    FinalAgentCommission = x.FinalAgentCommission,
+                    IsCommissionFinalized = x.IsCommissionFinalized,
+                    SuperCRMCommissionEarned = x.SuperCRMCommissionEarned
+
+                })
                 .ToListAsync(cancellationToken);
 
-            return (items, totalRecords);
+            var adminUsers = await GetAdminUsersAsync(cancellationToken);
+
+            return new SalesOrderManagementDetailDto
+            {
+                SaleId = sale.SaleId,
+                OrderNo = sale.OrderNo,
+                SalesOrderStatus = sale.SalesOrderStatus,
+
+                ServiceStartDate = sale.ServiceStartDate,
+                NextRenewDate = sale.NextRenewDate,
+                NoOfRenew = sale.NoOfRenew,
+                EmailSentToProvider = sale.EmailSentToProvider,
+                EmailSentToCustomer = sale.EmailSentToCustomer,
+                SpecialNotes = sale.SpecialNotes,
+
+                SentToProviderDate = sale.SentToProviderDate,
+                SentToProviderUserId = sale.SentToProviderUserId,
+
+                ProviderAcceptedDate = sale.ProviderAcceptedDate,
+                ProviderAcceptedUserId = sale.ProviderAcceptedUserId,
+
+                ProviderRejectedDate = sale.ProviderRejectedDate,
+                ProviderRejectedUserId = sale.ProviderRejectedUserId,
+
+                CompletedDate = sale.CompletedDate,
+
+                OnHoldDate = sale.OnHoldDate,
+                OnHoldByUserId = sale.OnHoldByUserId,
+                OnHoldReason = sale.OnHoldReason,
+
+                CancelledDate = sale.CancelledDate,
+                CancelledByUserId = sale.CancelledByUserId,
+                CancelledReason = sale.CancelledReason,
+
+                ProviderCommissionEarned = sale.ProviderCommissionEarned,
+                IsProviderCommissionReceived = sale.IsProviderCommissionReceived,
+
+                AdminUsers = adminUsers,
+                Lines = lines
+            };
         }
 
 
+        // END
 
     }
 }

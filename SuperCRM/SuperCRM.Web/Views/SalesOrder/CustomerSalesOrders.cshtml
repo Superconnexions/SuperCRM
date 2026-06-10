@@ -1,0 +1,75 @@
+﻿@model SuperCRM.Web.ViewModels.SalesOrders.CustomerSalesOrdersViewModel
+
+@{
+    ViewData["Title"] = "Customer Sales Orders";
+}
+
+<div class="container-fluid mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-1">Customer Sales Orders</h4>
+            <small class="text-muted">@Model.CustomerName</small>
+        </div>
+
+        <a asp-action="CustomerManagement"
+           asp-controller="SalesOrder"
+           class="btn btn-outline-secondary">
+            Back to Customer List
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover table-sm align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Order No</th>
+                        <th>Order Date</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th class="text-end">Order Total</th>
+                        <th style="width:100px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Orders.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No sales order found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Orders)
+                        {
+                            <tr>
+                                <td><strong>@item.OrderNo</strong></td>
+                                <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
+                                <td>@item.ProviderName</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        @item.SalesOrderStatusText
+                                    </span>
+                                </td>
+                                <td class="text-end">@item.OrderTotal.ToString("N2")</td>
+                                <td>
+                                    <a asp-controller="SalesOrder"
+                                       asp-action="SalesOrderCreatedSummary"
+                                       asp-route-saleIds="@item.SaleId"
+                                       class="btn btn-sm btn-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>

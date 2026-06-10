@@ -29,5 +29,30 @@ namespace SuperCRM.Application.Interfaces.Services
         SaveSalesOrderCustomerDto request,
         CancellationToken cancellationToken = default);
 
+        Task<(List<CustomerManagementListDto> Items, int TotalRecords)> GetCustomerManagementListAsync(
+        Guid? createdByUserId,
+        DateTime? createdDateFrom,
+        DateTime? createdDateTo,
+        string? customerCode,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+        Task<List<CustomerSalesOrderListDto>> GetCustomerSalesOrdersAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default);
+
+        Task<List<CustomerAddressListDto>> GetCustomerAddressesAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default);
+
+        Task<CustomerBusinessViewDto?> GetCustomerBusinessViewAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default);
+
+        Task<List<CustomerBankAccountViewDto>> GetCustomerBankAccountsViewAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default);
+
     }
 }

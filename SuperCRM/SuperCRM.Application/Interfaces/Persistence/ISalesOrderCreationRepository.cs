@@ -44,5 +44,20 @@ namespace SuperCRM.Application.Interfaces.Persistence
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
+
+        Task<Sale?> GetSaleForUpdateAsync(Guid saleId, CancellationToken cancellationToken = default);
+
+        Task<List<SaleLine>> GetSaleLinesForUpdateAsync(Guid saleId, CancellationToken cancellationToken = default);
+
+        Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
+            Guid saleId,
+            CancellationToken cancellationToken = default);
+
+        Task<List<AdminUserOptionDto>> GetAdminUsersAsync(
+            CancellationToken cancellationToken = default);
+
+        Task AddSalesOrderStatusHistoryAsync(
+            SalesOrderStatusHistory history,
+            CancellationToken cancellationToken = default);
     }
 }

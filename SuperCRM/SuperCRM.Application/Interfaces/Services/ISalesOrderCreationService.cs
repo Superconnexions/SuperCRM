@@ -30,5 +30,29 @@ namespace SuperCRM.Application.Interfaces.Services
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
-        }
+
+        Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
+        Guid saleId,
+        CancellationToken cancellationToken = default);
+
+            Task<bool> UpdateSalesInformationAsync(
+                UpdateSalesInformationDto request,
+                CancellationToken cancellationToken = default);
+
+            Task<bool> UpdateSalesCommissionAsync(
+                UpdateSalesCommissionDto request,
+                CancellationToken cancellationToken = default);
+
+            Task<bool> UpdateSalesOrderStatusAsync(
+                UpdateSalesOrderStatusDto request,
+                CancellationToken cancellationToken = default);
+
+            Task<bool> UpdateSuperCRMCommissionAsync(
+                UpdateSuperCRMCommissionDto request,
+                CancellationToken cancellationToken = default);
+
+        // END
+
+    }
+
 }

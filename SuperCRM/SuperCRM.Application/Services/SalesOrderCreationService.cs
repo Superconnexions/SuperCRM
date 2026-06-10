@@ -499,5 +499,175 @@ namespace SuperCRM.Application.Services
                     pageSize,
                     cancellationToken);
             }
+
+        public Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
+    Guid saleId,
+    CancellationToken cancellationToken = default)
+        {
+            return _repository.GetSalesOrderManagementDetailAsync(saleId, cancellationToken);
         }
+
+        public async Task<bool> UpdateSalesInformationAsync(
+            UpdateSalesInformationDto request,
+            CancellationToken cancellationToken = default)
+        {
+            var sale = await _repository.GetSaleForUpdateAsync(request.SaleId, cancellationToken);
+            if (sale == null) return false;
+
+            sale.ServiceStartDate = request.ServiceStartDate;
+            sale.NextRenewDate = request.NextRenewDate;
+            sale.NoOfRenew = request.NoOfRenew;
+            sale.EmailSentToProvider = request.EmailSentToProvider;
+            sale.EmailSentToCustomer = request.EmailSentToCustomer;
+            sale.SpecialNotes = request.SpecialNotes;
+            sale.UpdatedAt = DateTime.UtcNow;
+            sale.UpdatedByUserId = request.UpdatedByUserId;
+
+            await _repository.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+
+        public async Task<bool> UpdateSalesCommissionAsync(
+            UpdateSalesCommissionDto request,
+            CancellationToken cancellationToken = default)
+        {
+            var sale = await _repository.GetSaleForUpdateAsync(request.SaleId, cancellationToken);
+            if (sale == null) return false;
+
+            var lines = await _repository.GetSaleLinesForUpdateAsync(request.SaleId, cancellationToken);
+
+            foreach (var inputLine in request.Lines)
+            {
+                var line = lines.FirstOrDefault(x => x.SaleLineId == inputLine.SaleLineId);
+                if (line == null) continue;
+
+                line.FinalAgentCommission = inputLine.FinalAgentCommission;
+                line.IsCommissionFinalized = true;
+                line.UpdatedAt = DateTime.UtcNow;
+                line.UpdatedByUserId = request.UpdatedByUserId;
+            }
+
+            sale.AgentCommissionAmount = lines.Sum(x => x.FinalAgentCommission);
+            sale.UpdatedAt = DateTime.UtcNow;
+            sale.UpdatedByUserId = request.UpdatedByUserId;
+
+            await _repository.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+
+        public async Task<bool> UpdateSalesOrderStatusAsync(
+            UpdateSalesOrderStatusDto request,
+            CancellationToken cancellationToken = default)
+        {
+            var sale = await _repository.GetSaleForUpdateAsync(request.SaleId, cancellationToken);
+            if (sale == null) return false;
+
+            var oldStatus = sale.SalesOrderStatus;
+
+            sale.SalesOrderStatus = request.SalesOrderStatus;
+            sale.OrderStatus = ((SalesOrderStatus)request.SalesOrderStatus).ToString();
+            sale.UpdatedAt = DateTime.UtcNow;
+            sale.UpdatedByUserId = request.UpdatedByUserId;
+
+            var status = (SalesOrderStatus)request.SalesOrderStatus;
+
+            switch (status)
+            {
+                case SalesOrderStatus.SentToProvider:
+                    sale.SentToProviderDate = request.SentToProviderDate;
+                    sale.SentToProviderUserId = request.SentToProviderUserId;
+                    break;
+
+                case SalesOrderStatus.ProviderAccepted:
+                    sale.ProviderAcceptedDate = request.ProviderAcceptedDate;
+                    sale.ProviderAcceptedUserId = request.ProviderAcceptedUserId;
+                    break;
+
+                case SalesOrderStatus.ProviderRejected:
+                    sale.ProviderRejectedDate = request.ProviderRejectedDate;
+                    sale.ProviderRejectedUserId = request.ProviderRejectedUserId;
+                    break;
+
+                case SalesOrderStatus.Completed:
+                    sale.CompletedDate = request.CompletedDate;
+                    sale.ServiceStartDate = request.ServiceStartDate;
+                    sale.NextRenewDate = request.NextRenewDate;
+                    break;
+
+                case SalesOrderStatus.OnHold:
+                    sale.OnHoldDate = request.OnHoldDate;
+                    sale.OnHoldByUserId = request.OnHoldByUserId;
+                    sale.OnHoldReason = request.OnHoldReason;
+                    break;
+
+                case SalesOrderStatus.Cancelled:
+                    sale.CancelledDate = request.CancelledDate;
+                    sale.CancelledByUserId = request.CancelledByUserId;
+                    sale.CancelledReason = request.CancelledReason;
+                    break;
+            }
+
+            await _repository.AddSalesOrderStatusHistoryAsync(new SalesOrderStatusHistory
+            {
+                SalesOrderStatusHistoryId = Guid.NewGuid(),
+                SaleId = sale.SaleId,
+                OldStatus = oldStatus,
+                NewStatus = request.SalesOrderStatus,
+                Remarks = BuildStatusHistoryRemarks(request),
+                ChangedByUserId = request.UpdatedByUserId,
+                ChangedAt = DateTime.UtcNow
+            }, cancellationToken);
+
+            await _repository.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+
+        private static string? BuildStatusHistoryRemarks(UpdateSalesOrderStatusDto request)
+        {
+            var status = (SalesOrderStatus)request.SalesOrderStatus;
+
+            return status switch
+            {
+                SalesOrderStatus.OnHold => request.OnHoldReason,
+                SalesOrderStatus.Cancelled => request.CancelledReason,
+                SalesOrderStatus.SentToProvider => "Order sent to provider.",
+                SalesOrderStatus.ProviderAccepted => "Provider accepted the order.",
+                SalesOrderStatus.ProviderRejected => "Provider rejected the order.",
+                SalesOrderStatus.Completed => "Order completed.",
+                _ => status.ToString()
+            };
+        }
+
+        public async Task<bool> UpdateSuperCRMCommissionAsync(
+    UpdateSuperCRMCommissionDto request,
+    CancellationToken cancellationToken = default)
+        {
+            var sale = await _repository.GetSaleForUpdateAsync(request.SaleId, cancellationToken);
+            if (sale == null)
+                return false;
+
+            var lines = await _repository.GetSaleLinesForUpdateAsync(request.SaleId, cancellationToken);
+
+            foreach (var inputLine in request.Lines)
+            {
+                var line = lines.FirstOrDefault(x => x.SaleLineId == inputLine.SaleLineId);
+                if (line == null)
+                    continue;
+
+                line.SuperCRMCommissionEarned = inputLine.SuperCRMCommissionEarned;
+                line.UpdatedAt = DateTime.UtcNow;
+                line.UpdatedByUserId = request.UpdatedByUserId;
+            }
+
+            sale.ProviderCommissionEarned = lines.Sum(x => x.SuperCRMCommissionEarned);
+            sale.IsProviderCommissionReceived = request.IsProviderCommissionReceived;
+            sale.UpdatedAt = DateTime.UtcNow;
+            sale.UpdatedByUserId = request.UpdatedByUserId;
+
+            await _repository.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+
+        // END
+    }
 }

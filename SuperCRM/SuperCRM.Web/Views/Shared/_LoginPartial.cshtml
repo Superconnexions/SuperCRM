@@ -26,13 +26,8 @@
                     @if (User.IsInRole(AppRoles.SuperAdmin))
                     {
 
-                        <li>
-                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">SuperAdmin Dashboard</a>
-                        </li>
 
-                        <li>
-                            <a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">Admin Users</a>
-                        </li>
+                        
 
                         <li>
                             <a class="dropdown-item" asp-controller="ProductBaseCommissions" asp-action="Index">
@@ -47,29 +42,9 @@
                         </li>
                     }
 
-                    @if (User.IsInRole(AppRoles.SuperCRMAdmin))
-                    {
-                        <li>
-                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
-                        </li>
-
-                    }
+                    
 
 
-                    <li>
-                        
-
-                        <a asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="dropdown-item">
-                            Sales Order Creation
-                        </a>
-
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderHistory">
-                            Sales Order History
-                        </a>
-                    </li>
 
 
                     <li>
@@ -78,9 +53,7 @@
                         </a>
                     </li>
 
-                    <li>
-                        <a class="dropdown-item" asp-controller="AgentManagement" asp-action="Index">Agent Management</a>
-                    </li>
+                    
 
                     <li>
                         <a class="dropdown-item" asp-controller="Providers" asp-action="Index">
@@ -130,6 +103,66 @@
                 </ul>
             </li>
 
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-dark"
+                   href="#"
+                   id="adminTaskDropdown"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    Admin Task
+                </a>
+
+                <ul class="dropdown-menu" aria-labelledby="adminTaskDropdown">
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                    </li>
+
+                    <li>
+                         <a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">Admin Users</a>
+                     </li>
+
+                    <li>
+                        <a class="dropdown-item" asp-controller="AgentManagement" asp-action="Index">Agent Management</a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="SalesOrderProductList">
+                            Sales Order Creation
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="SalesOrderHistory">
+                            Sales Order History
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="SalesOrderManagement">
+                            Sales Order Management
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="CustomerManagement">
+                            Customer Management
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+
         }
 
 
@@ -164,8 +197,8 @@
                     </li>
 
                     <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
-                            Customer List
+                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="CustomerManagement">
+                            Customer Management
                         </a>
                     </li>
 @* 

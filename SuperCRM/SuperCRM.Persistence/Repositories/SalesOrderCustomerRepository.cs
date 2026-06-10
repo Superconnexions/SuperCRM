@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Persistence;
 using SuperCRM.Domain.Entities;
+using SuperCRM.Domain.Enums;
 using SuperCRM.Persistence.DbContexts;
 
 namespace SuperCRM.Persistence.Repositories
@@ -337,6 +338,153 @@ namespace SuperCRM.Persistence.Repositories
                     (!excludeBankAccountId.HasValue || x.CustomerBankAccountId != excludeBankAccountId.Value),
                     cancellationToken);
         }
+
+        public async Task<(List<CustomerManagementListDto> Items, int TotalRecords)> GetCustomerManagementListAsync(
+    Guid? createdByUserId,
+    DateTime? createdDateFrom,
+    DateTime? createdDateTo,
+    string? customerCode,
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken = default)
+        {
+            page = page <= 0 ? 1 : page;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+            customerCode = (customerCode ?? "").Trim();
+
+            var query = _dbContext.Customers
+                .AsNoTracking()
+                .Where(c =>
+                    c.IsActive &&
+                    (!createdByUserId.HasValue || c.CreatedByUserId == createdByUserId.Value) &&
+                    (!createdDateFrom.HasValue || c.CreatedAt.Date >= createdDateFrom.Value.Date) &&
+                    (!createdDateTo.HasValue || c.CreatedAt.Date <= createdDateTo.Value.Date) &&
+                    (string.IsNullOrWhiteSpace(customerCode) || (c.CustomerCode ?? "").Contains(customerCode)));
+
+            var totalRecords = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new CustomerManagementListDto
+                {
+                    CustomerId = c.CustomerId,
+                    CustomerCode = c.CustomerCode ?? "",
+                    FirstName = c.FirstName ?? "",
+                    LastName = c.LastName ?? "",
+                    RegistrationSource = c.RegistrationSource,
+                    RegistrationSourceText = ((RegistrationSource)c.RegistrationSource).ToString(),
+                    Email = c.Email,
+                    Phone = c.Phone,
+                    Mobile = c.Mobile,
+                    CreatedAt = c.CreatedAt,
+
+                    SalesOrderCount = _dbContext.Sales.Count(s => s.CustomerId == c.CustomerId),
+                    HasBusiness = _dbContext.CustomerBusinesses.Any(b => b.CustomerId == c.CustomerId && b.IsActive),
+                    HasBank = _dbContext.CustomerBankAccounts.Any(b => b.CustomerId == c.CustomerId)
+                })
+                .ToListAsync(cancellationToken);
+
+            return (items, totalRecords);
+        }
+
+        public async Task<List<CustomerSalesOrderListDto>> GetCustomerSalesOrdersAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var query =
+                from s in _dbContext.Sales.AsNoTracking()
+                join p in _dbContext.Providers.AsNoTracking()
+                    on s.ProviderId equals p.ProviderId into providers
+                from provider in providers.DefaultIfEmpty()
+                join sl in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals sl.SaleId into saleLines
+                where s.CustomerId == customerId
+                orderby s.OrderDate descending
+                select new CustomerSalesOrderListDto
+                {
+                    SaleId = s.SaleId,
+                    OrderNo = s.OrderNo,
+                    OrderDate = s.OrderDate,
+                    ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+                    SalesOrderStatus = s.SalesOrderStatus,
+                    SalesOrderStatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+                    OrderTotal = saleLines.Sum(x => x.LineTotalAmount)
+                };
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<CustomerAddressListDto>> GetCustomerAddressesAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var query =
+                from a in _dbContext.CustomerAddresses.AsNoTracking()
+                join c in _dbContext.Countries.AsNoTracking()
+                    on a.CountryId equals c.CountryId into countries
+                from country in countries.DefaultIfEmpty()
+                where a.CustomerId == customerId
+                orderby a.AddressType
+                select new CustomerAddressListDto
+                {
+                    AddressType = a.AddressType,
+                    AddressTypeText = a.AddressType == 1 ? "Home/Personal"
+                        : a.AddressType == 2 ? "Business"
+                        : "Other",
+                    HouseNo = a.HouseNo,
+                    RoadName = a.RoadName,
+                    PostCode = a.PostCode,
+                    City = a.City,
+                    CountryName = country != null ? country.CountryName : ""
+                };
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
+        public async Task<CustomerBusinessViewDto?> GetCustomerBusinessViewAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.CustomerBusinesses
+                .AsNoTracking()
+                .Where(x => x.CustomerId == customerId && x.IsActive)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new CustomerBusinessViewDto
+                {
+                    BusinessName = x.BusinessName,
+                    BusinessType = x.BusinessType,
+                    BusinessTypeText = x.BusinessType == 1 ? "Solo"
+                        : x.BusinessType == 2 ? "Limited"
+                        : "Unknown",
+                    BusinessEmail = x.BusinessEmail,
+                    TradingName = x.TradingName,
+                    RegistrationNo = x.RegistrationNo,
+                    ContactPersonName = x.ContactPersonName,
+                    ContactPersonPhone = x.ContactPersonPhone
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<List<CustomerBankAccountViewDto>> GetCustomerBankAccountsViewAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.CustomerBankAccounts
+                .AsNoTracking()
+                .Where(x => x.CustomerId == customerId)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new CustomerBankAccountViewDto
+                {
+                    BankName = x.BankName,
+                    AccountName = x.AccountName,
+                    AccountNumber = x.AccountNumber,
+                    SortCode = x.SortCode
+                })
+                .ToListAsync(cancellationToken);
+        }
+
         /// END
     }
 }

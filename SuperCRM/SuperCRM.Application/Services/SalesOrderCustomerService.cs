@@ -934,6 +934,56 @@ namespace SuperCRM.Application.Services
             };
         }
 
+
+        // Customer Management
+
+        public Task<(List<CustomerManagementListDto> Items, int TotalRecords)> GetCustomerManagementListAsync(
+    Guid? createdByUserId,
+    DateTime? createdDateFrom,
+    DateTime? createdDateTo,
+    string? customerCode,
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken = default)
+        {
+            return _repository.GetCustomerManagementListAsync(
+                createdByUserId,
+                createdDateFrom,
+                createdDateTo,
+                customerCode,
+                page,
+                pageSize,
+                cancellationToken);
+        }
+
+        public Task<List<CustomerSalesOrderListDto>> GetCustomerSalesOrdersAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            return _repository.GetCustomerSalesOrdersAsync(customerId, cancellationToken);
+        }
+
+        public Task<List<CustomerAddressListDto>> GetCustomerAddressesAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            return _repository.GetCustomerAddressesAsync(customerId, cancellationToken);
+        }
+
+        public Task<CustomerBusinessViewDto?> GetCustomerBusinessViewAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            return _repository.GetCustomerBusinessViewAsync(customerId, cancellationToken);
+        }
+
+        public Task<List<CustomerBankAccountViewDto>> GetCustomerBankAccountsViewAsync(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            return _repository.GetCustomerBankAccountsViewAsync(customerId, cancellationToken);
+        }
+
         // END
 
     }

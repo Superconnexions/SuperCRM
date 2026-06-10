@@ -1,0 +1,712 @@
+﻿@model SuperCRM.Web.ViewModels.SalesOrders.SalesOrderHistoryViewModel
+
+@{
+    ViewData["Title"] = "Sales Order Management";
+    var startRecord = Model.TotalRecords == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    var endRecord = Math.Min(Model.Page * Model.PageSize, Model.TotalRecords);
+}
+
+<div class="container-fluid mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-1">Sales Order Management</h4>
+            <small class="text-muted">
+                Showing @startRecord - @endRecord of @Model.TotalRecords records
+            </small>
+        </div>
+        <span class="badge bg-primary px-3 py-2">Admin View</span>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form asp-action="SalesOrderManagement"
+          asp-controller="SalesOrder"
+          method="get"
+          class="card mb-3">
+
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label">Order Date From</label>
+                    <input type="date"
+                           name="orderDateFrom"
+                           value="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Order Date To</label>
+                    <input type="date"
+                           name="orderDateTo"
+                           value="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Sales Order Status</label>
+                    <select name="salesOrderStatus" class="form-select">
+                        <option value="">All Status</option>
+                        @foreach (var item in Model.StatusOptions)
+                        {
+                            <option value="@item.Value" selected="@(Model.SalesOrderStatus?.ToString() == item.Value)">
+                                @item.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Page Size</label>
+                    <select name="pageSize" class="form-select">
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                        <option value="100" selected="@(Model.PageSize == 100)">100</option>
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-grid">
+                    <input type="hidden" name="page" value="1" />
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div class="card shadow-sm">
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover table-sm align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Order No</th>
+                        <th>Order Date</th>
+                        <th>Customer</th>
+                        <th>Mobile</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th class="text-end">Order Total</th>
+                        <th>Commission</th>
+                        <th>Renew</th>
+                        <th>Email</th>
+                        <th style="width:100px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Orders.Any())
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center text-muted py-4">
+                                No sales order found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Orders)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.OrderNo</strong>
+                                </td>
+
+                                <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
+
+                                <td>
+                                    <div>@item.CustomerName</div>
+                                    <small class="text-muted">@item.CustomerCode</small>
+                                </td>
+
+                                <td>@item.CustomerMobile</td>
+
+                                <td>@item.ProviderName</td>
+
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        @item.SalesOrderStatusText
+                                    </span>
+                                </td>
+
+                                <td class="text-end">
+                                    @item.OrderTotal.ToString("N2")
+                                </td>
+
+                                <td>
+                                    <small>
+                                        Applicable: @item.CommissionApplicableText<br />
+                                        Finalized: @item.CommissionFinalizedText
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <small>
+                                        Next: @(item.NextRenewDate?.ToString("dd-MMM-yyyy") ?? "-")<br />
+                                        Count: @item.NoOfRenew
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <small>
+                                        Provider: @(item.EmailSentToProvider ? "Yes" : "No")<br />
+                                        Customer: @(item.EmailSentToCustomer ? "Yes" : "No")
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary btn-manage-sales-order"
+                                            data-sale-id="@item.SaleId"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#salesOrderManageModal">
+                                        Action
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-end">
+
+                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="SalesOrderManagement"
+                       asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                       asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                       asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-pageSize="@Model.PageSize">
+                        Previous
+                    </a>
+                </li>
+
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="SalesOrderManagement"
+                               asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                               asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                               asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                               asp-route-page="@i"
+                               asp-route-pageSize="@Model.PageSize">
+                                @i
+                            </a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="SalesOrderManagement"
+                       asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                       asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                       asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-pageSize="@Model.PageSize">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    }
+</div>
+
+<div class="modal fade" id="salesOrderManageModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Manage Sales Order</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabSalesInfo" type="button">
+                            Sales Information
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabCommission" type="button">
+                            Agent Commission
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSuperCRMCommission" type="button">
+                            SuperCRM Commission
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabStatus" type="button">
+                            Order Status
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content pt-3">
+
+                    <div class="tab-pane fade show active" id="tabSalesInfo">
+                        <form method="post" asp-action="UpdateSalesInformation">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="SaleId" id="SalesInfo_SaleId" />
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label>Service Start Date</label>
+                                    <input type="date" name="ServiceStartDate" id="SalesInfo_ServiceStartDate" class="form-control" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Next Renew Date</label>
+                                    <input type="date" name="NextRenewDate" id="SalesInfo_NextRenewDate" class="form-control" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>No Of Renew</label>
+                                    <input type="number" name="NoOfRenew" id="SalesInfo_NoOfRenew" class="form-control" />
+                                </div>
+
+                                <div class="col-md-4 form-check mt-4">
+                                    <input type="checkbox" name="EmailSentToProvider" value="true" id="SalesInfo_EmailSentToProvider" class="form-check-input" />
+                                    <input type="hidden" name="EmailSentToProvider" value="false" />
+                                    <label class="form-check-label">Email Sent To Provider</label>
+                                </div>
+
+                                <div class="col-md-4 form-check mt-4">
+                                    <input type="checkbox" name="EmailSentToCustomer" value="true" id="SalesInfo_EmailSentToCustomer" class="form-check-input" />
+                                    <input type="hidden" name="EmailSentToCustomer" value="false" />
+                                    <label class="form-check-label">Email Sent To Customer</label>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Special Notes</label>
+                                    <textarea name="SpecialNotes" id="SalesInfo_SpecialNotes" class="form-control"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-3">
+                                <button type="submit" class="btn btn-success">Update Sales Information</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="tabCommission">
+                        <form method="post" asp-action="UpdateSalesCommission">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="SaleId" id="Commission_SaleId" />
+                            <div id="commissionLinesContainer"></div>
+
+                            <div class="text-end mt-3">
+                                <button type="submit" class="btn btn-success">Update Commission</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="tabSuperCRMCommission">
+                        <form method="post" asp-action="UpdateSuperCRMCommission">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="SaleId" id="SuperCRMCommission_SaleId" />
+
+                            <div id="superCRMCommissionLinesContainer"></div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Total SuperCRM Earned</label>
+                                    <input type="text"
+                                           id="SuperCRMCommission_Total"
+                                           class="form-control text-end"
+                                           readonly />
+                                </div>
+
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               name="IsProviderCommissionReceived"
+                                               value="true"
+                                               id="SuperCRMCommission_IsProviderCommissionReceived"
+                                               class="form-check-input" />
+
+                                        <input type="hidden"
+                                               name="IsProviderCommissionReceived"
+                                               value="false" />
+
+                                        <label class="form-check-label fw-bold">
+                                            Is SuperCRM Received Commission
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-3">
+                                <button type="submit" class="btn btn-success">
+                                    Update SuperCRM Commission
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="tabStatus">
+                        <form method="post" asp-action="UpdateSalesOrderStatus">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="SaleId" id="Status_SaleId" />
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label>Status</label>
+                                    <select name="SalesOrderStatus" id="Status_SalesOrderStatus" class="form-select">
+                                        <option value="0">Unknown</option>
+                                        <option value="1">Created</option>
+                                        <option value="2">SentToProvider</option>
+                                        <option value="3">ProviderAccepted</option>
+                                        <option value="4">ProviderRejected</option>
+                                        <option value="5">Processing</option>
+                                        <option value="6">Shipped</option>
+                                        <option value="7">Completed</option>
+                                        <option value="8">PartialDelivered</option>
+                                        <option value="9">OnHold</option>
+                                        <option value="10">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="statusDynamicFields" class="row g-3 mt-2"></div>
+
+                            <div class="text-end mt-3">
+                                <button type="submit" class="btn btn-success">Update Status</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function formatDate(value) {
+            return value ? value.substring(0, 10) : '';
+        }
+
+        function setDateValue(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.value = formatDate(value);
+        }
+
+        function buildAdminUserDropdown(fieldName, selectedValue, adminUsers, labelText) {
+            let html = `
+                <div class="col-md-4">
+                    <label>${labelText}</label>
+                    <select name="${fieldName}" class="form-select">
+                        <option value="">-- Select User --</option>`;
+
+            adminUsers.forEach(x => {
+                const selected =
+                    String(x.userId).toLowerCase() === String(selectedValue || '').toLowerCase()
+                        ? 'selected'
+                        : '';
+
+                html += `<option value="${x.userId}" ${selected}>${x.fullName}</option>`;
+            });
+
+            html += `</select></div>`;
+            return html;
+        }
+
+        document.addEventListener('click', async function (e) {
+            const btn = e.target.closest('.btn-manage-sales-order');
+            if (!btn) return;
+
+            const saleId = btn.dataset.saleId;
+
+            const response = await fetch('/SalesOrder/GetSalesOrderManagementDetail?saleId=' + encodeURIComponent(saleId));
+            const result = await response.json();
+
+            if (!result.success) {
+                alert(result.message || 'Sales order not found.');
+                return;
+            }
+
+            const data = result.data;
+
+            document.getElementById('SalesInfo_SaleId').value = data.saleId;
+            document.getElementById('Commission_SaleId').value = data.saleId;
+            document.getElementById('SuperCRMCommission_SaleId').value = data.saleId;
+            document.getElementById('Status_SaleId').value = data.saleId;
+
+            setDateValue('SalesInfo_ServiceStartDate', data.serviceStartDate);
+            setDateValue('SalesInfo_NextRenewDate', data.nextRenewDate);
+
+            document.getElementById('SalesInfo_NoOfRenew').value = data.noOfRenew || 0;
+            document.getElementById('SalesInfo_EmailSentToProvider').checked = data.emailSentToProvider === true;
+            document.getElementById('SalesInfo_EmailSentToCustomer').checked = data.emailSentToCustomer === true;
+            document.getElementById('SalesInfo_SpecialNotes').value = data.specialNotes || '';
+
+            document.getElementById('Status_SalesOrderStatus').value = data.salesOrderStatus;
+
+            renderCommissionLines(data.lines || []);
+            renderSuperCRMCommissionLines(data.lines || [], data);
+            renderStatusFields(parseInt(data.salesOrderStatus), data);
+        });
+
+        document.getElementById('Status_SalesOrderStatus')?.addEventListener('change', function () {
+            renderStatusFields(parseInt(this.value), window.currentSalesOrderManagementData || {});
+        });
+
+        function renderCommissionLines(lines) {
+            const box = document.getElementById('commissionLinesContainer');
+
+            let html = `
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Variant</th>
+                            <th class="text-end">Line Total</th>
+                            <th class="text-end">Calculated Commission</th>
+                            <th class="text-end">Final Commission</th>
+                            <th>Finalized</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            lines.forEach((line, index) => {
+                html += `
+                    <tr>
+                        <td>
+                            ${line.productName || ''}
+                            <input type="hidden" name="Lines[${index}].SaleLineId" value="${line.saleLineId}" />
+                        </td>
+                        <td>${line.variantName || ''}</td>
+                        <td class="text-end">${Number(line.lineTotalAmount || 0).toFixed(2)}</td>
+                        <td class="text-end">${Number(line.calculatedAgentCommission || 0).toFixed(2)}</td>
+                        <td>
+                            <input type="number"
+                                   step="0.01"
+                                   name="Lines[${index}].FinalAgentCommission"
+                                   value="${Number(line.finalAgentCommission || 0).toFixed(2)}"
+                                   class="form-control form-control-sm text-end" />
+                        </td>
+                        <td>${line.isCommissionFinalized ? 'Yes' : 'No'}</td>
+                    </tr>`;
+            });
+
+            html += '</tbody></table>';
+            box.innerHTML = html;
+        }
+
+        function renderSuperCRMCommissionLines(lines, data) {
+            const box = document.getElementById('superCRMCommissionLinesContainer');
+            const totalBox = document.getElementById('SuperCRMCommission_Total');
+            const receivedBox = document.getElementById('SuperCRMCommission_IsProviderCommissionReceived');
+
+            if (!box) return;
+
+            if (receivedBox) {
+                receivedBox.checked = data.isProviderCommissionReceived === true;
+            }
+
+            let html = `
+                <table class="table table-bordered table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Variant</th>
+                            <th class="text-end">Qty</th>
+                            <th class="text-end">Line Total</th>
+                            <th class="text-end">Agent Commission</th>
+                            <th>Agent Finalized</th>
+                            <th class="text-end">SuperCRM Earned</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            lines.forEach((line, index) => {
+                html += `
+                    <tr>
+                        <td>
+                            ${line.productName || ''}
+                            <input type="hidden"
+                                   name="Lines[${index}].SaleLineId"
+                                   value="${line.saleLineId}" />
+                        </td>
+
+                        <td>${line.variantName || ''}</td>
+
+                        <td class="text-end">
+                            ${line.quantity || 0}
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(line.lineTotalAmount || 0).toFixed(2)}
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(line.finalAgentCommission || 0).toFixed(2)}
+                        </td>
+
+                        <td>
+                            ${line.isCommissionFinalized ? 'Yes' : 'No'}
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   step="0.01"
+                                   name="Lines[${index}].SuperCRMCommissionEarned"
+                                   value="${Number(line.superCRMCommissionEarned || 0).toFixed(2)}"
+                                   class="form-control form-control-sm text-end supercrm-earned-input" />
+                        </td>
+                    </tr>`;
+            });
+
+            html += '</tbody></table>';
+
+            box.innerHTML = html;
+
+            calculateSuperCRMTotal();
+
+            document.querySelectorAll('.supercrm-earned-input')
+                .forEach(function (input) {
+                    input.addEventListener('input', calculateSuperCRMTotal);
+                });
+        }
+
+        function calculateSuperCRMTotal() {
+            let total = 0;
+
+            document.querySelectorAll('.supercrm-earned-input')
+                .forEach(function (input) {
+                    const value = parseFloat(input.value || '0');
+                    if (!isNaN(value)) {
+                        total += value;
+                    }
+                });
+
+            const totalBox = document.getElementById('SuperCRMCommission_Total');
+            if (totalBox) {
+                totalBox.value = total.toFixed(2);
+            }
+        }
+        // END SuperCRM Commission
+
+        function renderStatusFields(status, data) {
+            window.currentSalesOrderManagementData = data;
+
+            const box = document.getElementById('statusDynamicFields');
+            const adminUsers = data.adminUsers || [];
+
+            let html = '';
+
+            if (status === 2) {
+                html = `
+                    <div class="col-md-4">
+                        <label>Sent To Provider Date</label>
+                        <input type="date" name="SentToProviderDate" class="form-control" value="${formatDate(data.sentToProviderDate)}" />
+                    </div>
+                    ${buildAdminUserDropdown('SentToProviderUserId', data.sentToProviderUserId, adminUsers, 'Communicated By')}`;
+            }
+
+            if (status === 3) {
+                html = `
+                    <div class="col-md-4">
+                        <label>Provider Accepted Date</label>
+                        <input type="date" name="ProviderAcceptedDate" class="form-control" value="${formatDate(data.providerAcceptedDate)}" />
+                    </div>
+                    ${buildAdminUserDropdown('ProviderAcceptedUserId', data.providerAcceptedUserId, adminUsers, 'Accepted By')}`;
+            }
+
+            if (status === 4) {
+                html = `
+                    <div class="col-md-4">
+                        <label>Provider Rejected Date</label>
+                        <input type="date" name="ProviderRejectedDate" class="form-control" value="${formatDate(data.providerRejectedDate)}" />
+                    </div>
+                    ${buildAdminUserDropdown('ProviderRejectedUserId', data.providerRejectedUserId, adminUsers, 'Rejected By')}`;
+            }
+
+            if (status === 7) {
+                html = `
+                    <div class="col-md-4">
+                        <label>Completed Date</label>
+                        <input type="date" name="CompletedDate" class="form-control" value="${formatDate(data.completedDate)}" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Service Start Date</label>
+                        <input type="date" name="ServiceStartDate" class="form-control" value="${formatDate(data.serviceStartDate)}" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Next Renew Date</label>
+                        <input type="date" name="NextRenewDate" class="form-control" value="${formatDate(data.nextRenewDate)}" />
+                    </div>`;
+            }
+
+            if (status === 9) {
+                html = `
+                    <div class="col-md-4">
+                        <label>On Hold Date</label>
+                        <input type="date" name="OnHoldDate" class="form-control" value="${formatDate(data.onHoldDate)}" />
+                    </div>
+                    ${buildAdminUserDropdown('OnHoldByUserId', data.onHoldByUserId, adminUsers, 'On Hold By')}
+                    <div class="col-md-12">
+                        <label>On Hold Reason</label>
+                        <textarea name="OnHoldReason" class="form-control">${data.onHoldReason || ''}</textarea>
+                    </div>`;
+            }
+
+            if (status === 10) {
+                html = `
+                    <div class="col-md-4">
+                        <label>Cancelled Date</label>
+                        <input type="date" name="CancelledDate" class="form-control" value="${formatDate(data.cancelledDate)}" />
+                    </div>
+                    ${buildAdminUserDropdown('CancelledByUserId', data.cancelledByUserId, adminUsers, 'Cancelled By')}
+                    <div class="col-md-12">
+                        <label>Cancelled Reason</label>
+                        <textarea name="CancelledReason" class="form-control">${data.cancelledReason || ''}</textarea>
+                    </div>`;
+            }
+
+            box.innerHTML = html;
+        }
+    </script>
+}

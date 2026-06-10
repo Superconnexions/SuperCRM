@@ -68,6 +68,8 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<SaleLine> SaleLines { get; set; }
         public DbSet<InstallmentSchedule> InstallmentSchedules { get; set; }
 
+        public DbSet<SalesOrderStatusHistory> SalesOrderStatusHistories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -1037,6 +1039,19 @@ namespace SuperCRM.Persistence.DbContexts
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            builder.Entity<SalesOrderStatusHistory>(entity =>
+            {
+                entity.ToTable("SalesOrderStatusHistory");
+                entity.HasKey(x => x.SalesOrderStatusHistoryId);
+
+                entity.Property(x => x.Remarks).HasMaxLength(500);
+                entity.Property(x => x.ChangedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                entity.HasOne<Sale>()
+                    .WithMany()
+                    .HasForeignKey(x => x.SaleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
             /// END ALL
 
 

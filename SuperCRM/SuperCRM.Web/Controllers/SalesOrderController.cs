@@ -906,12 +906,12 @@ namespace SuperCRM.Web.Controllers
 
         [HttpGet]
         public async Task<IActionResult> SalesOrderHistory(
-    DateTime? orderDateFrom,
-    DateTime? orderDateTo,
-    byte? salesOrderStatus,
-    int page = 1,
-    int pageSize = 20,
-    CancellationToken cancellationToken = default)
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        int page = 1,
+        int pageSize = 20,
+        CancellationToken cancellationToken = default)
         {
             var currentUserId = GetCurrentUserId();
 
@@ -964,6 +964,278 @@ namespace SuperCRM.Web.Controllers
         }
 
         // END Agents Activities
+
+        // Start Sales Management
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin")]
+        public async Task<IActionResult> SalesOrderManagement(
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        int page = 1,
+        int pageSize = 20,
+        CancellationToken cancellationToken = default)
+        {
+            if (!orderDateFrom.HasValue && !orderDateTo.HasValue)
+            {
+                orderDateFrom = DateTime.UtcNow.Date.AddDays(-30);
+                orderDateTo = DateTime.UtcNow.Date;
+            }
+
+            var result = await _salesOrderCreationService.GetSalesOrderHistoryAsync(
+                soldByUserId: null,
+                orderDateFrom,
+                orderDateTo,
+                salesOrderStatus,
+                page,
+                pageSize,
+                cancellationToken);
+
+            var model = new SalesOrderHistoryViewModel
+            {
+                IsAgentView = false,
+                OrderDateFrom = orderDateFrom,
+                OrderDateTo = orderDateTo,
+                SalesOrderStatus = salesOrderStatus,
+                Orders = result.Items,
+                TotalRecords = result.TotalRecords,
+                Page = page,
+                PageSize = pageSize,
+                StatusOptions = Enum.GetValues(typeof(SalesOrderStatus))
+                    .Cast<SalesOrderStatus>()
+                    .Where(x => x != SalesOrderStatus.Unknown)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = ((byte)x).ToString(),
+                        Text = x.ToString()
+                    })
+                    .ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSalesOrderManagementDetail(
+        Guid saleId,
+        CancellationToken cancellationToken = default)
+        {
+
+            TempData.Remove("SuccessMessage");
+            TempData.Remove("ErrorMessage");
+
+            var dto = await _salesOrderCreationService.GetSalesOrderManagementDetailAsync(
+                saleId,
+                cancellationToken);
+
+            if (dto == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Sales order was not found."
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                data = dto
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateSalesInformation(
+            UpdateSalesInformationDto model,
+            CancellationToken cancellationToken = default)
+        {
+            model.UpdatedByUserId = GetCurrentUserId();
+
+            var success = await _salesOrderCreationService.UpdateSalesInformationAsync(
+                model,
+                cancellationToken);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+                success ? "Sales information updated successfully." : "Sales order was not found.";
+
+            return RedirectToAction(nameof(SalesOrderManagement));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateSalesCommission(
+            UpdateSalesCommissionDto model,
+            CancellationToken cancellationToken = default)
+        {
+            model.UpdatedByUserId = GetCurrentUserId();
+
+            var success = await _salesOrderCreationService.UpdateSalesCommissionAsync(
+                model,
+                cancellationToken);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+                success ? "Commission updated successfully." : "Sales order was not found.";
+
+            return RedirectToAction(nameof(SalesOrderManagement));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateSalesOrderStatus(
+            UpdateSalesOrderStatusDto model,
+            CancellationToken cancellationToken = default)
+        {
+            model.UpdatedByUserId = GetCurrentUserId();
+
+            var success = await _salesOrderCreationService.UpdateSalesOrderStatusAsync(
+                model,
+                cancellationToken);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+                success ? "Sales order status updated successfully." : "Sales order was not found.";
+
+            return RedirectToAction(nameof(SalesOrderManagement));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin")]
+        public async Task<IActionResult> UpdateSuperCRMCommission(
+        UpdateSuperCRMCommissionDto model,
+        CancellationToken cancellationToken = default)
+        {
+            model.UpdatedByUserId = GetCurrentUserId();
+
+            var success = await _salesOrderCreationService.UpdateSuperCRMCommissionAsync(
+                model,
+                cancellationToken);
+
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] =
+                success
+                    ? "SuperCRM commission updated successfully."
+                    : "Sales order was not found.";
+
+            return RedirectToAction(nameof(SalesOrderManagement));
+        }
+
+
+        // Customer Managment
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> CustomerManagement(
+        DateTime? createdDateFrom,
+        DateTime? createdDateTo,
+        string? customerCode,
+        int page = 1,
+        int pageSize = 20,
+        CancellationToken cancellationToken = default)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            Guid? createdByUserId = null;
+            var isAgentView = false;
+
+            if (User.IsInRole("Agent"))
+            {
+                createdByUserId = currentUserId;
+                isAgentView = true;
+            }
+
+            if (!createdDateFrom.HasValue && !createdDateTo.HasValue)
+            {
+                createdDateFrom = DateTime.UtcNow.Date.AddDays(-30);
+                createdDateTo = DateTime.UtcNow.Date;
+            }
+
+            var result = await _salesOrderCustomerService.GetCustomerManagementListAsync(
+                createdByUserId,
+                createdDateFrom,
+                createdDateTo,
+                customerCode,
+                page,
+                pageSize,
+                cancellationToken);
+
+            var model = new CustomerManagementViewModel
+            {
+                IsAgentView = isAgentView,
+                CreatedDateFrom = createdDateFrom,
+                CreatedDateTo = createdDateTo,
+                CustomerCode = customerCode,
+                Customers = result.Items,
+                TotalRecords = result.TotalRecords,
+                Page = page,
+                PageSize = pageSize
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> CustomerSalesOrders(
+            Guid customerId,
+            string customerName = "",
+            CancellationToken cancellationToken = default)
+        {
+            var orders = await _salesOrderCustomerService.GetCustomerSalesOrdersAsync(
+                customerId,
+                cancellationToken);
+
+            var model = new CustomerSalesOrdersViewModel
+            {
+                CustomerId = customerId,
+                CustomerName = customerName,
+                Orders = orders
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> GetCustomerAddresses(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var items = await _salesOrderCustomerService.GetCustomerAddressesAsync(
+                customerId,
+                cancellationToken);
+
+            return Json(items);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> GetCustomerBusiness(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var item = await _salesOrderCustomerService.GetCustomerBusinessViewAsync(
+                customerId,
+                cancellationToken);
+
+            return Json(item);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> GetCustomerBankAccounts(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var items = await _salesOrderCustomerService.GetCustomerBankAccountsViewAsync(
+                customerId,
+                cancellationToken);
+
+            return Json(items);
+        }
+
+        // END
 
     }
 }
