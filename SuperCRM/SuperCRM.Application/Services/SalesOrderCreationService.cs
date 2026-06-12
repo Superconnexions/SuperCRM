@@ -668,6 +668,17 @@ namespace SuperCRM.Application.Services
             return true;
         }
 
+        public async Task MarkCustomerEmailSentAsync(
+        List<Guid> saleIds,
+        CancellationToken cancellationToken = default)
+        {
+            if (saleIds == null || !saleIds.Any())
+                return;
+
+            await _repository.MarkCustomerEmailSentAsync(saleIds, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
+        }
+
         // END
     }
 }

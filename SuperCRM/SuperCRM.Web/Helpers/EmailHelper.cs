@@ -8,7 +8,8 @@ namespace SuperCRM.Web.Helpers
     /// </summary>
     public interface IEmailHelper
     {
-        Task<SendEmailResultDto> SendAsync(string toEmail, string subject, string body, bool isHtml = true, string? sourceModule = null, Guid? userId = null, CancellationToken cancellationToken = default);
+        Task<SendEmailResultDto> EmailSendAsync(string toEmail, string subject, string body, bool isHtml = true, string? sourceModule = null, Guid? userId = null, CancellationToken cancellationToken = default);
+        Task<SendEmailResultDto> EmailSendWithCCBccAsync(string toEmail, string ccEmails, string bccEmails, string subject, string body, bool isHtml = true, string? sourceModule = null, Guid? userId = null, CancellationToken cancellationToken = default);
         Task<SendEmailResultDto> SendTestEmailAsync(string toEmail, Guid? userId = null, CancellationToken cancellationToken = default);
     }
 
@@ -21,11 +22,26 @@ namespace SuperCRM.Web.Helpers
             _emailSenderService = emailSenderService;
         }
 
-        public Task<SendEmailResultDto> SendAsync(string toEmail, string subject, string body, bool isHtml = true, string? sourceModule = null, Guid? userId = null, CancellationToken cancellationToken = default)
+        public Task<SendEmailResultDto> EmailSendAsync(string toEmail, string subject, string body, bool isHtml = true, string? sourceModule = null, Guid? userId = null, CancellationToken cancellationToken = default)
         {
             return _emailSenderService.SendAsync(new SendEmailRequestDto
             {
                 ToEmail = toEmail,
+                Subject = subject,
+                Body = body,
+                IsHtml = isHtml,
+                SourceModule = sourceModule,
+                CreatedByUserId = userId
+            }, cancellationToken);
+        }
+
+        public Task<SendEmailResultDto> EmailSendWithCCBccAsync(string toEmail, string ccEmails, string bccEmails, string subject, string body, bool isHtml = true, string? sourceModule = null, Guid? userId = null, CancellationToken cancellationToken = default)
+        {
+            return _emailSenderService.SendAsync(new SendEmailRequestDto
+            {
+                ToEmail = toEmail,
+                CcEmail = ccEmails,
+                BccEmail = bccEmails,
                 Subject = subject,
                 Body = body,
                 IsHtml = isHtml,

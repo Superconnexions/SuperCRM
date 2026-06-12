@@ -140,6 +140,7 @@ builder.Services.AddScoped<IEmailSettingService, EmailSettingService>();
 builder.Services.AddScoped<IEmailLogService, EmailLogService>();
 builder.Services.AddScoped<IEmailSenderService, MailKitEmailSenderService>();
 builder.Services.AddScoped<IEmailHelper, EmailHelper>();
+builder.Services.AddScoped<IAppSettingsHelper, AppSettingsHelper>();
 
 
 builder.Services.AddScoped<ISalesOrderProductRepository, SalesOrderProductRepository>();

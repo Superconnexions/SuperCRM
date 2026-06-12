@@ -5,6 +5,7 @@ using NuGet.Protocol.Core.Types;
 using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Services;
 using SuperCRM.Domain.Enums;
+using SuperCRM.Web.Helpers;
 using SuperCRM.Web.ViewModels.SalesOrders;
 using System.Security.Claims;
 
@@ -17,19 +18,24 @@ namespace SuperCRM.Web.Controllers
         private readonly ISalesOrderDraftService _salesOrderDraftService;
         private readonly ISalesOrderCustomerService _salesOrderCustomerService;
         private readonly ISalesOrderCreationService _salesOrderCreationService;
-       
+        private readonly IEmailHelper _emailHelper;
+        private readonly IAppSettingsHelper _appSettingsHelper;
 
 
         public SalesOrderController(
             ISalesOrderService salesOrderService,
             ISalesOrderDraftService salesOrderDraftService,
             ISalesOrderCustomerService salesOrderCustomerService,
-            ISalesOrderCreationService salesOrderCreationService)
+            ISalesOrderCreationService salesOrderCreationService,
+            IEmailHelper emailHelper,
+            IAppSettingsHelper appSettingsHelper)
         {
             _salesOrderService = salesOrderService;
             _salesOrderDraftService = salesOrderDraftService;
             _salesOrderCustomerService = salesOrderCustomerService;
             _salesOrderCreationService = salesOrderCreationService;
+            _emailHelper = emailHelper;
+            _appSettingsHelper = appSettingsHelper;
         }
 
         [HttpGet]
@@ -141,6 +147,10 @@ namespace SuperCRM.Web.Controllers
         Guid? draftId,
         CancellationToken cancellationToken = default)
         {
+
+            TempData.Remove("SuccessMessage");
+            TempData.Remove("ErrorMessage");
+
             var currentUserId = GetCurrentUserId();
 
             if (User.IsInRole("Agent"))
@@ -725,6 +735,10 @@ namespace SuperCRM.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateSalesOrder(Guid draftId, CancellationToken cancellationToken = default)
         {
+
+            TempData.Remove("SuccessMessage");
+            TempData.Remove("ErrorMessage");
+
             var userId = GetCurrentUserId();
 
             var result = await _salesOrderCreationService.CreateSalesOrderFromDraftAsync(
@@ -742,8 +756,14 @@ namespace SuperCRM.Web.Controllers
                 return RedirectToAction(nameof(SalesOrderCustomerCreation), new { draftId });
             }
 
-            TempData["SuccessMessage"] = result.Message;
             var saleIds = string.Join(",", result.SaleIds);
+
+            var emailResult = await SendCustomerSalesOrderEmailAsync( result.SaleIds, userId, cancellationToken);
+
+
+            //TempData["SuccessMessage"] = result.Message;
+            TempData["SuccessMessage"] = emailResult? result.Message + " Customer email also sent successfully." : result.Message + " However, customer email could not be sent.";
+
             return RedirectToAction(nameof(SalesOrderCreatedSummary), new { saleIds });
         }
 
@@ -1233,6 +1253,213 @@ namespace SuperCRM.Web.Controllers
                 cancellationToken);
 
             return Json(items);
+        }
+
+        private async Task<bool> SendCustomerSalesOrderEmailAsync(
+        List<Guid> saleIds,
+        Guid currentUserId,
+        CancellationToken cancellationToken)
+        {
+            if (saleIds == null || !saleIds.Any())
+                return false;
+
+            var dto = await _salesOrderCreationService.GetCreatedSalesOrderSummaryAsync(
+                saleIds,
+                cancellationToken);
+
+            if (dto == null || dto.Customer == null)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(dto.Customer.Email))
+                return false;
+
+            var subject = BuildCustomerSalesOrderEmailSubject(dto);
+            var body = BuildCustomerSalesOrderEmailBody(dto);
+
+            var ccEmails = _appSettingsHelper.GetSalesOrderCCEmail();
+            var bccEmails = _appSettingsHelper.GetSalesOrderBCCEmail();
+
+            var result = await _emailHelper.EmailSendWithCCBccAsync(
+                dto.Customer.Email,
+                ccEmails,
+                bccEmails,
+                subject,
+                body,
+                isHtml: true,
+                sourceModule: "SalesOrder",
+                userId: currentUserId,
+                cancellationToken: cancellationToken);
+
+            if (result.Success)
+            {
+                await _salesOrderCreationService.MarkCustomerEmailSentAsync(
+                    saleIds,
+                    cancellationToken);
+            }
+
+            return result.Success;
+        }
+
+        private static string BuildCustomerSalesOrderEmailSubject( SalesOrderCreatedSummaryDto dto)
+        {
+            var orderNos = dto.Orders == null || !dto.Orders.Any()
+                ? "Sales Order"
+                : string.Join(", ", dto.Orders.Select(x => x.OrderNo));
+
+            return $"SuperCRM Sales Order Confirmation - {orderNos}";
+        }
+
+        private static string BuildCustomerSalesOrderEmailBody( SalesOrderCreatedSummaryDto dto)
+        {
+            var customerName = dto.Customer.DisplayName;
+            var generatedAt = DateTime.UtcNow.ToString("dd-MMM-yyyy hh:mm tt");
+
+            var html = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='utf-8' />
+            </head>
+            <body style='font-family: Arial, Helvetica, sans-serif; background:#f5f7fb; padding:20px; color:#1f2937;'>
+
+                <div style='max-width:900px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; border:1px solid #e5e7eb;'>
+
+                    <div style='background:#1d4ed8; color:#ffffff; padding:18px 24px;'>
+                        <h2 style='margin:0;'>Sales Order Confirmation</h2>
+                        <p style='margin:5px 0 0 0;'>Thank you for your order with SuperCRM.</p>
+                    </div>
+
+                    <div style='padding:24px;'>
+
+                        <p>Dear <strong>{customerName}</strong>,</p>
+
+                        <p>
+                            Your sales order has been created successfully. Please find the order details below.
+                        </p>
+
+                        <table style='width:100%; border-collapse:collapse; margin-bottom:20px;'>
+                            <tr>
+                                <td style='padding:6px 0;'><strong>Customer Code:</strong></td>
+                                <td style='padding:6px 0;'>{dto.Customer.CustomerCode}</td>
+                            </tr>
+                            <tr>
+                                <td style='padding:6px 0;'><strong>Email:</strong></td>
+                                <td style='padding:6px 0;'>{dto.Customer.Email}</td>
+                            </tr>
+                            <tr>
+                                <td style='padding:6px 0;'><strong>Mobile:</strong></td>
+                                <td style='padding:6px 0;'>{dto.Customer.Mobile}</td>
+                            </tr>
+                            <tr>
+                                <td style='padding:6px 0;'><strong>Generated At:</strong></td>
+                                <td style='padding:6px 0;'>{generatedAt}</td>
+                            </tr>
+                        </table>";
+
+                        foreach (var order in dto.Orders)
+                        {
+                            html += $@"
+                        <div style='border:1px solid #dbeafe; border-radius:8px; margin-bottom:22px; overflow:hidden;'>
+
+                            <div style='background:#eff6ff; padding:12px 16px; border-bottom:1px solid #dbeafe;'>
+                                <strong>Order No:</strong> {order.OrderNo}
+                                &nbsp; | &nbsp;
+                                <strong>Provider:</strong> {order.ProviderName}
+                                &nbsp; | &nbsp;
+                                <strong>Order Date:</strong> {order.OrderDate:dd-MMM-yyyy}
+                            </div>
+
+                            <table style='width:100%; border-collapse:collapse;'>
+                                <thead>
+                                    <tr style='background:#f8fafc;'>
+                                        <th style='border:1px solid #e5e7eb; padding:8px; text-align:left;'>Product</th>
+                                        <th style='border:1px solid #e5e7eb; padding:8px; text-align:left;'>Variant</th>
+                                        <th style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>Qty</th>
+                                        <th style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>Unit Price</th>
+                                        <th style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>";
+
+                            foreach (var line in order.Lines)
+                            {
+                                html += $@"
+                                    <tr>
+                                        <td style='border:1px solid #e5e7eb; padding:8px;'>{line.ProductName}</td>
+                                        <td style='border:1px solid #e5e7eb; padding:8px;'>{line.VariantName}</td>
+                                        <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{line.Quantity}</td>
+                                        <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{line.UnitPrice:N2}</td>
+                                        <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{line.LineTotalAmount:N2}</td>
+                                    </tr>";
+                            }
+
+                            html += $@"
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan='4' style='border:1px solid #e5e7eb; padding:8px; text-align:right;'><strong>Order Total</strong></td>
+                                        <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'><strong>{order.OrderTotal:N2}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>";
+
+                            if (order.Installments != null && order.Installments.Any())
+                            {
+                                html += @"
+                            <div style='padding:12px 16px;'>
+                                <strong>Installment Schedule</strong>
+                                <table style='width:100%; border-collapse:collapse; margin-top:8px;'>
+                                    <thead>
+                                        <tr style='background:#f8fafc;'>
+                                            <th style='border:1px solid #e5e7eb; padding:8px;'>Product</th>
+                                            <th style='border:1px solid #e5e7eb; padding:8px;'>Installment No</th>
+                                            <th style='border:1px solid #e5e7eb; padding:8px;'>Due Date</th>
+                                            <th style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>";
+
+                                foreach (var ins in order.Installments)
+                                {
+                                    html += $@"
+                                        <tr>
+                                            <td style='border:1px solid #e5e7eb; padding:8px;'>{ins.ProductName}</td>
+                                            <td style='border:1px solid #e5e7eb; padding:8px;'>{ins.InstallmentNo}</td>
+                                            <td style='border:1px solid #e5e7eb; padding:8px;'>{ins.DueDate:dd-MMM-yyyy}</td>
+                                            <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{ins.InstallmentAmount:N2}</td>
+                                        </tr>";
+                                }
+
+                                html += @"
+                                    </tbody>
+                                </table>
+                            </div>";
+                            }
+
+                            html += @"
+                        </div>";
+                        }
+
+                        html += @"
+                        <p>
+                            If you have any questions regarding this order, please contact SuperCRM support.
+                        </p>
+
+                        <p style='margin-top:24px;'>
+                            Regards,<br/>
+                            <strong>SuperCRM Sales Team</strong>
+                        </p>
+                    </div>
+
+                    <div style='background:#f8fafc; color:#64748b; padding:12px 24px; font-size:12px; text-align:center;'>
+                        This is an automated email from SuperCRM. Please do not reply directly to this message.
+                    </div>
+                </div>
+
+            </body>
+            </html>";
+
+            return html;
         }
 
         // END

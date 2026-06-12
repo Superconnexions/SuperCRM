@@ -418,6 +418,20 @@ namespace SuperCRM.Persistence.Repositories
             };
         }
 
+        public async Task MarkCustomerEmailSentAsync(
+        List<Guid> saleIds,
+        CancellationToken cancellationToken = default)
+        {
+            var sales = await _dbContext.Sales
+                .Where(x => saleIds.Contains(x.SaleId))
+                .ToListAsync(cancellationToken);
+
+            foreach (var sale in sales)
+            {
+                sale.EmailSentToCustomer = true;
+                sale.UpdatedAt = DateTime.UtcNow;
+            }
+        }
 
         // END
 

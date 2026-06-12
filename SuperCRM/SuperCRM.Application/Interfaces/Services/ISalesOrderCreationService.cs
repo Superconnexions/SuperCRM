@@ -50,6 +50,9 @@ namespace SuperCRM.Application.Interfaces.Services
             Task<bool> UpdateSuperCRMCommissionAsync(
                 UpdateSuperCRMCommissionDto request,
                 CancellationToken cancellationToken = default);
+            Task MarkCustomerEmailSentAsync(
+            List<Guid> saleIds,
+            CancellationToken cancellationToken = default);
 
         // END
 

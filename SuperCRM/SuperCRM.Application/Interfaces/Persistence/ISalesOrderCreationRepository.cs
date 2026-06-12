@@ -59,5 +59,9 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task AddSalesOrderStatusHistoryAsync(
             SalesOrderStatusHistory history,
             CancellationToken cancellationToken = default);
+
+        Task MarkCustomerEmailSentAsync(
+        List<Guid> saleIds,
+        CancellationToken cancellationToken = default);
     }
 }
