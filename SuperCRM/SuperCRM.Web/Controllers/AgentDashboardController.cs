@@ -14,10 +14,12 @@ namespace SuperCRM.Web.Controllers
     public class AgentDashboardController : Controller
     {
         private readonly IAgentRegistrationService _agentRegistrationService;
+        private readonly ISalesOrderCreationService _salesOrderCreationService;
 
-        public AgentDashboardController(IAgentRegistrationService agentRegistrationService)
+        public AgentDashboardController(IAgentRegistrationService agentRegistrationService, ISalesOrderCreationService salesOrderCreationService)
         {
             _agentRegistrationService = agentRegistrationService;
+            _salesOrderCreationService = salesOrderCreationService;
         }
 
         /// <summary>
@@ -27,26 +29,44 @@ namespace SuperCRM.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var currentUserId = GetCurrentUserId();
 
-            if (string.IsNullOrWhiteSpace(currentUserId))
-                return Challenge();
+            //if (string.IsNullOrWhiteSpace(currentUserId))
+            //    return Challenge();
 
-            var dashboard = await _agentRegistrationService.GetDashboardAsync(Guid.Parse(currentUserId), cancellationToken);
+            //var dashboard = await _agentRegistrationService.GetDashboardAsync(Guid.Parse(currentUserId), cancellationToken);
 
-            if (dashboard == null)
-                return Forbid();
+            //if (dashboard == null)
+            //    return Forbid();
 
-            var model = new AgentDashboardViewModel
+            //var model = new AgentDashboardViewModel
+            //{
+            //    AgentCode = dashboard.AgentCode,
+            //    IsApproved = dashboard.IsApproved,
+            //    IsCommissionEligible = dashboard.IsCommissionEligible,
+            //    RegistrationStatusText = dashboard.RegistrationStatusText,
+            //    JoinedAt = dashboard.JoinedAt
+            //};
+
+            if (currentUserId == Guid.Empty)
             {
-                AgentCode = dashboard.AgentCode,
-                IsApproved = dashboard.IsApproved,
-                IsCommissionEligible = dashboard.IsCommissionEligible,
-                RegistrationStatusText = dashboard.RegistrationStatusText,
-                JoinedAt = dashboard.JoinedAt
-            };
+                return RedirectToAction("Login", "Account");
+            }
 
+            var model = await _salesOrderCreationService.GetAgentDashboardAsync(
+                currentUserId,
+                cancellationToken);
+
+            
             return View(model);
         }
+
+        private Guid GetCurrentUserId()
+        {
+            var raw = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Guid.TryParse(raw, out var id) ? id : Guid.Empty;
+        }
+
+        // END
     }
 }

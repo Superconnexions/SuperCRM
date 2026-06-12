@@ -501,8 +501,8 @@ namespace SuperCRM.Application.Services
             }
 
         public Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
-    Guid saleId,
-    CancellationToken cancellationToken = default)
+        Guid saleId,
+        CancellationToken cancellationToken = default)
         {
             return _repository.GetSalesOrderManagementDetailAsync(saleId, cancellationToken);
         }
@@ -677,6 +677,15 @@ namespace SuperCRM.Application.Services
 
             await _repository.MarkCustomerEmailSentAsync(saleIds, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
+        }
+
+        public Task<AgentDashboardDto> GetAgentDashboardAsync(
+        Guid currentUserId,
+        CancellationToken cancellationToken = default)
+        {
+            return _repository.GetAgentDashboardAsync(
+                currentUserId,
+                cancellationToken);
         }
 
         // END

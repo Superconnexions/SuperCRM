@@ -433,6 +433,144 @@ namespace SuperCRM.Persistence.Repositories
             }
         }
 
+        public async Task<AgentDashboardDto> GetAgentDashboardAsync(
+    Guid currentUserId,
+    CancellationToken cancellationToken = default)
+        {
+            var today = DateTime.UtcNow.Date;
+            var last30Days = today.AddDays(-30);
+            var monthStart = new DateTime(today.Year, today.Month, 1);
+
+            var excludedStatuses = new byte[]
+            {
+        (byte)SalesOrderStatus.ProviderRejected,
+        (byte)SalesOrderStatus.Cancelled,
+        (byte)SalesOrderStatus.OnHold
+            };
+
+            var activePendingExcluded = new byte[]
+            {
+        (byte)SalesOrderStatus.Completed,
+        (byte)SalesOrderStatus.ProviderRejected,
+        (byte)SalesOrderStatus.Cancelled,
+        (byte)SalesOrderStatus.OnHold
+            };
+
+            var salesQuery = _dbContext.Sales
+                .AsNoTracking()
+                .Where(x => x.SoldByUserId == currentUserId);
+
+            var customerQuery = _dbContext.Customers
+                .AsNoTracking()
+                .Where(x =>
+                    x.IsActive &&
+                    (x.CreatedByUserId == currentUserId ||
+                     x.UpdatedByUserId == currentUserId));
+
+            var myCustomerCount = await customerQuery.CountAsync(cancellationToken);
+
+            var mySalesOrderCount = await salesQuery.CountAsync(cancellationToken);
+
+            var ordersThisMonthCount = await salesQuery
+                .CountAsync(x => x.OrderDate.Date >= monthStart && x.OrderDate.Date <= today, cancellationToken);
+
+            var pendingOrderCount = await salesQuery
+                .CountAsync(x => !activePendingExcluded.Contains(x.SalesOrderStatus), cancellationToken);
+
+            var totalCommissionUnsettled = await
+                (from s in _dbContext.Sales.AsNoTracking()
+                 join l in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals l.SaleId
+                 where s.SoldByUserId == currentUserId
+                    && !excludedStatuses.Contains(s.SalesOrderStatus)
+                    && !l.IsCommissionFinalized
+                 select (decimal?)l.CalculatedAgentCommission)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var totalCommissionSettled = await
+                (from s in _dbContext.Sales.AsNoTracking()
+                 join l in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals l.SaleId
+                 where s.SoldByUserId == currentUserId
+                    && !excludedStatuses.Contains(s.SalesOrderStatus)
+                    && l.IsCommissionFinalized
+                 select (decimal?)l.FinalAgentCommission)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var receivedCommission = await salesQuery
+                .Where(x => x.IsAgentCommissionDistributed)
+                .Select(x => (decimal?)x.AgentCommissionAmount)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var statusSummary = await salesQuery
+                .GroupBy(x => x.SalesOrderStatus)
+                .Select(g => new AgentDashboardStatusDto
+                {
+                    Status = g.Key,
+                    StatusText = ((SalesOrderStatus)g.Key).ToString(),
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Status)
+                .ToListAsync(cancellationToken);
+
+            var recentCustomers = await customerQuery
+                .Where(x => x.CreatedAt.Date >= last30Days && x.CreatedAt.Date <= today)
+                .OrderByDescending(x => x.CreatedAt)
+                .Take(10)
+                .Select(x => new AgentDashboardCustomerDto
+                {
+                    CustomerId = x.CustomerId,
+                    CustomerCode = x.CustomerCode ?? "",
+                    CustomerName = x.DisplayName ?? ((x.FirstName ?? "") + " " + (x.LastName ?? "")).Trim(),
+                    Mobile = x.Mobile,
+                    Email = x.Email,
+                    RegistrationSourceText = ((RegistrationSource)x.RegistrationSource).ToString(),
+                    CreatedAt = x.CreatedAt
+                })
+                .ToListAsync(cancellationToken);
+
+            var recentOrders =
+                await (from s in _dbContext.Sales.AsNoTracking()
+                       join c in _dbContext.Customers.AsNoTracking()
+                            on s.CustomerId equals c.CustomerId
+                       join p in _dbContext.Providers.AsNoTracking()
+                            on s.ProviderId equals p.ProviderId into providers
+                       from provider in providers.DefaultIfEmpty()
+                       join l in _dbContext.SaleLines.AsNoTracking()
+                            on s.SaleId equals l.SaleId into lines
+                       where s.SoldByUserId == currentUserId
+                          && s.OrderDate.Date >= last30Days
+                          && s.OrderDate.Date <= today
+                       orderby s.OrderDate descending
+                       select new AgentDashboardOrderDto
+                       {
+                           SaleId = s.SaleId,
+                           OrderNo = s.OrderNo,
+                           OrderDate = s.OrderDate,
+                           CustomerName = c.DisplayName ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+                           ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+                           StatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+                           OrderTotal = lines.Sum(x => x.LineTotalAmount)
+                       })
+                      .Take(10)
+                      .ToListAsync(cancellationToken);
+
+            return new AgentDashboardDto
+            {
+                MyCustomerCount = myCustomerCount,
+                MySalesOrderCount = mySalesOrderCount,
+                OrdersThisMonthCount = ordersThisMonthCount,
+                PendingOrderCount = pendingOrderCount,
+                TotalCommissionUnsettled = totalCommissionUnsettled,
+                TotalCommissionSettled = totalCommissionSettled,
+                ReceivedCommission = receivedCommission,
+                StatusSummary = statusSummary,
+                RecentCustomers = recentCustomers,
+                RecentOrders = recentOrders
+            };
+        }
+
+
         // END
 
     }

@@ -938,13 +938,13 @@ namespace SuperCRM.Application.Services
         // Customer Management
 
         public Task<(List<CustomerManagementListDto> Items, int TotalRecords)> GetCustomerManagementListAsync(
-    Guid? createdByUserId,
-    DateTime? createdDateFrom,
-    DateTime? createdDateTo,
-    string? customerCode,
-    int page,
-    int pageSize,
-    CancellationToken cancellationToken = default)
+        Guid? createdByUserId,
+        DateTime? createdDateFrom,
+        DateTime? createdDateTo,
+        string? customerCode,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
         {
             return _repository.GetCustomerManagementListAsync(
                 createdByUserId,

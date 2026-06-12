@@ -63,5 +63,10 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task MarkCustomerEmailSentAsync(
         List<Guid> saleIds,
         CancellationToken cancellationToken = default);
+
+        Task<AgentDashboardDto> GetAgentDashboardAsync(
+        Guid currentUserId,
+        CancellationToken cancellationToken = default);
+
     }
 }

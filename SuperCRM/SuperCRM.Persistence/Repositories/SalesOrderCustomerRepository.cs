@@ -340,13 +340,13 @@ namespace SuperCRM.Persistence.Repositories
         }
 
         public async Task<(List<CustomerManagementListDto> Items, int TotalRecords)> GetCustomerManagementListAsync(
-    Guid? createdByUserId,
-    DateTime? createdDateFrom,
-    DateTime? createdDateTo,
-    string? customerCode,
-    int page,
-    int pageSize,
-    CancellationToken cancellationToken = default)
+        Guid? createdByUserId,
+        DateTime? createdDateFrom,
+        DateTime? createdDateTo,
+        string? customerCode,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
         {
             page = page <= 0 ? 1 : page;
             pageSize = pageSize <= 0 ? 20 : pageSize;
@@ -356,7 +356,7 @@ namespace SuperCRM.Persistence.Repositories
                 .AsNoTracking()
                 .Where(c =>
                     c.IsActive &&
-                    (!createdByUserId.HasValue || c.CreatedByUserId == createdByUserId.Value) &&
+                    (!createdByUserId.HasValue || c.CreatedByUserId == createdByUserId.Value || c.UpdatedByUserId == createdByUserId.Value ) &&
                     (!createdDateFrom.HasValue || c.CreatedAt.Date >= createdDateFrom.Value.Date) &&
                     (!createdDateTo.HasValue || c.CreatedAt.Date <= createdDateTo.Value.Date) &&
                     (string.IsNullOrWhiteSpace(customerCode) || (c.CustomerCode ?? "").Contains(customerCode)));

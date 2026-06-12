@@ -1,24 +1,385 @@
-﻿@model SuperCRM.Web.ViewModels.Agents.AgentDashboardViewModel
+﻿@model SuperCRM.Application.DTOs.SalesOrders.AgentDashboardDto
 
 @{
     ViewData["Title"] = "Agent Dashboard";
 }
 
-<h2>Agent Dashboard</h2>
+<style>
+    .dashboard-wrapper {
+        background: #f8fafc;
+        padding: 18px;
+        border-radius: 14px;
+    }
 
-<div class="card">
-    <div class="card-body">
-        <p><strong>Agent Code:</strong> @Model.AgentCode</p>
-        <p><strong>Registration Status:</strong> @Model.RegistrationStatusText</p>
-        <p><strong>Approved:</strong> @(Model.IsApproved ? "Yes" : "No")</p>
-        <p><strong>Commission Eligible:</strong> @(Model.IsCommissionEligible ? "Yes" : "No")</p>
-        <p><strong>Joined At:</strong> @(Model.JoinedAt.HasValue? Model.JoinedAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</p>
+    .dashboard-title {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .kpi-card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        transition: 0.2s ease-in-out;
+        height: 100%;
+    }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        }
+
+    .kpi-label {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .kpi-value {
+        font-size: 30px;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.2;
+    }
+
+    .kpi-note {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .kpi-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .section-card {
+        border: 0;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        height: 100%;
+    }
+
+        .section-card .card-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 700;
+            color: #1e293b;
+            border-radius: 16px 16px 0 0;
+        }
+
+    .dashboard-table thead th {
+        background: #eff6ff;
+        color: #1e3a8a;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .dashboard-table tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    .dashboard-table tbody tr:hover {
+        background: #e0f2fe;
+    }
+
+    .badge-soft-primary {
+        background: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #93c5fd;
+    }
+
+    .badge-soft-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+    }
+
+    .badge-soft-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fcd34d;
+    }
+
+    .badge-soft-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+</style>
+
+<div class="container-fluid mt-3 dashboard-wrapper">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="dashboard-title mb-1">Agent Dashboard</h4>
+            <div class="text-muted">
+                Track your customers, sales orders and commission performance.
+            </div>
+        </div>
+
+        <a asp-controller="SalesOrder"
+           asp-action="SalesOrderProductList"
+           class="btn btn-primary">
+            Create Sales Order
+        </a>
     </div>
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <a asp-controller="SalesOrder"
+               asp-action="CustomerManagement"
+               class="kpi-link">
+                <div class="card kpi-card">
+                    <div class="card-body">
+                        <div class="kpi-label">My Customers</div>
+                        <div class="kpi-value">@Model.MyCustomerCount</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a asp-controller="SalesOrder"
+               asp-action="SalesOrderHistory"
+               class="kpi-link">
+                <div class="card kpi-card">
+                    <div class="card-body">
+                        <div class="kpi-label">My Sales Orders</div>
+                        <div class="kpi-value">@Model.MySalesOrderCount</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card kpi-card">
+                <div class="card-body">
+                    <div class="kpi-label">Orders This Month</div>
+                    <div class="kpi-value">@Model.OrdersThisMonthCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card kpi-card">
+                <div class="card-body">
+                    <div class="kpi-label">Pending Orders</div>
+                    <div class="kpi-value">@Model.PendingOrderCount</div>
+                    <div class="kpi-note">
+                        Except ProviderRejected, Cancelled, OnHold
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-md-3">
+            <div class="card kpi-card">
+                <div class="card-body">
+                    <div class="kpi-label">Total Commission (Unsettled)</div>
+                    <div class="kpi-value">@Model.TotalCommissionUnsettled.ToString("N2")</div>
+                    <span class="badge badge-soft-warning">Calculated, not finalized</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card kpi-card">
+                <div class="card-body">
+                    <div class="kpi-label">Total Commission (Settled)</div>
+                    <div class="kpi-value">@Model.TotalCommissionSettled.ToString("N2")</div>
+                    <span class="badge badge-soft-success">Finalized commission</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card kpi-card">
+                <div class="card-body">
+                    <div class="kpi-label">Received Commission</div>
+                    <div class="kpi-value">@Model.ReceivedCommission.ToString("N2")</div>
+                    <span class="badge badge-soft-primary">Disbursed by SuperCRM</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card section-card">
+                <div class="card-header py-2">
+                    Order Status Summary
+                </div>
+
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0 dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th class="text-end">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.StatusSummary.Any())
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted py-3">
+                                        No status found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var item in Model.StatusSummary)
+                                {
+                                    <tr>
+                                        <td>@item.StatusText</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-secondary">@item.Count</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card section-card mb-3">
+
+        <div class="card-header">
+            Recent Customers (Last 30 Days)
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0 dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Customer Code</th>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Registration Source</th>
+                        <th>Created Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.RecentCustomers.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-3">
+                                No recent customer found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.RecentCustomers)
+                        {
+                            <tr>
+                                <td class="text-nowrap">
+                                    <strong>@item.CustomerCode</strong>
+                                </td>
+
+                                <td>@item.CustomerName</td>
+
+                                <td>@item.Mobile</td>
+
+                                <td>@item.Email</td>
+
+                                <td>@item.RegistrationSourceText</td>
+
+                                <td class="text-nowrap">
+                                    @item.CreatedAt.ToString("dd-MMM-yyyy")
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="card section-card">
+
+        <div class="card-header">
+            Recent Sales Orders (Last 30 Days)
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover mb-0 dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Order No</th>
+                        <th>Order Date</th>
+                        <th>Customer</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th class="text-end">Total</th>
+                        <th style="width:90px;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.RecentOrders.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                No recent sales order found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.RecentOrders)
+                        {
+                            <tr>
+                                <td class="text-nowrap">
+                                    <strong>@item.OrderNo</strong>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @item.OrderDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>@item.CustomerName</td>
+
+                                <td>@item.ProviderName</td>
+
+                                <td>
+                                    <span class="badge badge-soft-primary">
+                                        @item.StatusText
+                                    </span>
+                                </td>
+
+                                <td class="text-end">
+                                    @item.OrderTotal.ToString("N2")
+                                </td>
+
+                                <td>
+                                    <a asp-controller="SalesOrder"
+                                       asp-action="SalesOrderCreatedSummary"
+                                       asp-route-saleIds="@item.SaleId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
 </div>
-
-@if (!Model.IsApproved)
-{
-    <div class="alert alert-warning mt-3">
-        Your registration is pending approval. Order creation and commission workflows should remain restricted until approval is completed.
-    </div>
-}

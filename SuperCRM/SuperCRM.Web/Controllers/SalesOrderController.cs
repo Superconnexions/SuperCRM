@@ -20,7 +20,7 @@ namespace SuperCRM.Web.Controllers
         private readonly ISalesOrderCreationService _salesOrderCreationService;
         private readonly IEmailHelper _emailHelper;
         private readonly IAppSettingsHelper _appSettingsHelper;
-
+        private readonly ILogger<SalesOrderController> _logger;
 
         public SalesOrderController(
             ISalesOrderService salesOrderService,
@@ -28,7 +28,8 @@ namespace SuperCRM.Web.Controllers
             ISalesOrderCustomerService salesOrderCustomerService,
             ISalesOrderCreationService salesOrderCreationService,
             IEmailHelper emailHelper,
-            IAppSettingsHelper appSettingsHelper)
+            IAppSettingsHelper appSettingsHelper, 
+            ILogger<SalesOrderController> logger)
         {
             _salesOrderService = salesOrderService;
             _salesOrderDraftService = salesOrderDraftService;
@@ -36,6 +37,7 @@ namespace SuperCRM.Web.Controllers
             _salesOrderCreationService = salesOrderCreationService;
             _emailHelper = emailHelper;
             _appSettingsHelper = appSettingsHelper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -1279,25 +1281,37 @@ namespace SuperCRM.Web.Controllers
             var ccEmails = _appSettingsHelper.GetSalesOrderCCEmail();
             var bccEmails = _appSettingsHelper.GetSalesOrderBCCEmail();
 
-            var result = await _emailHelper.EmailSendWithCCBccAsync(
-                dto.Customer.Email,
-                ccEmails,
-                bccEmails,
-                subject,
-                body,
-                isHtml: true,
-                sourceModule: "SalesOrder",
-                userId: currentUserId,
-                cancellationToken: cancellationToken);
-
-            if (result.Success)
+            try
             {
-                await _salesOrderCreationService.MarkCustomerEmailSentAsync(
-                    saleIds,
+                var result = await _emailHelper.EmailSendWithCCBccAsync(
+                    dto.Customer.Email,
+                    ccEmails,
+                    bccEmails,
+                    subject,
+                    body,
+                    true,
+                    "SalesOrder",
+                    currentUserId,
                     cancellationToken);
+
+                if (result.Success)
+                {
+                    await _salesOrderCreationService.MarkCustomerEmailSentAsync(
+                        saleIds,
+                        cancellationToken);
+                }
+
+                return result.Success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Failed to send Sales Order email. SaleIds: {SaleIds}",
+                    string.Join(",", saleIds));
+
+                return false;
             }
 
-            return result.Success;
         }
 
         private static string BuildCustomerSalesOrderEmailSubject( SalesOrderCreatedSummaryDto dto)
