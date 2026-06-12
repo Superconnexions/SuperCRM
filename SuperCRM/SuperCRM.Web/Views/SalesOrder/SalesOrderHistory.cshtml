@@ -7,145 +7,252 @@
 }
 
 <style>
+    body {
+        background: #1f2123;
+    }
+
     .sales-history-page {
-        background: #f8fafc;
-        padding: 18px;
-        border-radius: 14px;
+        background: #1f2123;
+        color: #d6d6d6;
+        padding: 20px;
+        min-height: calc(100vh - 70px);
     }
 
-    .sales-history-card {
-        border: 0;
-        border-radius: 14px;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    .history-title {
+        color: #0d47ff;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .4px;
     }
 
-    .sales-history-title {
+    .history-subtitle {
+        color: #b5b5b5;
+        font-size: 22px;
+        font-weight: 400;
+    }
+
+    .blue-count {
+        color: #0d47ff;
+        font-weight: 900;
+    }
+
+    .filter-panel {
+        background: #1f2123;
+        border-radius: 14px;
+        padding: 22px 10px 18px 10px;
+        margin-bottom: 12px;
+    }
+
+    .filter-label {
+        color: #d6d6d6;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .filter-control {
+        background: #151719;
+        border: 3px solid #3b3f44;
+        border-radius: 16px;
+        color: #d6d6d6;
+        height: 48px;
         font-weight: 700;
-        color: #1e293b;
     }
 
-    .sales-history-filter {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 16px;
-        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
-        margin-bottom: 16px;
+        .filter-control:focus {
+            background: #151719;
+            color: #ffffff;
+            border-color: #0d47ff;
+            box-shadow: none;
+        }
+
+    .btn-search {
+        background: #101214;
+        color: #ffffff;
+        border: 5px solid #484b50;
+        border-radius: 18px;
+        height: 54px;
+        font-weight: 900;
+        min-width: 130px;
     }
 
-    .sales-history-table-wrap {
+        .btn-search:hover {
+            color: #ffffff;
+            border-color: #0d47ff;
+        }
+
+    .history-grid-block {
+        background: #17191b;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .history-table-wrap {
         overflow-x: auto;
         width: 100%;
     }
 
-    .sales-history-table {
-        min-width: 1650px;
-        font-size: 13px;
-        white-space: nowrap;
+    .history-table {
+        min-width: 1750px;
+        color: #d6d6d6;
+        margin-bottom: 0;
+        font-size: 15px;
     }
 
-        .sales-history-table thead th {
-            background: #1e3a8a;
-            color: #ffffff;
+        .history-table thead th {
+            background: #000000;
+            color: #d6d6d6;
+            border-color: #2d3033;
+            padding: 14px 12px;
+            font-weight: 900;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .history-table tbody td {
+            border-color: #2d3033;
+            padding: 16px 12px;
             vertical-align: middle;
-            border-color: #1e40af;
-            position: sticky;
-            top: 0;
-            z-index: 2;
+            text-align: center;
         }
 
-        .sales-history-table tbody tr:nth-child(odd) {
-            background: #ffffff;
+        .history-table tbody tr {
+            background: #17191b;
         }
 
-        .sales-history-table tbody tr:nth-child(even) {
-            background: #f1f5f9;
-        }
+            .history-table tbody tr:nth-child(even) {
+                background: #1b1d20;
+            }
 
-        .sales-history-table tbody tr:hover {
-            background: #e0f2fe;
-        }
+            .history-table tbody tr:hover {
+                background: #20242b;
+            }
 
-    .badge-soft-success {
-        background: #dcfce7;
-        color: #166534;
-        border: 1px solid #86efac;
+    .link-blue {
+        color: #0d6efd;
+        font-weight: 800;
+        text-decoration: underline;
     }
 
-    .badge-soft-warning {
-        background: #fef3c7;
-        color: #92400e;
-        border: 1px solid #fcd34d;
-    }
-
-    .badge-soft-danger {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fca5a5;
-    }
-
-    .badge-soft-info {
-        background: #dbeafe;
-        color: #1e40af;
-        border: 1px solid #93c5fd;
-    }
-
-    .small-muted {
-        color: #64748b;
+    .small-muted-dark {
+        color: #b5b5b5;
         font-size: 12px;
     }
 
+    .status-pill {
+        color: #ffffff;
+        background: #0d47ff;
+        border-radius: 18px;
+        padding: 5px 12px;
+        font-weight: 800;
+        display: inline-block;
+        min-width: 80px;
+    }
+
+    .pill-success {
+        background: #047857;
+    }
+
+    .pill-warning {
+        background: #b45309;
+    }
+
+    .pill-danger {
+        background: #991b1b;
+    }
+
+    .pill-info {
+        background: #0d47ff;
+    }
+
+    .pagination-panel {
+        background: #1f2123;
+        border-top: 2px solid #3b3f44;
+        padding: 16px 0 0 0;
+        margin-top: 18px;
+    }
+
+    .paging-info {
+        color: #d6d6d6;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
     .pagination .page-link {
-        border-radius: 8px;
-        margin: 0 2px;
+        background: #1f2123;
+        color: #d6d6d6;
+        border: 1px solid #3b3f44;
+        font-weight: 800;
+        padding: 10px 16px;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: #0d47ff;
+        border-color: #0d47ff;
+        color: #ffffff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background: #1f2123;
+        color: #6b7280;
+        border-color: #3b3f44;
+    }
+
+    .text-nowrap {
+        white-space: nowrap;
     }
 </style>
 
-<div class="container-fluid mt-3 sales-history-page">
+<div class="sales-history-page">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="sales-history-title mb-1">Sales Order History</h4>
-            <div class="small-muted">
-                Showing @startRecord - @endRecord of @Model.TotalRecords records
-            </div>
+            <span class="history-title">
+                @(Model.IsAgentView ? "My Sales Order History" : "Sales Order History")
+            </span>
+            <span class="history-subtitle">
+                | Total Orders:
+                <span class="blue-count">@Model.TotalRecords</span>
+            </span>
         </div>
 
-        @if (Model.IsAgentView)
-        {
-            <span class="badge badge-soft-info px-3 py-2">My Sales Orders</span>
-        }
-        else
-        {
-            <span class="badge badge-soft-success px-3 py-2">All Sales Orders</span>
-        }
+        <div>
+            @if (Model.IsAgentView)
+            {
+                <span class="status-pill pill-info">My Sales Orders</span>
+            }
+            else
+            {
+                <span class="status-pill pill-success">All Sales Orders</span>
+            }
+        </div>
     </div>
 
     <form asp-action="SalesOrderHistory"
           asp-controller="SalesOrder"
           method="get"
-          class="sales-history-filter">
+          class="filter-panel">
 
         <div class="row g-3 align-items-end">
 
-            <div class="col-md-3">
-                <label class="form-label">Order Date From</label>
+            <div class="col-md-2">
+                <label class="filter-label">Order Date From</label>
                 <input type="date"
                        name="orderDateFrom"
                        value="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
-                       class="form-control" />
+                       class="form-control filter-control" />
             </div>
 
-            <div class="col-md-3">
-                <label class="form-label">Order Date To</label>
+            <div class="col-md-2">
+                <label class="filter-label">Order Date To</label>
                 <input type="date"
                        name="orderDateTo"
                        value="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
-                       class="form-control" />
+                       class="form-control filter-control" />
             </div>
 
             <div class="col-md-3">
-                <label class="form-label">Sales Order Status</label>
-                <select name="salesOrderStatus" class="form-select">
+                <label class="filter-label">Sales Order Status</label>
+                <select name="salesOrderStatus" class="form-select filter-control">
                     <option value="">All Status</option>
                     @foreach (var item in Model.StatusOptions)
                     {
@@ -157,8 +264,8 @@
             </div>
 
             <div class="col-md-2">
-                <label class="form-label">Page Size</label>
-                <select name="pageSize" class="form-select">
+                <label class="filter-label">Page Size</label>
+                <select name="pageSize" class="form-select filter-control">
                     <option value="10" selected="@(Model.PageSize == 10)">10</option>
                     <option value="20" selected="@(Model.PageSize == 20)">20</option>
                     <option value="50" selected="@(Model.PageSize == 50)">50</option>
@@ -166,183 +273,208 @@
                 </select>
             </div>
 
-            <div class="col-md-1 d-grid">
+            <div class="col-md-3 text-end">
                 <input type="hidden" name="page" value="1" />
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-search">
                     Search
                 </button>
             </div>
+
         </div>
     </form>
 
-    <div class="card sales-history-card">
-        <div class="card-body p-0">
-            <div class="sales-history-table-wrap">
-                <table class="table table-bordered table-hover align-middle mb-0 sales-history-table">
-                    <thead>
-                        <tr>
-                            <th>Order No</th>
-                            <th>Order Date</th>
-                            <th>Customer</th>
-                            <th>Email</th>
-                            <th>Mobile</th>
-                            <th>Provider</th>
-                            <th>Status</th>
-                            <th>Commission Applicable</th>
-                            <th>Commission Finalized</th>
-                            <th>Service Start</th>
-                            <th>Next Renew</th>
-                            <th>No Of Renew</th>
-                            <th class="text-end">Order Total</th>
-                            <th class="text-end">Agent Commission</th>
-                            <th>Lines</th>
-                            <th>Email Sent</th>
-                            <th>Agent Code</th>
-                        </tr>
-                    </thead>
+    <div class="history-grid-block">
+        <div class="history-table-wrap">
+            <table class="table table-bordered table-hover align-middle history-table">
+                <thead>
+                    <tr>
+                        <th>Order No</th>
+                        <th>Order Date</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th>Commission Applicable</th>
+                        <th>Commission Finalized</th>
+                        <th>Service Start</th>
+                        <th>Next Renew</th>
+                        <th>No Of Renew</th>
+                        <th>Order Total</th>
+                        <th>Agent Commission</th>
+                        <th>Lines</th>
+                        <th>Email Sent</th>
+                        <th>Agent Code</th>
+                    </tr>
+                </thead>
 
-                    <tbody>
-                        @if (!Model.Orders.Any())
+                <tbody>
+                    @if (!Model.Orders.Any())
+                    {
+                        <tr>
+                            <td colspan="17" class="text-center py-4">
+                                No sales order found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Orders)
                         {
+                            var commissionClass = item.IsCommissionApplicable
+                            ? "pill-success"
+                            : "pill-danger";
+
+                            var finalizedClass = item.CommissionFinalizedText == "Yes"
+                            ? "pill-success"
+                            : item.CommissionFinalizedText == "Partial"
+                            ? "pill-warning"
+                            : "pill-danger";
+
                             <tr>
-                                <td colspan="17" class="text-center text-muted py-4">
-                                    No sales order found.
+                                <td class="text-nowrap">
+                                    <strong class="link-blue">@item.OrderNo</strong>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @item.OrderDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td>
+                                    <div>@item.CustomerName</div>
+                                    <small class="small-muted-dark">@item.CustomerCode</small>
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(item.CustomerEmail))
+                                    {
+                                        <a href="mailto:@item.CustomerEmail" class="link-blue">
+                                            @item.CustomerEmail
+                                        </a>
+                                    }
+                                </td>
+
+                                <td class="text-nowrap">@item.CustomerMobile</td>
+
+                                <td>@item.ProviderName</td>
+
+                                <td>
+                                    <span class="status-pill pill-info">
+                                        @item.SalesOrderStatusText
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-pill @commissionClass">
+                                        @item.CommissionApplicableText
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-pill @finalizedClass">
+                                        @item.CommissionFinalizedText
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @(item.ServiceStartDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @(item.NextRenewDate?.ToString("dd-MMM-yyyy") ?? "-")
+                                </td>
+
+                                <td>@item.NoOfRenew</td>
+
+                                <td class="text-end text-nowrap">
+                                    @item.OrderTotal.ToString("N2")
+                                </td>
+
+                                <td class="text-end text-nowrap">
+                                    @item.AgentCommissionAmount.ToString("N2")
+                                </td>
+
+                                <td>
+                                    <small>
+                                        Total: @item.TotalLines<br />
+                                        Completed: @item.CompletedLines<br />
+                                        Cancel/Reject: @item.CancelledOrRejectedLines
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <small>
+                                        Customer: @(item.EmailSentToCustomer ? "Yes" : "No")<br />
+                                        Provider: @(item.EmailSentToProvider ? "Yes" : "No")
+                                    </small>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @(item.SoldByAgentCode ?? "-")
                                 </td>
                             </tr>
                         }
-                        else
-                        {
-                            foreach (var item in Model.Orders)
-                            {
-                                var commissionClass = item.IsCommissionApplicable
-                                ? "badge-soft-success"
-                                : "badge-soft-danger";
-
-                                var finalizedClass = item.CommissionFinalizedText == "Yes"
-                                ? "badge-soft-success"
-                                : item.CommissionFinalizedText == "Partial"
-                                ? "badge-soft-warning"
-                                : "badge-soft-danger";
-
-                                <tr>
-                                    <td>
-                                        <strong>@item.OrderNo</strong>
-                                    </td>
-
-                                    <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
-
-                                    <td>
-                                        <div>@item.CustomerName</div>
-                                        <small class="small-muted">@item.CustomerCode</small>
-                                    </td>
-
-                                    <td>@item.CustomerEmail</td>
-                                    <td>@item.CustomerMobile</td>
-                                    <td>@item.ProviderName</td>
-
-                                    <td>
-                                        <span class="badge badge-soft-info">
-                                            @item.SalesOrderStatusText
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge @commissionClass">
-                                            @item.CommissionApplicableText
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge @finalizedClass">
-                                            @item.CommissionFinalizedText
-                                        </span>
-                                    </td>
-
-                                    <td>@(item.ServiceStartDate?.ToString("dd-MMM-yyyy") ?? "-")</td>
-                                    <td>@(item.NextRenewDate?.ToString("dd-MMM-yyyy") ?? "-")</td>
-                                    <td>@item.NoOfRenew</td>
-
-                                    <td class="text-end">
-                                        @item.OrderTotal.ToString("N2")
-                                    </td>
-
-                                    <td class="text-end">
-                                        @item.AgentCommissionAmount.ToString("N2")
-                                    </td>
-
-                                    <td>
-                                        <small>
-                                            Total: @item.TotalLines<br />
-                                            Completed: @item.CompletedLines<br />
-                                            Cancel/Reject: @item.CancelledOrRejectedLines
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <small>
-                                            Customer: @(item.EmailSentToCustomer ? "Yes" : "No")<br />
-                                            Provider: @(item.EmailSentToProvider ? "Yes" : "No")
-                                        </small>
-                                    </td>
-
-                                    <td>@(item.SoldByAgentCode ?? "-")</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
-    @if (Model.TotalPages > 1)
-    {
-        <nav class="mt-3">
-            <ul class="pagination justify-content-end">
+    <div class="pagination-panel d-flex justify-content-between align-items-center">
+        <div class="paging-info">
+            Showing @startRecord to @endRecord of @Model.TotalRecords entries
+        </div>
 
-                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="SalesOrderHistory"
-                       asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
-                       asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
-                       asp-route-salesOrderStatus="@Model.SalesOrderStatus"
-                       asp-route-page="@(Model.Page - 1)"
-                       asp-route-pageSize="@Model.PageSize">
-                        Previous
-                    </a>
-                </li>
+        @if (Model.TotalPages > 1)
+        {
+            <nav>
+                <ul class="pagination mb-0">
 
-                @for (var i = 1; i <= Model.TotalPages; i++)
-                {
-                    if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
+                    <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="SalesOrderHistory"
+                           asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                           asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                           asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                           asp-route-page="@(Model.Page - 1)"
+                           asp-route-pageSize="@Model.PageSize">
+                            Previous
+                        </a>
+                    </li>
+
+                    @for (var i = 1; i <= Model.TotalPages; i++)
                     {
-                        <li class="page-item @(i == Model.Page ? "active" : "")">
-                            <a class="page-link"
-                               asp-action="SalesOrderHistory"
-                               asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
-                               asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
-                               asp-route-salesOrderStatus="@Model.SalesOrderStatus"
-                               asp-route-page="@i"
-                               asp-route-pageSize="@Model.PageSize">
-                                @i
-                            </a>
-                        </li>
+                        if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="SalesOrderHistory"
+                                   asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                                   asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                                   asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                                   asp-route-page="@i"
+                                   asp-route-pageSize="@Model.PageSize">
+                                    @i
+                                </a>
+                            </li>
+                        }
                     }
-                }
 
-                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="SalesOrderHistory"
-                       asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
-                       asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
-                       asp-route-salesOrderStatus="@Model.SalesOrderStatus"
-                       asp-route-page="@(Model.Page + 1)"
-                       asp-route-pageSize="@Model.PageSize">
-                        Next
-                    </a>
-                </li>
+                    <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="SalesOrderHistory"
+                           asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                           asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                           asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                           asp-route-page="@(Model.Page + 1)"
+                           asp-route-pageSize="@Model.PageSize">
+                            Next
+                        </a>
+                    </li>
 
-            </ul>
-        </nav>
-    }
+                </ul>
+            </nav>
+        }
+    </div>
+
 </div>

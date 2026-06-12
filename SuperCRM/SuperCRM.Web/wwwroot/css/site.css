@@ -1,22 +1,94 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+body.supercrm-body {
+    margin: 0;
+    min-height: 100vh;
+    background: #191b1d;
+    color: #d6d6d6;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.supercrm-header {
+    background: #191b1d;
+    border-bottom: 1px solid #2d3033;
 }
 
-body {
-  margin-bottom: 60px;
+.supercrm-navbar {
+    background: #191b1d;
+    min-height: 64px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.supercrm-brand {
+    color: #0d47ff !important;
+    font-weight: 900;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.supercrm-page {
+    background: #191b1d;
+    min-height: calc(100vh - 120px);
+    padding: 0;
+}
+
+.supercrm-footer {
+    background: #191b1d;
+    border-top: 1px solid #2d3033;
+    color: #b5b5b5;
+    padding: 14px 18px;
+    font-size: 14px;
+}
+
+    .supercrm-footer a {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+        .supercrm-footer a:hover {
+            color: #4d8bff;
+            text-decoration: underline;
+        }
+
+.navbar .nav-link,
+.navbar .dropdown-toggle {
+    color: #d6d6d6 !important;
+    font-weight: 600;
+}
+
+    .navbar .nav-link:hover,
+    .navbar .dropdown-toggle:hover {
+        color: #0d6efd !important;
+    }
+
+.dropdown-menu {
+    background: #111315;
+    border: 1px solid #2d3033;
+}
+
+.dropdown-item {
+    color: #d6d6d6;
+}
+
+    .dropdown-item:hover {
+        background: #20242b;
+        color: #0d6efd;
+    }
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem #191b1d, 0 0 0 0.25rem #0d47ff;
 }
