@@ -18,7 +18,9 @@
 
     .dashboard-title {
         color: #0d47ff;
-        font-weight: 800;
+        
+        font-size: 18pt;
+        font-weight: 900;
         letter-spacing: .5px;
         margin-bottom: 4px;
         text-transform: uppercase;
@@ -26,7 +28,7 @@
 
     .dashboard-subtitle {
         color: #b5b5b5;
-        font-size: 16px;
+        font-size: 12pt;
     }
 
     .blue-text {
@@ -58,18 +60,20 @@
     }
 
         .metric-card:hover {
+            
             border-color: #0d47ff;
+            background: #1d2430;
         }
 
     .metric-label {
         color: #ffffff;
+        font-size: 11pt;
         font-weight: 800;
-        font-size: 15px;
     }
 
     .metric-value {
         color: #0d47ff;
-        font-size: 34px;
+        font-size: 24pt;
         font-weight: 900;
         margin-top: 10px;
         line-height: 1;
@@ -95,9 +99,10 @@
     .dashboard-block-header {
         background: #000000;
         color: #ffffff;
+        font-size: 12pt;
         font-weight: 800;
         padding: 14px 18px;
-        font-size: 17px;
+        
     }
 
     .dashboard-table {
@@ -111,6 +116,7 @@
             color: #d6d6d6;
             border-color: #2d3033;
             padding: 14px;
+            font-size: 10pt;
             font-weight: 800;
             white-space: nowrap;
         }
@@ -125,13 +131,21 @@
             background: #17191b;
         }
 
-            .dashboard-table tbody tr:nth-child(even) {
-                background: #1b1d20;
-            }
+    .dashboard-table tbody tr:nth-child(even) {
+        background: #1b1d20;
+    }
 
-            .dashboard-table tbody tr:hover {
-                background: #20242b;
-            }
+    .dashboard-table tbody tr:hover {
+        background: #2c3440 !important;
+    }
+
+    .dashboard-table tbody tr:hover td {
+        color: #ffffff !important;
+    }
+
+    .dashboard-table tbody tr:hover a {
+        color: #66a3ff !important;
+    }
 
     .status-pill {
         color: #0d6efd;

@@ -7,6 +7,8 @@
 
 <div id="clientValidationMessage"></div>
 
+<div class="sales-customer-page">
+
 <form asp-action="SaveCustomerAndPreview" method="post" id="salesOrderCustomerForm">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="SalesOrderDraftId" />
@@ -234,6 +236,7 @@
     </div>
 </form>
 
+
 <div class="modal fade" id="customerSearchModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -247,6 +250,9 @@
             </div>
         </div>
     </div>
+</div>
+
+
 </div>
 
 @section Scripts {

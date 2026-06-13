@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Agent Registration";
 }
-
+<div class="agent-registration-page">
 <div class="row justify-content-center mt-4">
     <div class="col-md-10 col-lg-9">
         <div class="card shadow-sm">
@@ -39,26 +39,26 @@
 
                     <h5 class="mb-3">Personal Information</h5>
                     <div class="row">
-                        <div class="col-md-3 mb-6">
+                        <div class="col-md-3 mb-3">
                             <label asp-for="FirstName" class="form-label"></label>
                             <input asp-for="FirstName" class="form-control" />
                             <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
 
-                        <div class="col-md-3 mb-6">
+                        <div class="col-md-3 mb-3">
                             <label asp-for="LastName" class="form-label"></label>
                             <input asp-for="LastName" class="form-control" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
 
 
-                        <div class="col-md-3 mb-6">
+                        <div class="col-md-3 mb-3">
                             <label asp-for="PhoneNo" class="form-label"></label>
                             <input asp-for="PhoneNo" class="form-control" />
                             <span asp-validation-for="PhoneNo" class="text-danger"></span>
                         </div>
 
-                        <div class="col-md-3 mb-6">
+                        <div class="col-md-3 mb-3">
                             <label asp-for="MobileNo" class="form-label"></label>
                             <input asp-for="MobileNo" class="form-control" />
                             <span asp-validation-for="MobileNo" class="text-danger"></span>
@@ -133,7 +133,7 @@
         </div>
     </div>
 </div>
-
+</div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 

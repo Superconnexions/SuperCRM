@@ -1,0 +1,742 @@
+﻿.crm-page,
+.crm-page * {
+    font-family: Calibri, Arial, sans-serif !important;
+    font-size: 12pt !important;
+}
+
+.crm-page {
+    background: #1f2123;
+    color: #d6d6d6;
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+}
+
+.crm-title {
+    color: #0d47ff;
+    font-size: 18pt !important;
+    font-weight: 900;
+}
+
+.crm-subtitle {
+    color: #b5b5b5;
+}
+
+.crm-search-panel {
+    background: #17191b;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 15px;
+}
+
+    .crm-search-panel label {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .crm-search-panel .form-control,
+    .crm-search-panel .form-select {
+        background: #151719;
+        color: #ffffff;
+        border: 2px solid #3b3f44;
+        height: 38px;
+    }
+
+        .crm-search-panel .form-control:focus,
+        .crm-search-panel .form-select:focus {
+            background: #151719;
+            color: #ffffff;
+            border-color: #0d47ff;
+            box-shadow: none;
+        }
+
+.crm-grid-panel {
+    background: #17191b;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.crm-grid-table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #ffffff;
+    border-collapse: collapse;
+}
+
+    .crm-grid-table thead th {
+        background: #000000;
+        color: #ffffff;
+        border: 1px solid #4a4a4a;
+        padding: 10px 8px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .crm-grid-table tbody td {
+        background: #17191b;
+        color: #ffffff;
+        border: 1px solid #4a4a4a;
+        padding: 8px;
+        vertical-align: middle;
+    }
+
+    .crm-grid-table tbody tr:nth-child(even) td {
+        background: #202328;
+    }
+
+    .crm-grid-table tbody tr:hover td {
+        background: #2d3748 !important;
+        color: #ffffff !important;
+    }
+
+    .crm-grid-table tbody tr:hover small,
+    .crm-grid-table tbody tr:hover span,
+    .crm-grid-table tbody tr:hover a {
+        color: #ffffff !important;
+    }
+
+.crm-status-badge {
+    background: #6c757d;
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.crm-action-btn {
+    background: #0d47ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    min-width: 75px;
+    font-weight: 700;
+}
+
+    .crm-action-btn:hover {
+        background: #0836c8;
+        color: #ffffff;
+    }
+
+.crm-date-wrap {
+    position: relative;
+}
+
+    .crm-date-wrap input[type="date"] {
+        padding-right: 42px;
+        color-scheme: dark;
+    }
+
+.crm-date-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 28px;
+    border: 0;
+    border-left: 1px solid #3b3f44;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+    .crm-date-btn::before {
+        content: "📅";
+        font-size: 14px;
+    }
+
+.crm-modal .modal-content,
+.modal.crm-modal-content {
+    background: #17191b;
+    color: #d6d6d6;
+    border: 1px solid #3b3f44;
+}
+
+.crm-modal .modal-header {
+    background: #000000 !important;
+    border-bottom: 1px solid #3b3f44;
+}
+
+.crm-modal .modal-title {
+    color: #ffffff;
+    font-weight: 800;
+}
+
+.crm-modal .nav-tabs {
+    border-bottom: 1px solid #3b3f44;
+}
+
+    .crm-modal .nav-tabs .nav-link {
+        color: #d6d6d6;
+    }
+
+        .crm-modal .nav-tabs .nav-link.active {
+            background: #0d47ff;
+            color: #ffffff;
+            border-color: #0d47ff;
+        }
+
+.crm-modal label {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.crm-modal input,
+.crm-modal textarea,
+.crm-modal select {
+    background: #151719;
+    color: #ffffff;
+    border: 1px solid #3b3f44;
+}
+
+    .crm-modal input:focus,
+    .crm-modal textarea:focus,
+    .crm-modal select:focus {
+        background: #151719;
+        color: #ffffff;
+        border-color: #0d47ff;
+        box-shadow: none;
+    }
+
+.crm-modal .table {
+    color: #ffffff;
+}
+
+    .crm-modal .table thead th {
+        background: #000000;
+        color: #ffffff;
+    }
+
+    .crm-modal .table tbody tr:nth-child(even) {
+        background: #202328;
+    }
+
+    .crm-modal .table tbody tr:hover {
+        background: #2d3748;
+    }
+
+/*// Added form View Registration*/
+
+.crm-page h1,
+.crm-page h2,
+.crm-page h3,
+.crm-page h4 {
+    color: #0d47ff;
+    font-weight: 900;
+}
+
+.crm-page .card,
+.crm-page .form-section,
+.crm-page fieldset {
+    background: #242628;
+    border: 1px dashed #0d6efd;
+    border-radius: 14px;
+    color: #ffffff;
+}
+
+.crm-page .card-header,
+.crm-page legend {
+    background: transparent;
+    color: #6692ff;
+    font-size: 15pt !important;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    border-bottom: 0;
+}
+
+.crm-page label,
+.crm-page .form-label {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.crm-page .form-control,
+.crm-page .form-select {
+    background: #17191b;
+    color: #ffffff;
+    border: 2px solid #3b3f44;
+    border-radius: 12px;
+    min-height: 42px;
+}
+
+    .crm-page .form-control:focus,
+    .crm-page .form-select:focus {
+        background: #17191b;
+        color: #ffffff;
+        border-color: #0d47ff;
+        box-shadow: none;
+    }
+
+    .crm-page .form-control[readonly],
+    .crm-page .form-control:disabled,
+    .crm-page .form-select:disabled {
+        background: #111315;
+        color: #bfc7d5;
+    }
+
+.crm-page .text-muted {
+    color: #b5b5b5 !important;
+}
+
+.crm-page .btn-primary {
+    background: #0d47ff;
+    border-color: #0d47ff;
+    font-weight: 700;
+}
+
+    .crm-page .btn-primary:hover {
+        background: #0836c8;
+    }
+
+.crm-page .btn-secondary {
+    background: #3b3f44;
+    border-color: #3b3f44;
+    color: #ffffff;
+}
+
+.crm-page .btn-secondary:hover {
+    background: #4b5563;
+}
+
+/*// legend view regis*/
+
+/* =========================================
+   SALES ORDER CUSTOMER CREATION
+   ========================================= */
+
+.sales-customer-page {
+    background: #1f2123;
+    color: #ffffff;
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+}
+
+    /* Page Title */
+
+    .sales-customer-page h2 {
+        color: #0d47ff;
+        font-weight: 900;
+        margin-bottom: 4px;
+    }
+
+    /* Bootstrap Cards */
+
+    .sales-customer-page .card {
+        background: #242628;
+        border: 1px dashed #0d6efd;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .sales-customer-page .card-header {
+        background: #2C2D2D;
+        color: #6692ff;
+        font-size: 15pt;
+        font-weight: 800;
+        text-transform: uppercase;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        padding: 14px;
+    }
+
+    .sales-customer-page .card-body {
+        padding: 20px;
+    }
+
+    /* Labels */
+
+    .sales-customer-page .form-label {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    /* Input Controls */
+
+    .sales-customer-page .form-control,
+    .sales-customer-page .form-select {
+        background: #17191b;
+        color: #ffffff;
+        border: 2px solid #3b3f44;
+        border-radius: 12px;
+        min-height: 42px;
+    }
+
+        .sales-customer-page .form-control:focus,
+        .sales-customer-page .form-select:focus {
+            background: #17191b;
+            color: #ffffff;
+            border-color: #0d47ff;
+            box-shadow: none;
+        }
+
+        /* Placeholder */
+
+        .sales-customer-page .form-control::placeholder {
+            color: #8d949c;
+        }
+
+    /* Checkboxes */
+
+    .sales-customer-page .form-check-label {
+        color: #ffffff;
+    }
+
+    /* Product Summary Grid */
+
+    .sales-customer-page .table {
+        margin-bottom: 0;
+        color: #ffffff;
+    }
+
+        .sales-customer-page .table thead th {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #4a4a4a;
+            font-weight: 700;
+        }
+
+        .sales-customer-page .table tbody td {
+            border: 1px solid #4a4a4a;
+            vertical-align: middle;
+        }
+
+        .sales-customer-page .table tbody tr:nth-child(odd) {
+            background: #16181b;
+        }
+
+        .sales-customer-page .table tbody tr:nth-child(even) {
+            background: #202328;
+        }
+
+        .sales-customer-page .table tbody tr:hover {
+            background: #2d3748;
+        }
+
+            .sales-customer-page .table tbody tr:hover td {
+                color: #ffffff;
+            }
+
+/* Existing Customer Box */
+
+#selectedCustomerBox {
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+}
+
+/* Scenario Badge */
+
+.sales-customer-page .badge {
+    font-size: 10pt;
+    padding: 6px 10px;
+}
+
+/* Buttons */
+
+.sales-customer-page .btn-primary {
+    background: #0d47ff;
+    border-color: #0d47ff;
+    font-weight: 700;
+}
+
+    .sales-customer-page .btn-primary:hover {
+        background: #0836c8;
+    }
+
+.sales-customer-page .btn-success {
+    font-weight: 700;
+}
+
+.sales-customer-page .btn-warning {
+    font-weight: 700;
+}
+
+.sales-customer-page .btn-secondary {
+    background: #4b5563;
+    border-color: #4b5563;
+}
+
+/* Modal */
+
+#customerSearchModal .modal-content {
+    background: #242628;
+    color: #ffffff;
+    border: 1px solid #3b3f44;
+}
+
+#customerSearchModal .modal-header {
+    background: #000000;
+    border-bottom: 1px solid #3b3f44;
+}
+
+#customerSearchModal .modal-title {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#customerSearchModal .modal-body {
+    background: #242628;
+}
+
+#customerSearchModal .form-control {
+    background: #17191b;
+    color: #ffffff;
+}
+
+#customerSearchModal .table {
+    color: #ffffff;
+}
+
+/* Validation */
+
+.field-validation-error,
+.validation-summary-errors {
+    color: #ff6b6b !important;
+}
+
+/* Required Labels */
+
+.ltd-required-label::after {
+    content: " *";
+    color: #ff6b6b;
+}
+
+
+
+/* Sales Order Summary */
+
+/* =========================================
+   SALES ORDER CREATED SUMMARY
+   ========================================= */
+
+.sales-order-summary-page {
+    background: #1f2123;
+    color: #ffffff;
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 10pt;
+}
+
+    .sales-order-summary-page * {
+        font-family: Calibri, Arial, sans-serif !important;
+        font-size: 10pt;
+    }
+
+    .sales-order-summary-page .card {
+        background: #242628;
+        border: 1px dashed #0d6efd;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .sales-order-summary-page .card-header {
+        background: #9394a5 !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid #3b3f44;
+        font-weight: 800;
+    }
+
+    .sales-order-summary-page .card-body {
+        background: #242628;
+        color: #ffffff;
+    }
+
+    .sales-order-summary-page .text-muted {
+        color: #b5b5b5 !important;
+    }
+
+    .sales-order-summary-page h5 {
+        color: #6692ff;
+        font-weight: 900;
+    }
+
+    .sales-order-summary-page .border {
+        border-color: #3b3f44 !important;
+        background: #17191b;
+    }
+
+    .sales-order-summary-page .alert-info {
+        background: #10233f;
+        color: #ffffff;
+        border: 1px solid #0d6efd;
+    }
+
+    .sales-order-summary-page .table {
+        color: #ffffff;
+        margin-bottom: 0;
+    }
+
+        .sales-order-summary-page .table thead th {
+            background: #000000 !important;
+            color: #ffffff;
+            border: 1px solid #4a4a4a;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .sales-order-summary-page .table tbody td {
+            background: #17191b;
+            color: #ffffff;
+            border: 1px solid #4a4a4a;
+            vertical-align: middle;
+        }
+
+        .sales-order-summary-page .table tbody tr:nth-child(even) td {
+            background: #202328;
+        }
+
+        .sales-order-summary-page .table tbody tr:hover td {
+            background: #2d3748 !important;
+            color: #ffffff !important;
+        }
+
+        .sales-order-summary-page .table tfoot th {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #4a4a4a;
+            font-weight: 900;
+        }
+
+    .sales-order-summary-page .btn {
+        font-weight: 700;
+    }
+
+    /*END Sales Order Summary*/
+
+    /*Agent Registration*/
+
+/* =========================================
+   AGENT REGISTRATION
+   ========================================= */
+
+.agent-registration-page {
+    min-height: 100vh;
+    background: url('/images/login-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding: 30px 15px;
+}
+
+    .agent-registration-page .card {
+        background: rgba(37,37,37,.96);
+        border: none;
+        border-radius: 18px;
+        color: #ffffff;
+        box-shadow: 0 15px 40px rgba(0,0,0,.45);
+    }
+
+    .agent-registration-page .card-header {
+        background: transparent;
+        border-bottom: 1px solid #3b3f44;
+        text-align: center;
+        padding: 20px;
+    }
+
+        .agent-registration-page .card-header h3 {
+            color: #ffffff;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: .5px;
+        }
+
+    .agent-registration-page h5 {
+        color: #5b8cff;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin-top: 10px;
+        margin-bottom: 18px;
+        border-left: 4px solid #0d6efd;
+        padding-left: 10px;
+    }
+
+    .agent-registration-page hr {
+        border-color: #3b3f44;
+        opacity: 1;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
+    .agent-registration-page .form-label {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .agent-registration-page .form-control,
+    .agent-registration-page .form-select {
+        background: #17191b;
+        color: #ffffff;
+        border: 2px solid #3b3f44;
+        border-radius: 10px;
+        min-height: 44px;
+    }
+
+        .agent-registration-page .form-control:focus,
+        .agent-registration-page .form-select:focus {
+            background: #17191b;
+            color: #ffffff;
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+
+        .agent-registration-page .form-control::placeholder {
+            color: #8a94a1;
+        }
+
+        .agent-registration-page .form-select option {
+            background: #17191b;
+            color: #ffffff;
+        }
+
+    .agent-registration-page .btn-primary {
+        background: linear-gradient(90deg,#183f94,#0078ff);
+        border: 1px solid #0d6efd;
+        min-width: 150px;
+        font-weight: 800;
+    }
+
+        .agent-registration-page .btn-primary:hover {
+            background: linear-gradient(90deg,#123172,#0062d1);
+        }
+
+    .agent-registration-page .btn-secondary {
+        min-width: 150px;
+        font-weight: 700;
+    }
+
+    .agent-registration-page .validation-summary-errors {
+        background: rgba(220,53,69,.15);
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .agent-registration-page .field-validation-error {
+        color: #ff8080;
+        font-size: 13px;
+    }
+
+    .agent-registration-page .text-danger {
+        color: #ff8080 !important;
+    }
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .agent-registration-page {
+        padding: 15px;
+    }
+
+        .agent-registration-page .card-body {
+            padding: 20px;
+        }
+
+        .agent-registration-page .btn-primary,
+        .agent-registration-page .btn-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+}

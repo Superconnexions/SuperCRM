@@ -6,12 +6,16 @@
     var endRecord = Math.Min(Model.Page * Model.PageSize, Model.TotalRecords);
 }
 
-<div class="container-fluid mt-3">
+
+
+<div class="crm-page">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="mb-1">Sales Order Management</h4>
-            <small class="text-muted">
+            <h3 class="crm-title mb-1">
+                Sales Order Management
+            </h3>
+            <small class="crm-subtitle">
                 Showing @startRecord - @endRecord of @Model.TotalRecords records
             </small>
         </div>
@@ -37,25 +41,36 @@
     <form asp-action="SalesOrderManagement"
           asp-controller="SalesOrder"
           method="get"
-          class="card mb-3">
+          id="salesOrderSearchForm"
+          class="crm-search-panel">
 
-        <div class="card-body">
+        <div>
             <div class="row g-3 align-items-end">
 
                 <div class="col-md-3">
                     <label class="form-label">Order Date From</label>
-                    <input type="date"
-                           name="orderDateFrom"
-                           value="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
-                           class="form-control" />
+                    
+
+                    <div class="crm-date-wrap">
+                        <input type="date"
+                               name="orderDateFrom"
+                               value="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
+                               class="form-control" required />
+                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                    </div>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Order Date To</label>
-                    <input type="date"
-                           name="orderDateTo"
-                           value="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
-                           class="form-control" />
+                    
+
+                    <div class="crm-date-wrap">
+                        <input type="date"
+                               name="orderDateTo"
+                               value="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
+                               class="form-control" required />
+                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                    </div>
                 </div>
 
                 <div class="col-md-3">
@@ -92,10 +107,10 @@
         </div>
     </form>
 
-    <div class="card shadow-sm">
-        <div class="card-body table-responsive">
-            <table class="table table-bordered table-hover table-sm align-middle">
-                <thead class="table-primary">
+    <div class="crm-grid-panel">
+        <div class="table-responsive">
+            <table class="crm-grid-table">
+                <thead>
                     <tr>
                         <th>Order No</th>
                         <th>Order Date</th>
@@ -115,7 +130,7 @@
                     @if (!Model.Orders.Any())
                     {
                         <tr>
-                            <td colspan="11" class="text-center text-muted py-4">
+                            <td colspan="11" class="text-center crm-subtitle py-4">
                                 No sales order found.
                             </td>
                         </tr>
@@ -133,7 +148,7 @@
 
                                 <td>
                                     <div>@item.CustomerName</div>
-                                    <small class="text-muted">@item.CustomerCode</small>
+                                    <small class="crm-subtitle">@item.CustomerCode</small>
                                 </td>
 
                                 <td>@item.CustomerMobile</td>
@@ -141,7 +156,7 @@
                                 <td>@item.ProviderName</td>
 
                                 <td>
-                                    <span class="badge bg-secondary">
+                                    <span class="crm-status-badge">
                                         @item.SalesOrderStatusText
                                     </span>
                                 </td>
@@ -173,7 +188,7 @@
 
                                 <td>
                                     <button type="button"
-                                            class="btn btn-sm btn-primary btn-manage-sales-order"
+                                            class="btn btn-sm crm-action-btn btn-manage-sales-order"
                                             data-sale-id="@item.SaleId"
                                             data-bs-toggle="modal"
                                             data-bs-target="#salesOrderManageModal">
@@ -240,8 +255,8 @@
     }
 </div>
 
-<div class="modal fade" id="salesOrderManageModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
+<div class="modal fade crm-modal" id="salesOrderManageModal" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen-xl-down modal-xl">
         <div class="modal-content">
 
             <div class="modal-header bg-primary text-white">
@@ -287,12 +302,28 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label>Service Start Date</label>
-                                    <input type="date" name="ServiceStartDate" id="SalesInfo_ServiceStartDate" class="form-control" />
+                                    
+
+                                    <div class="crm-date-wrap">
+                                        <input type="date"
+                                               name="ServiceStartDate"
+                                               id="SalesInfo_ServiceStartDate"
+                                               class="form-control" />
+                                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                    </div>
+
+
                                 </div>
 
                                 <div class="col-md-4">
                                     <label>Next Renew Date</label>
-                                    <input type="date" name="NextRenewDate" id="SalesInfo_NextRenewDate" class="form-control" />
+                                    <div class="crm-date-wrap">
+                                        <input type="date"
+                                                   name="NextRenewDate"
+                                                   id="SalesInfo_NextRenewDate"
+                                                   class="form-control" />
+                                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-4">
@@ -422,7 +453,10 @@
 </div>
 
 @section Scripts {
+
+
     <script>
+
         function formatDate(value) {
             return value ? value.substring(0, 10) : '';
         }
@@ -640,8 +674,11 @@
             if (status === 2) {
                 html = `
                     <div class="col-md-4">
-                        <label>Sent To Provider Date</label>
+                    <label>Sent To Provider Date</label>
+                    <div class="crm-date-wrap">
                         <input type="date" name="SentToProviderDate" class="form-control" value="${formatDate(data.sentToProviderDate)}" />
+                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                    </div>
                     </div>
                     ${buildAdminUserDropdown('SentToProviderUserId', data.sentToProviderUserId, adminUsers, 'Communicated By')}`;
             }
@@ -650,7 +687,10 @@
                 html = `
                     <div class="col-md-4">
                         <label>Provider Accepted Date</label>
-                        <input type="date" name="ProviderAcceptedDate" class="form-control" value="${formatDate(data.providerAcceptedDate)}" />
+                        <div class="crm-date-wrap">
+                            <input type="date" name="ProviderAcceptedDate" class="form-control" value="${formatDate(data.providerAcceptedDate)}" />
+                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>
                     ${buildAdminUserDropdown('ProviderAcceptedUserId', data.providerAcceptedUserId, adminUsers, 'Accepted By')}`;
             }
@@ -659,7 +699,10 @@
                 html = `
                     <div class="col-md-4">
                         <label>Provider Rejected Date</label>
-                        <input type="date" name="ProviderRejectedDate" class="form-control" value="${formatDate(data.providerRejectedDate)}" />
+                        <div class="crm-date-wrap">
+                            <input type="date" name="ProviderRejectedDate" class="form-control" value="${formatDate(data.providerRejectedDate)}" />
+                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>
                     ${buildAdminUserDropdown('ProviderRejectedUserId', data.providerRejectedUserId, adminUsers, 'Rejected By')}`;
             }
@@ -668,15 +711,24 @@
                 html = `
                     <div class="col-md-4">
                         <label>Completed Date</label>
-                        <input type="date" name="CompletedDate" class="form-control" value="${formatDate(data.completedDate)}" />
+                        <div class="crm-date-wrap">
+                            <input type="date" name="CompletedDate" class="form-control" value="${formatDate(data.completedDate)}" />
+                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Service Start Date</label>
-                        <input type="date" name="ServiceStartDate" class="form-control" value="${formatDate(data.serviceStartDate)}" />
+                        <div class="crm-date-wrap">
+                            <input type="date" name="ServiceStartDate" class="form-control" value="${formatDate(data.serviceStartDate)}" />
+                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <label>Next Renew Date</label>
+                        <div class="crm-date-wrap">
                         <input type="date" name="NextRenewDate" class="form-control" value="${formatDate(data.nextRenewDate)}" />
+                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>`;
             }
 
@@ -684,7 +736,10 @@
                 html = `
                     <div class="col-md-4">
                         <label>On Hold Date</label>
-                        <input type="date" name="OnHoldDate" class="form-control" value="${formatDate(data.onHoldDate)}" />
+                        <div class="crm-date-wrap">
+                            <input type="date" name="OnHoldDate" class="form-control" value="${formatDate(data.onHoldDate)}" />
+                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>
                     ${buildAdminUserDropdown('OnHoldByUserId', data.onHoldByUserId, adminUsers, 'On Hold By')}
                     <div class="col-md-12">
@@ -697,7 +752,10 @@
                 html = `
                     <div class="col-md-4">
                         <label>Cancelled Date</label>
-                        <input type="date" name="CancelledDate" class="form-control" value="${formatDate(data.cancelledDate)}" />
+                        <div class="crm-date-wrap">
+                            <input type="date" name="CancelledDate" class="form-control" value="${formatDate(data.cancelledDate)}" />
+                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                        </div>
                     </div>
                     ${buildAdminUserDropdown('CancelledByUserId', data.cancelledByUserId, adminUsers, 'Cancelled By')}
                     <div class="col-md-12">
@@ -708,5 +766,22 @@
 
             box.innerHTML = html;
         }
+
+        document.getElementById('salesOrderSearchForm')
+        ?.addEventListener('submit', function (e) {
+
+        const fromDate =
+            document.getElementById('orderDateFrom')?.value;
+
+        const toDate =
+            document.getElementById('orderDateTo')?.value;
+
+        if (fromDate > toDate) {
+            alert('Order Date From cannot be greater than Order Date To.');
+            e.preventDefault();
+            return false;
+        }
+        });
+
     </script>
 }

@@ -2,48 +2,226 @@
 
 @{
     ViewData["Title"] = "Login";
+    Layout = null;
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <h3 class="text-center">SuperCRM Login</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - SuperCMR</title>
 
-        <form asp-action="Login" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-            <div class="mb-3">
-                <label asp-for="UserName" class="form-label"></label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: Calibri, Arial, sans-serif;
+        }
+
+        .login-page {
+            min-height: 100vh;
+            background: url('/images/login-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 540px;
+            background: #252525;
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 34px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.45);
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 55px;
+            text-transform: uppercase;
+        }
+
+        .login-description {
+            font-size: 18px;
+            line-height: 1.35;
+            margin-bottom: 18px;
+        }
+
+        .ready-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 900;
+            margin-top: 18px;
+            margin-bottom: 20px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #00aaff;
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+
+        .login-divider {
+            border-color: #3a3a3a;
+            margin-bottom: 28px;
+        }
+
+        .login-card label {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .login-card .form-control {
+            height: 44px;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+
+            .login-card .form-control::placeholder {
+                color: #6b7280;
+            }
+
+        .login-options {
+            color: #bdbdbd;
+            font-size: 16px;
+        }
+
+            .login-options a,
+            .login-card a {
+                color: #008cff;
+                text-decoration: underline;
+            }
+
+        .btn-login {
+            background: linear-gradient(90deg, #183f94, #0078ff);
+            color: #ffffff;
+            height: 48px;
+            border: 1px solid #0d6efd;
+            border-radius: 0;
+            font-size: 16px;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+            .btn-login:hover {
+                color: #ffffff;
+                background: linear-gradient(90deg, #0d2f7a, #006ae0);
+            }
+
+        .signup-text {
+            color: #bdbdbd;
+            font-size: 15px;
+            margin-top: 22px;
+        }
+
+        .footer-text {
+            color: #a9a9a9;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        .validation-summary-errors {
+            color: #ff6b6b;
+            margin-bottom: 12px;
+        }
+
+        .field-validation-error {
+            color: #ff6b6b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="login-card">
+
+            <h2 class="login-title">
+                WELCOME TO SUPERCMR @@HOME
+            </h2>
+
+            <p class="login-description">
+                SuperCMR @@Home is designed to put you in control of your
+                time and income, so you can live the lifestyle you’ve always
+                wanted! It has already created easy income Earners and you
+                could be next.
+            </p>
+
+            <div class="ready-title">
+                @@ ARE YOU READY TO USE?
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+            <div class="login-subtitle">
+                Please Log In to Your Account
             </div>
 
-            <div class="form-check mb-3">
-                <input asp-for="RememberMe" class="form-check-input" />
-                <label asp-for="RememberMe" class="form-check-label"></label>
+            <hr class="login-divider" />
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="mb-2">
+                    <label asp-for="UserName" class="form-label">Email</label>
+                    <input asp-for="UserName"
+                           class="form-control"
+                           placeholder="Enter your email" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-2">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password"
+                           class="form-control"
+                           placeholder="Enter your password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-2 login-options">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">
+                        Keep me logged in
+                    </label>
+
+                    <a asp-controller="Home"
+                       asp-action="ForgotPassword"
+                       class="ms-2">
+                        Forgot password
+                    </a>
+                </div>
+
+                <button type="submit" class="btn btn-login">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="signup-text">
+                Don’t have an account?<br />
+                <a href="/AgentRegistration/Register">Please Sign up</a>
+                or
+                <a href="#">Contact our support team.</a>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-        </form>
+            <div class="footer-text">
+                ©2025-2026 Supper CMR. All rights reserved.
+            </div>
 
-        <div class="mt-3 text-center">
-            
-            <!-- Agent registration link -->
-            <a href="/AgentRegistration/Register">Register as Agent</a>
         </div>
-
-        <div class="mt-3 text-center">
-            <a asp-controller="Home" asp-action="ForgotPassword">Forgot Password?</a>
-        </div>
-
     </div>
-</div>
 
-@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     <partial name="_ValidationScriptsPartial" />
-}
+</body>
+</html>

@@ -10,7 +10,7 @@
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
-
+<div class="crm-page">
 <form asp-action="UpdateRegistration" method="post">
     <input type="hidden" asp-for="AgentId" />
     <input type="hidden" asp-for="UserId" />
@@ -99,6 +99,8 @@
         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 </form>
+</div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -6,12 +6,12 @@
     var endRecord = Math.Min(Model.Page * Model.PageSize, Model.TotalRecords);
 }
 
-<div class="container-fluid mt-3">
+<div class="crm-page">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h4 class="mb-1">Customer Management</h4>
-            <small class="text-muted">
+            <h4 class="crm-title mb-1">Customer Management</h4>
+            <small class="crm-subtitle">
                 Showing @startRecord - @endRecord of @Model.TotalRecords records
             </small>
         </div>
@@ -29,25 +29,35 @@
     <form asp-action="CustomerManagement"
           asp-controller="SalesOrder"
           method="get"
-          class="card mb-3 shadow-sm">
+          class="crm-search-panel">
 
         <div class="card-body">
             <div class="row g-3 align-items-end">
 
                 <div class="col-md-3">
                     <label class="form-label">Created Date From</label>
-                    <input type="date"
-                           name="createdDateFrom"
-                           value="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
-                           class="form-control" />
+                    <div class="crm-date-wrap">
+                        <input type="date"
+                               name="createdDateFrom"
+                               value="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
+                               class="form-control" />
+                        <button type="button" class="crm-date-btn">
+                            <i class="bi bi-calendar3"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Created Date To</label>
-                    <input type="date"
-                           name="createdDateTo"
-                           value="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
-                           class="form-control" />
+                    <div class="crm-date-wrap">
+                        <input type="date"
+                               name="createdDateTo"
+                               value="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
+                               class="form-control" />
+                        <button type="button" class="crm-date-btn">
+                            <i class="bi bi-calendar3"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="col-md-3">
@@ -80,10 +90,10 @@
         </div>
     </form>
 
-    <div class="card shadow-sm">
-        <div class="card-body table-responsive">
-            <table class="table table-striped table-hover align-middle customer-grid">
-                <thead class="table-primary">
+    <div class="crm-grid-panel">
+        <div class="table-responsive">
+            <table class="crm-grid-table">
+                <thead>
                     <tr>
                         <th class="text-nowrap">Customer Code</th>
                         <th>First Name</th>
@@ -104,7 +114,7 @@
                     @if (!Model.Customers.Any())
                     {
                         <tr>
-                            <td colspan="12" class="text-center text-muted py-4">
+                            <td colspan="12" class="text-center crm-subtitle py-4">
                                 No customer found.
                             </td>
                         </tr>
@@ -130,14 +140,14 @@
                                        asp-action="CustomerSalesOrders"
                                        asp-route-customerId="@item.CustomerId"
                                        asp-route-customerName="@customerName"
-                                       class="badge bg-primary fs-6 text-decoration-none px-3 py-2">
+                                       class="crm-status-badge text-decoration-none">
                                         @item.SalesOrderCount Orders
                                     </a>
                                 </td>
 
                                 <td class="text-nowrap">
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-primary btn-view-address"
+                                            class="btn btn-sm crm-action-btn btn-view-address"
                                             data-customer-id="@item.CustomerId"
                                             data-bs-toggle="modal"
                                             data-bs-target="#customerAddressModal">
@@ -147,7 +157,7 @@
 
                                 <td class="text-nowrap">
                                     <button type="button"
-                                            class="btn btn-sm btn-outline-success btn-view-business"
+                                            class="btn btn-sm crm-action-btn btn-view-business"
                                             data-customer-id="@item.CustomerId"
                                             data-bs-toggle="modal"
                                             data-bs-target="#customerBusinessModal"
@@ -157,8 +167,8 @@
                                 </td>
 
                                 <td class="text-nowrap">
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-warning btn-view-bank"
+                                    <button type="button"s
+                                            class="btn btn-sm crm-action-btn btn-view-bank"
                                             data-customer-id="@item.CustomerId"
                                             data-bs-toggle="modal"
                                             data-bs-target="#customerBankModal"
@@ -226,7 +236,7 @@
     }
 </div>
 
-<div class="modal fade" id="customerAddressModal" tabindex="-1">
+<div class="modal fade crm-modal" id="customerAddressModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
@@ -238,7 +248,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="customerBusinessModal" tabindex="-1">
+<div class="modal fade crm-modal" id="customerBusinessModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
@@ -250,7 +260,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="customerBankModal" tabindex="-1">
+<div class="modal fade crm-modal" id="customerBankModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-warning">
@@ -262,19 +272,6 @@
     </div>
 </div>
 
-<style>
-    .customer-grid tbody tr:nth-child(odd) {
-        background-color: #f8f9fa;
-    }
-
-    .customer-grid tbody tr:nth-child(even) {
-        background-color: #ffffff;
-    }
-
-    .customer-grid tbody tr:hover {
-        background-color: #e8f4ff !important;
-    }
-</style>
 
 @section Scripts {
     <script>
@@ -298,7 +295,7 @@
 
         async function loadCustomerAddresses(customerId) {
             const box = document.getElementById('customerAddressModalBody');
-            box.innerHTML = '<div class="text-muted">Loading...</div>';
+            box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
 
             const response = await fetch('/SalesOrder/GetCustomerAddresses?customerId=' + encodeURIComponent(customerId));
             const items = await response.json();
@@ -310,7 +307,7 @@
 
             let html = `
                 <table class="table table-bordered table-sm">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Type</th>
                             <th>House No</th>
@@ -340,7 +337,7 @@
 
         async function loadCustomerBusiness(customerId) {
             const box = document.getElementById('customerBusinessModalBody');
-            box.innerHTML = '<div class="text-muted">Loading...</div>';
+            box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
 
             const response = await fetch('/SalesOrder/GetCustomerBusiness?customerId=' + encodeURIComponent(customerId));
             const x = await response.json();
@@ -351,7 +348,7 @@
             }
 
             box.innerHTML = `
-                <table class="table table-bordered table-sm">
+                <table class="crm-grid-table">
                     <tr><th>Business Name</th><td>${x.businessName || ''}</td></tr>
                     <tr><th>Business Type</th><td>${x.businessTypeText || ''}</td></tr>
                     <tr><th>Business Email</th><td>${x.businessEmail || ''}</td></tr>
@@ -364,7 +361,7 @@
 
         async function loadCustomerBank(customerId) {
             const box = document.getElementById('customerBankModalBody');
-            box.innerHTML = '<div class="text-muted">Loading...</div>';
+            box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
 
             const response = await fetch('/SalesOrder/GetCustomerBankAccounts?customerId=' + encodeURIComponent(customerId));
             const items = await response.json();
@@ -375,8 +372,8 @@
             }
 
             let html = `
-                <table class="table table-bordered table-sm">
-                    <thead class="table-light">
+                <table class="crm-grid-table">
+                    <thead>
                         <tr>
                             <th>Bank Name</th>
                             <th>Account Name</th>

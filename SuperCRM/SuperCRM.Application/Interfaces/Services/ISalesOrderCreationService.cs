@@ -58,6 +58,12 @@ namespace SuperCRM.Application.Interfaces.Services
         Guid currentUserId,
         CancellationToken cancellationToken = default);
 
+        Task<AdminDashboardDto> GetAdminDashboardAsync(
+        string searchMode,
+        Guid? agentUserId,
+        Guid? adminUserId,
+        CancellationToken cancellationToken = default);
+
         // END
 
     }

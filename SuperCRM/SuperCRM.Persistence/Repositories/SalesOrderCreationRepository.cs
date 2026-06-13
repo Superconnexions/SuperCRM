@@ -434,8 +434,8 @@ namespace SuperCRM.Persistence.Repositories
         }
 
         public async Task<AgentDashboardDto> GetAgentDashboardAsync(
-    Guid currentUserId,
-    CancellationToken cancellationToken = default)
+        Guid currentUserId,
+        CancellationToken cancellationToken = default)
         {
             var today = DateTime.UtcNow.Date;
             var last30Days = today.AddDays(-30);
@@ -443,17 +443,17 @@ namespace SuperCRM.Persistence.Repositories
 
             var excludedStatuses = new byte[]
             {
-        (byte)SalesOrderStatus.ProviderRejected,
-        (byte)SalesOrderStatus.Cancelled,
-        (byte)SalesOrderStatus.OnHold
+            (byte)SalesOrderStatus.ProviderRejected,
+            (byte)SalesOrderStatus.Cancelled,
+            (byte)SalesOrderStatus.OnHold
             };
 
             var activePendingExcluded = new byte[]
             {
-        (byte)SalesOrderStatus.Completed,
-        (byte)SalesOrderStatus.ProviderRejected,
-        (byte)SalesOrderStatus.Cancelled,
-        (byte)SalesOrderStatus.OnHold
+            (byte)SalesOrderStatus.Completed,
+            (byte)SalesOrderStatus.ProviderRejected,
+            (byte)SalesOrderStatus.Cancelled,
+            (byte)SalesOrderStatus.OnHold
             };
 
             var salesQuery = _dbContext.Sales
@@ -570,6 +570,440 @@ namespace SuperCRM.Persistence.Repositories
             };
         }
 
+        // Start Admin Dasahboard
+
+        public async Task<List<DashboardUserOptionDto>> GetAgentUserOptionsAsync(
+        CancellationToken cancellationToken = default)
+        {
+            var query =
+                from user in _dbContext.Users.AsNoTracking()
+
+                join profile in _dbContext.UserProfiles.AsNoTracking()
+                    on user.Id equals profile.UserId into profileJoin
+                from profile in profileJoin.DefaultIfEmpty()
+
+                join agent in _dbContext.Agents.AsNoTracking()
+                    on user.Id equals agent.UserId into agentJoin
+                from agent in agentJoin.DefaultIfEmpty()
+
+                join userRole in _dbContext.UserRoles.AsNoTracking()
+                    on user.Id equals userRole.UserId
+
+                join role in _dbContext.Roles.AsNoTracking()
+                    on userRole.RoleId equals role.Id
+
+                where role.Name == "Agent"
+
+                orderby agent.AgentCode, user.Email
+
+                select new DashboardUserOptionDto
+                {
+                    UserId = user.Id,
+                    Email = user.Email,
+                    AgentCode = agent != null ? agent.AgentCode : "",
+
+                    FullName = profile != null &&
+                               (!string.IsNullOrWhiteSpace(profile.FirstName) ||
+                                !string.IsNullOrWhiteSpace(profile.LastName))
+                        ? ((profile.FirstName ?? "") + " " + (profile.LastName ?? "")).Trim()
+                        : user.Email ?? user.UserName ?? user.Id.ToString(),
+
+                    DisplayText =
+                        ((agent != null ? agent.AgentCode : "") + " - " +
+                        (profile != null &&
+                         (!string.IsNullOrWhiteSpace(profile.FirstName) ||
+                          !string.IsNullOrWhiteSpace(profile.LastName))
+                            ? ((profile.FirstName ?? "") + " " + (profile.LastName ?? "")).Trim()
+                            : user.Email ?? user.UserName ?? user.Id.ToString()))
+                };
+
+            return await query.Distinct().ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<DashboardUserOptionDto>> GetAdminUserOptionsAsync(
+    CancellationToken cancellationToken = default)
+        {
+            var query =
+                from user in _dbContext.Users.AsNoTracking()
+
+                join profile in _dbContext.UserProfiles.AsNoTracking()
+                    on user.Id equals profile.UserId into profileJoin
+                from profile in profileJoin.DefaultIfEmpty()
+
+                join userRole in _dbContext.UserRoles.AsNoTracking()
+                    on user.Id equals userRole.UserId
+
+                join role in _dbContext.Roles.AsNoTracking()
+                    on userRole.RoleId equals role.Id
+
+                where role.Name == "SuperAdmin"
+                   || role.Name == "SuperCRMAdmin"
+
+                orderby user.Email
+
+                select new DashboardUserOptionDto
+                {
+                    UserId = user.Id,
+                    Email = user.Email,
+
+                    FullName = profile != null &&
+                               (!string.IsNullOrWhiteSpace(profile.FirstName) ||
+                                !string.IsNullOrWhiteSpace(profile.LastName))
+                        ? ((profile.FirstName ?? "") + " " + (profile.LastName ?? "")).Trim()
+                        : user.Email ?? user.UserName ?? user.Id.ToString(),
+
+                    DisplayText =
+                        (profile != null &&
+                         (!string.IsNullOrWhiteSpace(profile.FirstName) ||
+                          !string.IsNullOrWhiteSpace(profile.LastName))
+                            ? ((profile.FirstName ?? "") + " " + (profile.LastName ?? "")).Trim()
+                            : user.Email ?? user.UserName ?? user.Id.ToString())
+                        + " - " + (user.Email ?? "")
+                };
+
+            return await query.Distinct().ToListAsync(cancellationToken);
+        }
+
+        public async Task<AdminDashboardDto> GetAdminDashboardAsync(
+        string searchMode,
+        Guid? agentUserId,
+        Guid? adminUserId,
+        CancellationToken cancellationToken = default)
+        {
+            var today = DateTime.UtcNow.Date;
+            var last30Days = today.AddDays(-30);
+            var monthStart = new DateTime(today.Year, today.Month, 1);
+
+            var excludedStatuses = new byte[]
+            {
+                (byte)SalesOrderStatus.ProviderRejected,
+                (byte)SalesOrderStatus.Cancelled,
+                (byte)SalesOrderStatus.OnHold
+            };
+
+            var pendingExcludedStatuses = new byte[]
+            {
+                (byte)SalesOrderStatus.Completed,
+                (byte)SalesOrderStatus.ProviderRejected,
+                (byte)SalesOrderStatus.Cancelled,
+                (byte)SalesOrderStatus.OnHold
+            };
+
+            IQueryable<Sale> salesQuery = _dbContext.Sales.AsNoTracking();
+            IQueryable<Customer> customerQuery = _dbContext.Customers.AsNoTracking()
+                .Where(x => x.IsActive);
+
+
+            // Replace Sales and Customer SQL
+            switch (searchMode)
+            {
+                case "Agent":
+
+                    // All Agents
+                    if (!agentUserId.HasValue)
+                    {
+                        //salesQuery =
+                        //    from s in salesQuery
+                        //    where s.SoldByAgentId != null
+                        //    select s;
+
+                        salesQuery = salesQuery.Where(x => x.SoldByAgentId != null);
+
+                        customerQuery =
+                            customerQuery.Where(x =>
+                                x.RegistrationSource ==
+                                (byte)RegistrationSource.AgentCreated);
+                    }
+                    else
+                    {
+                        salesQuery =
+                            from s in salesQuery
+                            join a in _dbContext.Agents
+                                on s.SoldByAgentId equals a.AgentId
+                            where a.UserId == agentUserId.Value
+                            select s;
+
+                        customerQuery =
+                            customerQuery.Where(x =>
+                                x.CreatedByUserId == agentUserId.Value ||
+                                x.UpdatedByUserId == agentUserId.Value);
+                    }
+
+                    break;
+
+                case "Admin":
+
+                    // All Admins
+                    if (!adminUserId.HasValue)
+                    {
+                        salesQuery =
+                            salesQuery.Where(x =>
+                                x.SoldByAgentId == null);
+
+                        customerQuery =
+                            customerQuery.Where(x =>
+                                x.RegistrationSource == (byte)RegistrationSource.AdminCreated);
+                    }
+                    else
+                    {
+                        salesQuery =
+                            salesQuery.Where(x =>
+                                x.SoldByAgentId == null &&
+                                x.SoldByUserId == adminUserId.Value);
+
+                        customerQuery =
+                            customerQuery.Where(x =>
+                                x.CreatedByUserId == adminUserId.Value ||
+                                x.UpdatedByUserId == adminUserId.Value);
+                    }
+
+                    break;
+
+                default:
+
+                    // Search All
+                    break;
+            }
+
+
+
+            // END
+
+            var totalCustomerCount = await customerQuery.CountAsync(cancellationToken);
+            var totalSalesOrderCount = await salesQuery.CountAsync(cancellationToken);
+
+            var ordersThisMonthCount = await salesQuery
+                .CountAsync(x => x.OrderDate.Date >= monthStart && x.OrderDate.Date <= today, cancellationToken);
+
+            var pendingOrderCount = await salesQuery
+                .CountAsync(x => !pendingExcludedStatuses.Contains(x.SalesOrderStatus), cancellationToken);
+
+            var filteredSaleIds = salesQuery.Select(x => x.SaleId);
+
+            var totalCommissionUnsettled = await
+                (from s in _dbContext.Sales.AsNoTracking()
+                 join l in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals l.SaleId
+                 where filteredSaleIds.Contains(s.SaleId)
+                    && !excludedStatuses.Contains(s.SalesOrderStatus)
+                    && !l.IsCommissionFinalized
+                 select (decimal?)l.CalculatedAgentCommission)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var totalCommissionSettled = await
+                (from s in _dbContext.Sales.AsNoTracking()
+                 join l in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals l.SaleId
+                 where filteredSaleIds.Contains(s.SaleId)
+                    && !excludedStatuses.Contains(s.SalesOrderStatus)
+                    && l.IsCommissionFinalized
+                 select (decimal?)l.FinalAgentCommission)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var receivedCommission = await salesQuery
+                .Where(x => x.IsAgentCommissionDistributed)
+                .Select(x => (decimal?)x.AgentCommissionAmount)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var statusSummary = await salesQuery
+                .GroupBy(x => x.SalesOrderStatus)
+                .Select(g => new AgentDashboardStatusDto
+                {
+                    Status = g.Key,
+                    StatusText = ((SalesOrderStatus)g.Key).ToString(),
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Status)
+                .ToListAsync(cancellationToken);
+
+            //var recentCustomers = await customerQuery
+            //    .Where(x => x.CreatedAt.Date >= last30Days && x.CreatedAt.Date <= today)
+            //    .OrderByDescending(x => x.CreatedAt)
+            //    .Take(10)
+            //    .Select(x => new AgentDashboardCustomerDto
+            //    {
+            //        CustomerId = x.CustomerId,
+            //        CustomerCode = x.CustomerCode ?? "",
+            //        CustomerName = x.DisplayName ?? ((x.FirstName ?? "") + " " + (x.LastName ?? "")).Trim(),
+            //        Mobile = x.Mobile,
+            //        Email = x.Email,
+            //        RegistrationSourceText = ((RegistrationSource)x.RegistrationSource).ToString(),
+            //        CreatedAt = x.CreatedAt
+            //    })
+            //    .ToListAsync(cancellationToken);
+
+            var recentCustomers =
+    await (from c in customerQuery
+           join createdByUser in _dbContext.Users.AsNoTracking()
+                on c.CreatedByUserId equals createdByUser.Id into createdByJoin
+           from createdByUser in createdByJoin.DefaultIfEmpty()
+
+           join createdByProfile in _dbContext.UserProfiles.AsNoTracking()
+                on createdByUser.Id equals createdByProfile.UserId into createdByProfileJoin
+           from createdByProfile in createdByProfileJoin.DefaultIfEmpty()
+
+           join updatedByUser in _dbContext.Users.AsNoTracking()
+                on c.UpdatedByUserId equals updatedByUser.Id into updatedByJoin
+           from updatedByUser in updatedByJoin.DefaultIfEmpty()
+
+           join updatedByProfile in _dbContext.UserProfiles.AsNoTracking()
+                on updatedByUser.Id equals updatedByProfile.UserId into updatedByProfileJoin
+           from updatedByProfile in updatedByProfileJoin.DefaultIfEmpty()
+
+           where c.CreatedAt.Date >= last30Days &&
+                 c.CreatedAt.Date <= today
+
+           orderby c.CreatedAt descending
+
+           select new AgentDashboardCustomerDto
+           {
+               CustomerId = c.CustomerId,
+               CustomerCode = c.CustomerCode ?? "",
+               CustomerName = c.DisplayName ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+               Mobile = c.Mobile,
+               Email = c.Email,
+               RegistrationSourceText = ((RegistrationSource)c.RegistrationSource).ToString(),
+               CreatedAt = c.CreatedAt,
+
+               CreatedByName =
+                   createdByUser == null
+                       ? ""
+                       : ((createdByProfile != null &&
+                           (!string.IsNullOrWhiteSpace(createdByProfile.FirstName) ||
+                            !string.IsNullOrWhiteSpace(createdByProfile.LastName))
+                               ? ((createdByProfile.FirstName ?? "") + " " + (createdByProfile.LastName ?? "")).Trim()
+                               : createdByUser.Email)
+                          + " - " + createdByUser.Email),
+
+               UpdatedByName =
+                   updatedByUser == null
+                       ? ""
+                       : ((updatedByProfile != null &&
+                           (!string.IsNullOrWhiteSpace(updatedByProfile.FirstName) ||
+                            !string.IsNullOrWhiteSpace(updatedByProfile.LastName))
+                               ? ((updatedByProfile.FirstName ?? "") + " " + (updatedByProfile.LastName ?? "")).Trim()
+                               : updatedByUser.Email)
+                          + " - " + updatedByUser.Email)
+           })
+          .Take(10)
+          .ToListAsync(cancellationToken);
+
+            //var recentOrders =
+            //    await (from s in salesQuery
+            //           join c in _dbContext.Customers.AsNoTracking()
+            //                on s.CustomerId equals c.CustomerId
+            //           join p in _dbContext.Providers.AsNoTracking()
+            //                on s.ProviderId equals p.ProviderId into providers
+            //           from provider in providers.DefaultIfEmpty()
+            //           join l in _dbContext.SaleLines.AsNoTracking()
+            //                on s.SaleId equals l.SaleId into lines
+            //           where s.OrderDate.Date >= last30Days
+            //              && s.OrderDate.Date <= today
+            //           orderby s.OrderDate descending
+            //           select new AgentDashboardOrderDto
+            //           {
+            //               SaleId = s.SaleId,
+            //               OrderNo = s.OrderNo,
+            //               OrderDate = s.OrderDate,
+            //               CustomerName = c.DisplayName ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+            //               ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+            //               StatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+            //               OrderTotal = lines.Sum(x => x.LineTotalAmount)
+            //           })
+            //          .Take(10)
+            //          .ToListAsync(cancellationToken);
+
+            var recentOrders =
+    await (from s in salesQuery
+
+           join c in _dbContext.Customers.AsNoTracking()
+                on s.CustomerId equals c.CustomerId
+
+           join p in _dbContext.Providers.AsNoTracking()
+                on s.ProviderId equals p.ProviderId into providers
+           from provider in providers.DefaultIfEmpty()
+
+           join l in _dbContext.SaleLines.AsNoTracking()
+                on s.SaleId equals l.SaleId into lines
+
+           join agent in _dbContext.Agents.AsNoTracking()
+                on s.SoldByAgentId equals agent.AgentId into agentJoin
+           from agent in agentJoin.DefaultIfEmpty()
+
+           join agentUser in _dbContext.Users.AsNoTracking()
+                on agent.UserId equals agentUser.Id into agentUserJoin
+           from agentUser in agentUserJoin.DefaultIfEmpty()
+
+           join agentProfile in _dbContext.UserProfiles.AsNoTracking()
+                on agentUser.Id equals agentProfile.UserId into agentProfileJoin
+           from agentProfile in agentProfileJoin.DefaultIfEmpty()
+
+           join adminUser in _dbContext.Users.AsNoTracking()
+                on s.SoldByUserId equals adminUser.Id into adminUserJoin
+           from adminUser in adminUserJoin.DefaultIfEmpty()
+
+           join adminProfile in _dbContext.UserProfiles.AsNoTracking()
+                on adminUser.Id equals adminProfile.UserId into adminProfileJoin
+           from adminProfile in adminProfileJoin.DefaultIfEmpty()
+
+           where s.OrderDate.Date >= last30Days &&
+                 s.OrderDate.Date <= today
+
+           orderby s.OrderDate descending
+
+           select new AgentDashboardOrderDto
+           {
+               SaleId = s.SaleId,
+               OrderNo = s.OrderNo,
+               OrderDate = s.OrderDate,
+               CustomerName = c.DisplayName ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+               ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+               StatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+               OrderTotal = lines.Sum(x => x.LineTotalAmount),
+
+               AgentDisplayName =
+                   agent == null
+                       ? ""
+                       : agent.AgentCode + " - " +
+                         (agentProfile != null &&
+                          (!string.IsNullOrWhiteSpace(agentProfile.FirstName) ||
+                           !string.IsNullOrWhiteSpace(agentProfile.LastName))
+                            ? ((agentProfile.FirstName ?? "") + " " + (agentProfile.LastName ?? "")).Trim()
+                            : agentUser.Email),
+
+               AdminDisplayName =
+                   adminUser == null
+                       ? ""
+                       : ((adminProfile != null &&
+                           (!string.IsNullOrWhiteSpace(adminProfile.FirstName) ||
+                            !string.IsNullOrWhiteSpace(adminProfile.LastName))
+                               ? ((adminProfile.FirstName ?? "") + " " + (adminProfile.LastName ?? "")).Trim()
+                               : adminUser.Email)
+                          + " - " + adminUser.Email)
+           })
+          .Take(10)
+          .ToListAsync(cancellationToken);
+
+            return new AdminDashboardDto
+            {
+                TotalCustomerCount = totalCustomerCount,
+                TotalSalesOrderCount = totalSalesOrderCount,
+                OrdersThisMonthCount = ordersThisMonthCount,
+                PendingOrderCount = pendingOrderCount,
+                TotalCommissionUnsettled = totalCommissionUnsettled,
+                TotalCommissionSettled = totalCommissionSettled,
+                ReceivedCommission = receivedCommission,
+                StatusSummary = statusSummary,
+                RecentCustomers = recentCustomers,
+                RecentOrders = recentOrders,
+                SelectedAgentUserId = agentUserId,
+                SelectedAdminUserId = adminUserId,
+                AgentOptions = await GetAgentUserOptionsAsync(cancellationToken),
+                AdminOptions = await GetAdminUserOptionsAsync(cancellationToken)
+            };
+        }
+
+        // END Admin Dashboard
 
         // END
 

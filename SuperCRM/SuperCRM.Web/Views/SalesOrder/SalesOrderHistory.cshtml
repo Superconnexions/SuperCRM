@@ -18,6 +18,28 @@
         min-height: calc(100vh - 70px);
     }
 
+    /* Font setting */
+
+    .history-title {
+        color: #0d47ff;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        font-size: 18pt;
+    }
+
+    .history-subtitle {
+        color: #b5b5b5;
+        font-size: 14pt;
+    }
+
+    .dashboard-table thead th {
+        font-size: 10pt;
+        font-weight: 800;
+    }
+
+    /* END Font setting */
+
     .history-title {
         color: #0d47ff;
         font-weight: 900;
@@ -119,13 +141,22 @@
             background: #17191b;
         }
 
-            .history-table tbody tr:nth-child(even) {
-                background: #1b1d20;
-            }
+    .history-table tbody tr:nth-child(even) {
+        background: #1b1d20;
+    }
 
-            .history-table tbody tr:hover {
-                background: #20242b;
-            }
+    .history-table tbody tr:hover {
+        background: #2c3440 !important;
+        color: #ffffff !important;
+    }
+
+    .history-table tbody tr:hover td {
+        color: #ffffff !important;
+    }
+
+    .history-table tbody tr:hover a {
+        color: #66a3ff !important;
+    }
 
     .link-blue {
         color: #0d6efd;

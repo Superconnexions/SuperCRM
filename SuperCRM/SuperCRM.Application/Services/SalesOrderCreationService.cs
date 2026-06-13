@@ -688,6 +688,19 @@ namespace SuperCRM.Application.Services
                 cancellationToken);
         }
 
+        public Task<AdminDashboardDto> GetAdminDashboardAsync(
+        string searchMode,
+        Guid? agentUserId,
+        Guid? adminUserId,
+        CancellationToken cancellationToken = default)
+        {
+            return _repository.GetAdminDashboardAsync(
+                searchMode,
+                agentUserId,
+                adminUserId,
+                cancellationToken);
+        }
+
         // END
     }
 }

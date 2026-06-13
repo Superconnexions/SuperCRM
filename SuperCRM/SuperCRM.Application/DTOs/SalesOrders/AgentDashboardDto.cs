@@ -21,6 +21,7 @@
         public byte Status { get; set; }
         public string StatusText { get; set; } = "";
         public int Count { get; set; }
+
     }
 
     public class AgentDashboardCustomerDto
@@ -32,6 +33,8 @@
         public string? Email { get; set; }
         public string RegistrationSourceText { get; set; } = "";
         public DateTime CreatedAt { get; set; }
+        public string? CreatedByName { get; set; }
+        public string? UpdatedByName { get; set; }
     }
 
     public class AgentDashboardOrderDto
@@ -43,5 +46,7 @@
         public string ProviderName { get; set; } = "";
         public string StatusText { get; set; } = "";
         public decimal OrderTotal { get; set; }
+        public string? AgentDisplayName { get; set; }
+        public string? AdminDisplayName { get; set; }
     }
 }

@@ -68,5 +68,19 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Guid currentUserId,
         CancellationToken cancellationToken = default);
 
+        Task<AdminDashboardDto> GetAdminDashboardAsync(
+        string searchMode,
+        Guid? agentUserId,
+        Guid? adminUserId,
+        CancellationToken cancellationToken = default);
+
+        Task<List<DashboardUserOptionDto>> GetAgentUserOptionsAsync(
+            CancellationToken cancellationToken = default);
+
+        Task<List<DashboardUserOptionDto>> GetAdminUserOptionsAsync(
+            CancellationToken cancellationToken = default);
+
+        // END
+
     }
 }
