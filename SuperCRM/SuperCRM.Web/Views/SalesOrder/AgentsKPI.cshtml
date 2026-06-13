@@ -1,0 +1,262 @@
+﻿@model SuperCRM.Web.ViewModels.SalesOrders.AgentsKpiViewModel
+
+@{
+    ViewData["Title"] = "Agents KPI";
+    var startRecord = Model.TotalRecords == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    var endRecord = Math.Min(Model.Page * Model.PageSize, Model.TotalRecords);
+}
+
+<div class="crm-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="crm-title mb-1">Agents KPI</h3>
+            <small class="crm-subtitle">
+                Showing @startRecord - @endRecord of @Model.TotalRecords agents
+            </small>
+        </div>
+
+        <span class="badge bg-primary px-3 py-2">Admin View</span>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form asp-action="AgentsKPI"
+          asp-controller="SalesOrder"
+          method="get"
+          id="agentsKpiSearchForm"
+          class="crm-search-panel">
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-3">
+                <label class="form-label">Order Date From</label>
+                <div class="crm-date-wrap">
+                    <input type="date"
+                           id="orderDateFrom"
+                           name="orderDateFrom"
+                           value="@Model.OrderDateFrom.ToString("yyyy-MM-dd")"
+                           class="form-control"
+                           required />
+                    <button type="button" class="crm-date-btn">
+                        <i class="bi bi-calendar3"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Order Date To</label>
+                <div class="crm-date-wrap">
+                    <input type="date"
+                           id="orderDateTo"
+                           name="orderDateTo"
+                           value="@Model.OrderDateTo.ToString("yyyy-MM-dd")"
+                           class="form-control"
+                           required />
+                    <button type="button" class="crm-date-btn">
+                        <i class="bi bi-calendar3"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Agent</label>
+                <select name="agentId" class="form-select">
+                    <option value="">All Agents</option>
+                    @foreach (var item in Model.AgentOptions)
+                    {
+                        <option value="@item.Value" selected="@(Model.AgentId?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Sales Order Status</label>
+                <select name="salesOrderStatus" class="form-select">
+                    <option value="">All Status</option>
+                    @foreach (var item in Model.StatusOptions)
+                    {
+                        <option value="@item.Value" selected="@(Model.SalesOrderStatus?.ToString() == item.Value)">
+                            @item.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">Page Size</label>
+                <select name="pageSize" class="form-select">
+                    <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                    <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                    <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                    <option value="100" selected="@(Model.PageSize == 100)">100</option>
+                </select>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <input type="hidden" name="page" value="1" />
+                <button type="submit" class="btn btn-primary">
+                    Search
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="crm-grid-panel">
+        <div class="table-responsive">
+            <table class="crm-grid-table">
+                <thead>
+                    <tr>
+                        <th>Agent Code</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th class="text-end">Total Customer</th>
+                        <th class="text-end">Total Sales Order</th>
+                        <th class="text-end">Commission (Unsettled)</th>
+                        <th class="text-end">Commission (Settled)</th>
+                        <th class="text-end">Commission Distributed</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center crm-subtitle py-4">
+                                No agent KPI found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        var index = 0;
+
+                        foreach (var item in Model.Items)
+                        {
+                            var modalId = $"agentStatusModal_{index}";
+
+                            <tr>
+                                <td><strong>@item.AgentCode</strong></td>
+                                <td>@item.FullName</td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(item.Email))
+                                    {
+                                        <a href="mailto:@item.Email">@item.Email</a>
+                                    }
+                                </td>
+                                <td>@item.Mobile</td>
+                                <td class="text-end">@item.TotalCustomer.ToString("N0")</td>
+                                <td class="text-end">
+                                    <a href="#"
+                                       class="crm-status-badge text-decoration-none"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#@modalId">
+                                        @item.TotalSalesOrder.ToString("N0")
+                                    </a>
+                                </td>
+                                <td class="text-end">@item.CommissionUnsettled.ToString("N2")</td>
+                                <td class="text-end">@item.CommissionSettled.ToString("N2")</td>
+                                <td class="text-end">@item.CommissionDistributed.ToString("N2")</td>
+                            </tr>
+
+                            index++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@{
+    var modalIndex = 0;
+}
+
+@foreach (var item in Model.Items)
+{
+    var modalId = $"agentStatusModal_{modalIndex}";
+
+    <div class="modal fade crm-modal" id="@modalId" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        Sales Order Status Summary - @item.AgentCode
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Agent:</strong> @item.FullName<br />
+                        <strong>Email:</strong> @item.Email
+                    </div>
+
+                    <table class="crm-grid-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th class="text-end">Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!item.StatusCounts.Any())
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center crm-subtitle py-3">
+                                        No sales order found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var status in item.StatusCounts)
+                                {
+                                    <tr>
+                                        <td>@status.StatusText</td>
+                                        <td class="text-end">@status.Count.ToString("N0")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    modalIndex++;
+}
+
+@section Scripts {
+    <script>
+        document.getElementById('agentsKpiSearchForm')
+            ?.addEventListener('submit', function (e) {
+
+                const fromDate = document.getElementById('orderDateFrom')?.value;
+                const toDate = document.getElementById('orderDateTo')?.value;
+
+                if (fromDate > toDate) {
+                    alert('Order Date From cannot be greater than Order Date To.');
+                    e.preventDefault();
+                    return false;
+                }
+            });
+    </script>
+}

@@ -1478,6 +1478,86 @@ namespace SuperCRM.Web.Controllers
             return html;
         }
 
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin")]
+        public async Task<IActionResult> AgentsKPI(
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        Guid? agentId,
+        byte? salesOrderStatus,
+        int page = 1,
+        int pageSize = 20,
+        CancellationToken cancellationToken = default)
+        {
+            var toDate = orderDateTo?.Date ?? DateTime.Today;
+            var fromDate = orderDateFrom?.Date ?? toDate.AddDays(-90);
+
+            if (fromDate > toDate)
+            {
+                TempData["ErrorMessage"] =
+                    "Order Date From cannot be greater than Order Date To.";
+
+                return RedirectToAction(nameof(AgentsKPI));
+            }
+
+            var dto = await _salesOrderCreationService.GetAgentsKpiAsync(
+                fromDate,
+                toDate,
+                agentId,
+                salesOrderStatus,
+                page,
+                pageSize,
+                cancellationToken);
+
+            var model = new AgentsKpiViewModel
+            {
+                OrderDateFrom = dto.OrderDateFrom,
+                OrderDateTo = dto.OrderDateTo,
+                AgentId = dto.AgentId,
+                SalesOrderStatus = dto.SalesOrderStatus,
+                Page = dto.Page,
+                PageSize = dto.PageSize,
+                TotalRecords = dto.TotalRecords,
+
+                AgentOptions = dto.AgentOptions.Select(x => new SelectListItem
+                {
+                    Value = x.AgentId.ToString(),
+                    Text = $"{x.AgentCode} - {x.FullName}"
+                }).ToList(),
+
+                StatusOptions = Enum.GetValues(typeof(SalesOrderStatus))
+                    .Cast<SalesOrderStatus>()
+                    .Select(x => new SelectListItem
+                    {
+                        Value = ((byte)x).ToString(),
+                        Text = x.ToString()
+                    })
+                    .ToList(),
+
+                Items = dto.Items.Select(x => new AgentsKpiRowViewModel
+                {
+                    AgentId = x.AgentId,
+                    AgentCode = x.AgentCode,
+                    FullName = x.FullName,
+                    Email = x.Email,
+                    Mobile = x.Mobile,
+                    TotalCustomer = x.TotalCustomer,
+                    TotalSalesOrder = x.TotalSalesOrder,
+                    CommissionUnsettled = x.CommissionUnsettled,
+                    CommissionSettled = x.CommissionSettled,
+                    CommissionDistributed = x.CommissionDistributed,
+                    StatusCounts = x.StatusCounts.Select(s => new AgentsKpiStatusCountViewModel
+                    {
+                        Status = s.Status,
+                        StatusText = s.StatusText,
+                        Count = s.Count
+                    }).ToList()
+                }).ToList()
+            };
+
+            return View(model);
+        }
         // END
 
     }

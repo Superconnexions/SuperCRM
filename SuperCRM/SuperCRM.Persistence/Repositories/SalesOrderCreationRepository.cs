@@ -1005,6 +1005,167 @@ namespace SuperCRM.Persistence.Repositories
 
         // END Admin Dashboard
 
+        public async Task<AgentsKpiDto> GetAgentsKpiAsync(
+        DateTime orderDateFrom,
+        DateTime orderDateTo,
+        Guid? agentId,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+        {
+            page = page <= 0 ? 1 : page;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+
+            var fromDate = orderDateFrom.Date;
+            var toDate = orderDateTo.Date.AddDays(1).AddTicks(-1);
+
+            var excludedStatusesForCommission = new byte[]
+            {
+            (byte)SalesOrderStatus.ProviderRejected,
+            (byte)SalesOrderStatus.Cancelled,
+            (byte)SalesOrderStatus.OnHold
+            };
+
+            var agentQuery =
+                from agent in _dbContext.Agents.AsNoTracking()
+                join user in _dbContext.Users.AsNoTracking()
+                    on agent.UserId equals user.Id
+                join profile in _dbContext.UserProfiles.AsNoTracking()
+                    on user.Id equals profile.UserId into profileJoin
+                from profile in profileJoin.DefaultIfEmpty()
+                orderby agent.AgentCode
+                select new
+                {
+                    agent.AgentId,
+                    agent.UserId,
+                    agent.AgentCode,
+                    user.Email,
+                    FirstName = profile != null ? profile.FirstName : "",
+                    LastName = profile != null ? profile.LastName : "",
+                    MobileNo = profile != null ? profile.MobileNo : ""
+                };
+
+            if (agentId.HasValue)
+            {
+                agentQuery = agentQuery.Where(x => x.AgentId == agentId.Value);
+            }
+
+            var totalRecords = await agentQuery.CountAsync(cancellationToken);
+
+            var agents = await agentQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            var rows = new List<AgentsKpiRowDto>();
+
+            foreach (var agent in agents)
+            {
+                var salesQuery = _dbContext.Sales.AsNoTracking()
+                    .Where(s =>
+                        s.SoldByAgentId == agent.AgentId &&
+                        s.OrderDate >= fromDate &&
+                        s.OrderDate <= toDate);
+
+                if (salesOrderStatus.HasValue)
+                {
+                    salesQuery = salesQuery.Where(s =>
+                        s.SalesOrderStatus == salesOrderStatus.Value);
+                }
+
+                var totalSalesOrder = await salesQuery.CountAsync(cancellationToken);
+
+                var totalCustomer = await _dbContext.Customers.AsNoTracking()
+                    .CountAsync(c =>
+                        c.CreatedByUserId == agent.UserId ||
+                        c.UpdatedByUserId == agent.UserId,
+                        cancellationToken);
+
+                var commissionUnsettled = await
+                    (from sale in salesQuery
+                     join line in _dbContext.SaleLines.AsNoTracking()
+                        on sale.SaleId equals line.SaleId
+                     where !line.IsCommissionFinalized
+                        && !excludedStatusesForCommission.Contains(sale.SalesOrderStatus)
+                     select (decimal?)line.CalculatedAgentCommission)
+                    .SumAsync(cancellationToken) ?? 0m;
+
+                var commissionSettled = await
+                    (from sale in salesQuery
+                     join line in _dbContext.SaleLines.AsNoTracking()
+                        on sale.SaleId equals line.SaleId
+                     where line.IsCommissionFinalized
+                        && !excludedStatusesForCommission.Contains(sale.SalesOrderStatus)
+                     select (decimal?)line.FinalAgentCommission)
+                    .SumAsync(cancellationToken) ?? 0m;
+
+                var commissionDistributed = await salesQuery
+                    .Where(s => s.IsAgentCommissionDistributed)
+                    .Select(s => (decimal?)s.AgentCommissionAmount)
+                    .SumAsync(cancellationToken) ?? 0m;
+
+                var statusCounts = await salesQuery
+                    .GroupBy(s => s.SalesOrderStatus)
+                    .Select(g => new AgentsKpiStatusCountDto
+                    {
+                        Status = g.Key,
+                        StatusText = ((SalesOrderStatus)g.Key).ToString(),
+                        Count = g.Count()
+                    })
+                    .OrderBy(x => x.Status)
+                    .ToListAsync(cancellationToken);
+
+                rows.Add(new AgentsKpiRowDto
+                {
+                    AgentId = agent.AgentId,
+                    AgentCode = agent.AgentCode,
+                    FullName = ((agent.FirstName ?? "") + " " + (agent.LastName ?? "")).Trim(),
+                    Email = agent.Email ?? "",
+                    Mobile = agent.MobileNo,
+                    TotalCustomer = totalCustomer,
+                    TotalSalesOrder = totalSalesOrder,
+                    CommissionUnsettled = commissionUnsettled,
+                    CommissionSettled = commissionSettled,
+                    CommissionDistributed = commissionDistributed,
+                    StatusCounts = statusCounts
+                });
+            }
+
+            var agentOptions = await
+                (from agent in _dbContext.Agents.AsNoTracking()
+                 join user in _dbContext.Users.AsNoTracking()
+                    on agent.UserId equals user.Id
+                 join profile in _dbContext.UserProfiles.AsNoTracking()
+                    on user.Id equals profile.UserId into profileJoin
+                 from profile in profileJoin.DefaultIfEmpty()
+                 orderby agent.AgentCode
+                 select new AgentsKpiAgentOptionDto
+                 {
+                     AgentId = agent.AgentId,
+                     AgentCode = agent.AgentCode,
+                     FullName =
+                        profile != null &&
+                        (!string.IsNullOrWhiteSpace(profile.FirstName) ||
+                         !string.IsNullOrWhiteSpace(profile.LastName))
+                            ? ((profile.FirstName ?? "") + " " + (profile.LastName ?? "")).Trim()
+                            : user.Email ?? ""
+                 })
+                .ToListAsync(cancellationToken);
+
+            return new AgentsKpiDto
+            {
+                OrderDateFrom = orderDateFrom,
+                OrderDateTo = orderDateTo,
+                AgentId = agentId,
+                SalesOrderStatus = salesOrderStatus,
+                Page = page,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                AgentOptions = agentOptions,
+                Items = rows
+            };
+        }
         // END
 
     }

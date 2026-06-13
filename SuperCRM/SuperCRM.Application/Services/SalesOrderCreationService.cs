@@ -701,6 +701,25 @@ namespace SuperCRM.Application.Services
                 cancellationToken);
         }
 
+        public Task<AgentsKpiDto> GetAgentsKpiAsync(
+        DateTime orderDateFrom,
+        DateTime orderDateTo,
+        Guid? agentId,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+        {
+            return _repository.GetAgentsKpiAsync(
+                orderDateFrom,
+                orderDateTo,
+                agentId,
+                salesOrderStatus,
+                page,
+                pageSize,
+                cancellationToken);
+        }
+
         // END
     }
 }

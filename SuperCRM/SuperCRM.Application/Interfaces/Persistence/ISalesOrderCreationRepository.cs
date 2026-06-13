@@ -80,6 +80,15 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task<List<DashboardUserOptionDto>> GetAdminUserOptionsAsync(
             CancellationToken cancellationToken = default);
 
+        Task<AgentsKpiDto> GetAgentsKpiAsync(
+        DateTime orderDateFrom,
+        DateTime orderDateTo,
+        Guid? agentId,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
         // END
 
     }

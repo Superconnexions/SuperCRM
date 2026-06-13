@@ -64,6 +64,15 @@ namespace SuperCRM.Application.Interfaces.Services
         Guid? adminUserId,
         CancellationToken cancellationToken = default);
 
+        Task<AgentsKpiDto> GetAgentsKpiAsync(
+        DateTime orderDateFrom,
+        DateTime orderDateTo,
+        Guid? agentId,
+        byte? salesOrderStatus,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
         // END
 
     }
