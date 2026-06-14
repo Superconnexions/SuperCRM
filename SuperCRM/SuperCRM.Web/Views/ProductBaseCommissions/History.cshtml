@@ -4,13 +4,19 @@
     ViewData["Title"] = "Commission History";
 }
 
-<h1>Commission History</h1>
+<div class="crm-page">
+
+
+<h1 class="crm-page-title">Commission History</h1>
 
 <p>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </p>
 
-<table class="table table-bordered table-striped">
+
+<div class="crm-grid-panel">
+
+    <table class="crm-grid-table">
     <thead>
         <tr>
             <th>Changed At</th>
@@ -47,4 +53,6 @@
         <tr><td colspan="9" class="text-center">No history found.</td></tr>
     }
     </tbody>
-</table>
+    </table>
+</div>
+</div>

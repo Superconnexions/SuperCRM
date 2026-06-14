@@ -4,49 +4,65 @@
     ViewData["Title"] = "Edit Admin User";
 }
 
-<h2>Edit Admin User</h2>
+<div class="crm-form-page">
 
-<span asp-validation-for="IsActive" class="text-danger"></span>
+    <h2 class="crm-form-title">
+        Edit Admin User
+    </h2>
 
-<form asp-action="Edit" method="post">
-    <input asp-for="UserId" type="hidden" />
+    <span asp-validation-for="IsActive" class="text-danger"></span>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form asp-action="Edit"
+          method="post"
+          class="crm-form-panel">
 
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+        <input asp-for="UserId" type="hidden" />
 
-    <div class="mb-3">
-        <label asp-for="UserName" class="form-label"></label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
-    </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="mb-3">
-        <label asp-for="SelectedRole" class="form-label"></label>
-        <select asp-for="SelectedRole" class="form-select">
-            <option value="">-- Select Role --</option>
-            @foreach (var role in Model.AvailableRoles)
-            {
-                <option value="@role">@role</option>
-            }
-        </select>
-        <span asp-validation-for="SelectedRole" class="text-danger"></span>
-    </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
 
-    <div class="form-check mb-3">
-        <input asp-for="IsActive" class="form-check-input" />
-        <label asp-for="IsActive" class="form-check-label"></label>
-    </div>
+        <div class="mb-3">
+            <label asp-for="UserName" class="form-label"></label>
+            <input asp-for="UserName" class="form-control" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="SelectedRole" class="form-label"></label>
+            <select asp-for="SelectedRole" class="form-select">
+                <option value="">-- Select Role --</option>
+                @foreach (var role in Model.AvailableRoles)
+                {
+                    <option value="@role">@role</option>
+                }
+            </select>
+            <span asp-validation-for="SelectedRole" class="text-danger"></span>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <button type="submit" class="btn btn-primary">
+            Update
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Back
+        </a>
+
+    </form>
+
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

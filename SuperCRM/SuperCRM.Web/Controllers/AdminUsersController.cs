@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SuperCRM.Application.Interfaces.Persistence;
 using SuperCRM.Persistence.Identity;
 using SuperCRM.Shared;
 using SuperCRM.Web.ViewModels.AdminUsers;
@@ -9,18 +10,21 @@ using System.Security.Claims;
 
 namespace SuperCRM.Web.Controllers
 {
-    [Authorize(Roles = AppRoles.SuperAdmin)]
+    [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.SuperCRMAdmin)]
     public class AdminUsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IAgentRegistrationRepository _userProfileRepository;
 
         public AdminUsersController(
             UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager)
+            RoleManager<ApplicationRole> roleManager,
+            IAgentRegistrationRepository repository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _userProfileRepository = repository;
         }
 
         public async Task<IActionResult> Index()

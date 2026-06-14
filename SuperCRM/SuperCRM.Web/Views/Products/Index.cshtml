@@ -4,18 +4,30 @@
     ViewData["Title"] = "Products";
 }
 
-<h2>Products</h2>
+<div class="crm-page">
+
+<h2 class="crm-page-title">Products</h2>
 
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 
+@* 
 <p>
     <a asp-action="Create" class="btn btn-primary">Add Product</a>
-</p>
+</p> *@
 
-<table class="table table-bordered table-striped">
+<div class="mb-3 text-end">
+    <a asp-action="Create"
+       class="btn btn-success">
+            Add Product
+    </a>
+</div>
+
+<div class="crm-grid-panel">
+
+<table class="crm-grid-table">
     <thead>
         <tr>
             <th>Product Code</th>
@@ -52,4 +64,5 @@
     }
     </tbody>
 </table>
+</div>
 

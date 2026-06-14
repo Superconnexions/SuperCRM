@@ -338,7 +338,7 @@
                 <select name="agentUserId"
                         class="form-select filter-control">
 
-                    <option value="">Select Agent</option>
+                    <option value="">All Agents</option>
 
                     @foreach (var item in Model.AgentOptions)
                     {
@@ -357,7 +357,7 @@
                         name="searchMode"
                         value="Agent"
                         class="btn btn-search-agent">
-                    Search Agent
+                    Search By Agent
                 </button>
 
             </div>
@@ -371,7 +371,7 @@
                 <select name="adminUserId"
                         class="form-select filter-control">
 
-                    <option value="">Select Admin</option>
+                    <option value="">All Admin</option>
 
                     @foreach (var item in Model.AdminOptions)
                     {
@@ -390,7 +390,7 @@
                         name="searchMode"
                         value="Admin"
                         class="btn btn-search-admin">
-                    Search Admin
+                    Search by Admin
                 </button>
 
             </div>
@@ -401,7 +401,7 @@
                         name="searchMode"
                         value="All"
                         class="btn btn-search-all">
-                    Search All
+                    Search All Admin and Agents
                 </button>
 
             </div>
