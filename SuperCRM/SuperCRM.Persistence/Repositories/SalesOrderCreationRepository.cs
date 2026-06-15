@@ -805,6 +805,11 @@ namespace SuperCRM.Persistence.Repositories
                 .Select(x => (decimal?)x.AgentCommissionAmount)
                 .SumAsync(cancellationToken) ?? 0m;
 
+            var receivedCommissionBySuperCRM = await salesQuery
+                .Where(x => x.IsProviderCommissionReceived)
+                .Select(x => (decimal?)x.ProviderCommissionEarned)
+                .SumAsync(cancellationToken) ?? 0m;
+
             var statusSummary = await salesQuery
                 .GroupBy(x => x.SalesOrderStatus)
                 .Select(g => new AgentDashboardStatusDto
@@ -993,6 +998,7 @@ namespace SuperCRM.Persistence.Repositories
                 TotalCommissionUnsettled = totalCommissionUnsettled,
                 TotalCommissionSettled = totalCommissionSettled,
                 ReceivedCommission = receivedCommission,
+                ReceivedCommissionBySuperCRM = receivedCommissionBySuperCRM,
                 StatusSummary = statusSummary,
                 RecentCustomers = recentCustomers,
                 RecentOrders = recentOrders,

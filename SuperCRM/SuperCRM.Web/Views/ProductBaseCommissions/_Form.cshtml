@@ -50,6 +50,11 @@
     <span asp-validation-for="CurrencyCode" class="text-danger"></span>
 </div>
 
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+</div>
+
 <div class="mb-3">
     <label asp-for="Note" class="form-label"></label>
     <textarea asp-for="Note" class="form-control" rows="3"></textarea>

@@ -100,7 +100,8 @@ namespace SuperCRM.Web.Controllers
                 Note = dto.Note,
                 CurrencyCode = dto.CurrencyCode,
                 EffectiveFrom = dto.EffectiveFrom,
-                EffectiveTo = dto.EffectiveTo
+                EffectiveTo = dto.EffectiveTo,
+                IsActive = dto.IsActive
             };
 
             await BindProductsAsync(vm, cancellationToken);
@@ -130,6 +131,7 @@ namespace SuperCRM.Web.Controllers
                 Percentage = vm.Percentage,
                 EffectiveFrom = vm.EffectiveFrom,
                 EffectiveTo = vm.EffectiveTo,
+                IsActive = vm.IsActive,
                 CurrencyCode = vm.CurrencyCode,               
                 UpdatedByUserId = userId,
                 Note = vm.Note

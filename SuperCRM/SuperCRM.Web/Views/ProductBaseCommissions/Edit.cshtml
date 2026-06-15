@@ -4,14 +4,18 @@
     ViewData["Title"] = "Edit Product Base Commission";
 }
 
-<h1>Edit Product Base Commission</h1>
+<div class="crm-form-page">
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="ProductBaseCommissionId" />
-    <partial name="_Form" model="Model" />
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
+    <h1 class="crm-form-title">Edit Product Base Commission</h1>
+
+    <form asp-action="Edit" method="post" class="crm-form-panel">
+        <input type="hidden" asp-for="ProductBaseCommissionId" />
+        <partial name="_Form" model="Model" />
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </form>
+
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

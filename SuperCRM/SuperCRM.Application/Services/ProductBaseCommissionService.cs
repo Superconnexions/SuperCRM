@@ -134,6 +134,7 @@ namespace SuperCRM.Application.Services
             entity.Percentage = history.NewPercentage;
             entity.EffectiveFrom = request.EffectiveFrom;
             entity.EffectiveTo = request.EffectiveTo;
+            entity.IsActive = request.IsActive;
             entity.Note = request.Note;
             entity.CurrencyCode = request.CurrencyCode;
             entity.UpdatedAt = DateTime.UtcNow;

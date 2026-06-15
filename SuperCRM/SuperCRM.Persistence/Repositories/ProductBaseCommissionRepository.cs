@@ -21,8 +21,8 @@ namespace SuperCRM.Persistence.Repositories
                 .Include(x => x.Product)
                 .AsQueryable();
 
-            if (!includeInactive)
-                query = query.Where(x => x.IsActive);
+            //if (!includeInactive)
+            //    query = query.Where(x => x.IsActive);
 
             if (!string.IsNullOrWhiteSpace(productKeyword))
             {

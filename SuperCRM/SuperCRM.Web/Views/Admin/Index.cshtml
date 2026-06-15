@@ -401,7 +401,7 @@
                         name="searchMode"
                         value="All"
                         class="btn btn-search-all">
-                    Search All Admin and Agents
+                    All Admin & Agents
                 </button>
 
             </div>
@@ -453,7 +453,7 @@
             <div class="metric-card">
                 <div class="metric-label">Total Commission (Unsettled)</div>
                 <div class="metric-value">@Model.TotalCommissionUnsettled.ToString("N2")</div>
-                <div class="metric-note">Calculated, not finalized</div>
+                <div class="metric-note">Calculated, not finalized for agent</div>
             </div>
         </div>
 
@@ -461,15 +461,23 @@
             <div class="metric-card">
                 <div class="metric-label">Total Commission (Settled)</div>
                 <div class="metric-value">@Model.TotalCommissionSettled.ToString("N2")</div>
-                <div class="metric-note">Finalized commission</div>
+                <div class="metric-note">Finalized commission for agent</div>
             </div>
         </div>
 
         <div class="col-md-3">
             <div class="metric-card">
-                <div class="metric-label">Received Commission</div>
+                <div class="metric-label">Received Commission by Agent</div>
                 <div class="metric-value">@Model.ReceivedCommission.ToString("N2")</div>
-                <div class="metric-note">Distributed to agent</div>
+                <div class="metric-note">Distribute to Agent</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-label">Received Commission by SuperCRM</div>
+                <div class="metric-value">@Model.ReceivedCommissionBySuperCRM.ToString("N2")</div>
+                <div class="metric-note">Distribute to SuperCRM</div>
             </div>
         </div>
 

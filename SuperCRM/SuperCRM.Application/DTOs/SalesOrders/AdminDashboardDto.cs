@@ -11,6 +11,8 @@
         public decimal TotalCommissionSettled { get; set; }
         public decimal ReceivedCommission { get; set; }
 
+        public decimal ReceivedCommissionBySuperCRM { get; set; }
+
         public Guid? SelectedAgentUserId { get; set; }
         public Guid? SelectedAdminUserId { get; set; }
 

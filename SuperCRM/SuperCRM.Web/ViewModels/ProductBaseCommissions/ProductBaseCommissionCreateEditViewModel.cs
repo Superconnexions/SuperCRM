@@ -31,7 +31,11 @@ namespace SuperCRM.Web.ViewModels.ProductBaseCommissions
         [Display(Name = "Note")]
         [StringLength(500)]
         public string? Note { get; set; }
-        
+
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; } = true;
+
+
         [Required(ErrorMessage = "Currency is required.")]
         [Display(Name = "Currency")]
         public string CurrencyCode { get; set; } = string.Empty;

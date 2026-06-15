@@ -28,7 +28,7 @@ ViewData["Title"] = "Product Base Commission";
                    placeholder="Product code or product name" />
         </div>
 
-        <div class="col-md-2">
+       @*  <div class="col-md-2">
             <label asp-for="EffectiveFrom" class="form-label"></label>
             <input asp-for="EffectiveFrom"
                    type="date"
@@ -40,8 +40,8 @@ ViewData["Title"] = "Product Base Commission";
             <input asp-for="EffectiveTo"
                    type="date"
                    class="form-control" />
-        </div>
-
+        </div> *@
+@* 
         <div class="col-md-2 d-flex align-items-end">
             <div class="form-check">
                 <input asp-for="IncludeInactive"
@@ -51,7 +51,7 @@ ViewData["Title"] = "Product Base Commission";
                 </label>
             </div>
         </div>
-
+ *@
         <div class="col-md-2 d-flex align-items-end gap-2">
             <button type="submit"
                     class="btn crm-grid-btn-primary">
@@ -127,7 +127,7 @@ ViewData["Title"] = "Product Base Commission";
                             <a asp-action="History"
                                asp-route-id="@item.ProductBaseCommissionId"
                                class="btn btn-sm btn-info">
-                                History
+                                Change History
                             </a>
                         </td>
                     </tr>

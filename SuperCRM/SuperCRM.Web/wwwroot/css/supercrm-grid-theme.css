@@ -118,7 +118,7 @@
     }
 
 /* Make native date calendar icon clearly visible on dark inputs */
-input[type="date"] {
+/*input[type="date"] {
     color-scheme: dark;
 }
 
@@ -126,7 +126,7 @@ input[type="date"] {
         filter: invert(1) brightness(1.8);
         opacity: 1;
         cursor: pointer;
-    }
+    }*/
 
 .crm-date-wrap input[type="date"] {
     color-scheme: dark;
