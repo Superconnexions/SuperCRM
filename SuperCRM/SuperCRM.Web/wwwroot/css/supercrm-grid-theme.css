@@ -911,6 +911,94 @@
         background: #e0a800;
         color: #000;
     }
+/* =========================================
+   CRM PAGINATION
+   ========================================= */
+
+.crm-pagination {
+    margin-top: 25px;
+}
+
+    .crm-pagination .pagination {
+        justify-content: center;
+        margin-bottom: 0;
+    }
+
+    .crm-pagination .page-item {
+        margin: 0 3px;
+    }
+
+    .crm-pagination .page-link {
+        background: #17191b;
+        border: 1px solid #3b3f44;
+        color: #ffffff;
+        min-width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        border-radius: 8px;
+        transition: .2s ease;
+    }
+
+        .crm-pagination .page-link:hover {
+            background: #0d6efd;
+            color: #ffffff;
+            border-color: #0d6efd;
+        }
+
+    .crm-pagination .page-item.active .page-link {
+        background: #0d6efd;
+        color: #ffffff;
+        border-color: #0d6efd;
+    }
+
+    .crm-pagination .page-item.disabled .page-link {
+        background: #242628;
+        color: #6c757d;
+        border-color: #3b3f44;
+        cursor: not-allowed;
+    }
+
+    .crm-pagination .page-link:focus {
+        box-shadow: none;
+    }
+
+
+/* =========================================
+   COMMON BUTTONS
+   ========================================= */
+
+.crm-btn-primary {
+    background: linear-gradient(90deg,#183f94,#0078ff);
+    border: 1px solid #0d6efd;
+    color: #fff;
+    font-weight: 700;
+}
+
+    .crm-btn-primary:hover {
+        background: linear-gradient(90deg,#123172,#0062d1);
+        color: #fff;
+    }
+
+.crm-btn-secondary {
+    font-weight: 700;
+}
+
+.crm-btn-warning {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+    font-weight: 700;
+}
+
+    .crm-btn-warning:hover {
+        background: #e0a800;
+        color: #000;
+    }
+
+
 
 /* Mobile */
 

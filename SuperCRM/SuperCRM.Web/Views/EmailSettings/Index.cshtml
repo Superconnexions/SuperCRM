@@ -4,54 +4,93 @@
     ViewData["Title"] = "Email Settings";
 }
 
-<h1>Email Settings</h1>
+<div class="crm-page">
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
+    <h1 class="crm-page-title">
+        Email Settings
+    </h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-success">Create New</a>
-    <a asp-action="Test" class="btn btn-primary">Send Test Email</a>
-    <a asp-action="Logs" class="btn btn-secondary">Email Logs</a>
-</p>
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Setting Name</th>
-            <th>SMTP Server</th>
-            <th>Port</th>
-            <th>Sender Email</th>
-            <th>Username</th>
-            <th>SSL</th>
-            <th>Default</th>
-            <th>Active</th>
-            <th style="width:120px;">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-    @if (Model.Any())
+    @if (TempData["SuccessMessage"] != null)
     {
-        foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.SettingName</td>
-                <td>@item.SmtpServer</td>
-                <td>@item.Port</td>
-                <td>@item.SenderEmail</td>
-                <td>@item.Username</td>
-                <td>@(item.EnableSsl ? "Yes" : "No")</td>
-                <td>@(item.IsDefault ? "Yes" : "No")</td>
-                <td>@(item.IsActive ? "Yes" : "No")</td>
-                <td><a asp-action="Edit" asp-route-id="@item.EmailSettingId" class="btn btn-sm btn-primary">Edit</a></td>
-            </tr>
-        }
+        <div class="alert alert-success mb-3">
+            @TempData["SuccessMessage"]
+        </div>
     }
-    else
-    {
-        <tr><td colspan="9" class="text-center">No email setting found.</td></tr>
-    }
-    </tbody>
-</table>
+
+    <div class="mb-3 text-end">
+
+        <a asp-action="Create"
+           class="btn crm-btn-success">
+            Create New
+        </a>
+
+        <a asp-action="Test"
+           class="btn crm-btn-primary">
+            Send Test Email
+        </a>
+
+        <a asp-action="Logs"
+           class="btn crm-btn-secondary">
+            Email Logs
+        </a>
+
+    </div>
+
+    <div class="crm-grid-panel">
+
+        <table class="crm-grid-table">
+
+            <thead>
+                <tr>
+                    <th>Setting Name</th>
+                    <th>SMTP Server</th>
+                    <th>Port</th>
+                    <th>Sender Email</th>
+                    <th>Username</th>
+                    <th>SSL</th>
+                    <th>Default</th>
+                    <th>Active</th>
+                    <th style="width:120px;">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.SettingName</td>
+                            <td>@item.SmtpServer</td>
+                            <td>@item.Port</td>
+                            <td>@item.SenderEmail</td>
+                            <td>@item.Username</td>
+                            <td>@(item.EnableSsl ? "Yes" : "No")</td>
+                            <td>@(item.IsDefault ? "Yes" : "No")</td>
+                            <td>@(item.IsActive ? "Yes" : "No")</td>
+                            <td>
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.EmailSettingId"
+                                   class="btn btn-sm crm-btn-primary">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9"
+                            style="text-align:center;padding:20px;">
+                            No email setting found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

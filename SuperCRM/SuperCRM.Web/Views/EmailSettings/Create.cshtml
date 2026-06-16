@@ -4,13 +4,16 @@
     ViewData["Title"] = "Create Email Setting";
 }
 
-<h1>Create Email Setting</h1>
+<div class="crm-form-page">
+
+    <h1 class="crm-form-title">>Create Email Setting</h1>
 
 <form asp-action="Create" method="post">
     <partial name="_Form" model="Model" />
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <button type="submit" class="btn crm-btn-primary">Save</button>
+    <a asp-action="Index" class="btn crm-btn-secondary">Back to List</a>
 </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

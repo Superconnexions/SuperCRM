@@ -1,17 +1,50 @@
 ﻿@model SuperCRM.Web.ViewModels.Providers.ProviderCreateEditViewModel
 
 @{
-    ViewData["Title"] = "Add Provider";
+ViewData["Title"] = "Add Provider";
 }
 
-<h2>Add Provider</h2>
+<div class="crm-form-page">
 
-<form asp-action="Create" method="post">
-    <partial name="_ProviderForm" model="Model" />
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+
+    <h2 class="crm-form-title">
+        Add Provider
+    </h2>
+
+    <form asp-action="Create"
+          method="post"
+          class="crm-form-panel">
+
+        <partial name="_ProviderForm"
+                 model="Model" />
+
+        <div class="mt-3">
+
+            <button type="submit"
+                    class="btn crm-btn-primary">
+
+                Save
+
+            </button>
+
+            <a asp-action="Index"
+               class="btn crm-btn-secondary">
+
+                Back
+
+            </a>
+
+        </div>
+
+    </form>
+
+
+</div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+
+
+<partial name="_ValidationScriptsPartial" />
+
+
 }

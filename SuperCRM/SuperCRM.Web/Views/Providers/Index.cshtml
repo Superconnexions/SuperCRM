@@ -4,50 +4,145 @@
     ViewData["Title"] = "Providers";
 }
 
-<h2>Providers</h2>
+<div class="crm-page">
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
+    
+    <h2 class="crm-page-title">
+        Providers
+    </h2>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Add Provider</a>
-</p>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success mb-3">
+            @TempData["SuccessMessage"]
+        </div>
+    }
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Provider Name</th>
-            <th>Contact Email</th>
-            <th>Contact Phone</th>
-            <th>Provider URL</th>
-            <th>Address</th>
-            <th>Active</th>
-            <th style="width:120px;">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.ProviderName</td>
-                <td>@item.ContactEmail</td>
-                <td>@item.ContactPhone</td>
-                <td>
-                    
-                    
-                    @if (!string.IsNullOrWhiteSpace(item.ProviderUrl))
+    <div class="mb-3 text-end">
+
+        <a asp-action="Create"
+           class="btn crm-btn-primary">
+
+            Add Provider
+
+        </a>
+
+    </div>
+
+    <div class="crm-grid-panel">
+
+        <table class="crm-grid-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Provider Name</th>
+
+                    <th>Contact Email</th>
+
+                    <th>Contact Phone</th>
+
+                    <th>Provider URL</th>
+
+                    <th>Address</th>
+
+                    <th>Active</th>
+
+                    <th style="width:120px;">
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
                     {
-                        <a href="@item.ProviderUrl" target="_blank">Open</a>
+                        <tr>
+
+                            <td>
+
+                                @item.ProviderName
+
+                            </td>
+
+                            <td>
+
+                                @item.ContactEmail
+
+                            </td>
+
+                            <td>
+
+                                @item.ContactPhone
+
+                            </td>
+
+                            <td>
+
+                                @if (!string.IsNullOrWhiteSpace(item.ProviderUrl))
+                                {
+                                    <a href="@item.ProviderUrl"
+                                       target="_blank">
+
+                                        Open
+
+                                    </a>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @item.ProviderAddress
+
+                            </td>
+
+                            <td>
+
+                                @(item.IsActive ? "Yes" : "No")
+
+                            </td>
+
+                            <td>
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.ProviderId"
+                                   class="btn btn-sm crm-btn-warning">
+
+                                    Edit
+
+                                </a>
+
+                            </td>
+
+                        </tr>
                     }
-                 </td>
-                <td>@item.ProviderAddress</td>
-                <td>@(item.IsActive ? "Yes" : "No")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.ProviderId" class="btn btn-sm btn-warning">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="7"
+                            style="text-align:center;padding:20px;">
+
+                            No providers found.
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+    
+
+</div>

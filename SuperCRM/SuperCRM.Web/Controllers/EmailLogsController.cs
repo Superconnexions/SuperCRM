@@ -49,7 +49,7 @@ namespace SuperCRM.Web.Controllers
         {
             var result = await _emailLogService.ResendFailedAsync(id, GetUserId(), cancellationToken);
             TempData[result.Success ? "SuccessMessage" : "ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(Index), new { isSent = false });
+            return RedirectToAction(nameof(Index));
         }
 
         private Guid? GetUserId()
