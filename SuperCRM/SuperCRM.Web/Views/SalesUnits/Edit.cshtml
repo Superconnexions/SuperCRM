@@ -4,14 +4,17 @@
     ViewData["Title"] = "Edit Sales Unit";
 }
 
-<h2>Edit Sales Unit</h2>
+<div class="crm-form-page">
 
-<form asp-action="Edit" method="post">
+<h2 class="crm-form-title">Edit Sales Unit</h2>
+
+<form asp-action="Edit" class="crm-form-panel" method="post">
     <input asp-for="SalesUnitId" type="hidden" />
     <partial name="_Form" model="Model" />
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn crm-btn-primary">Update</button>
+    <a asp-action="Index" class="btn crm-btn-secondary">Back</a>
 </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

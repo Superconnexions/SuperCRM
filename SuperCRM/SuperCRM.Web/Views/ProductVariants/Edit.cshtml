@@ -4,17 +4,20 @@
     ViewData["Title"] = "Edit Product Variant";
 }
 
-<h2>Edit Product Variant</h2>
+<div class="crm-form-page">
 
-<form asp-action="Edit" method="post">
+<h2 class="crm-form-title">Edit Product Variant</h2>
+
+    <form asp-action="Edit" class="crm-form-panel" method="post">
     <input asp-for="ProductVariantId" type="hidden" />
     <partial name="_Form" model="Model" />
 
     <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Update</button>
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <button type="submit" class="btn crm-btn-primary">Update</button>
+            <a asp-action="Index" class="btn crm-btn-secondary">Back to List</a>
     </div>
 </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

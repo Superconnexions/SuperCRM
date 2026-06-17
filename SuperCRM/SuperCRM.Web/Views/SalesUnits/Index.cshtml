@@ -4,18 +4,23 @@
     ViewData["Title"] = "Sales Units";
 }
 
-<h2>Sales Units</h2>
+<div class="crm-page">
+
+
+<h2 class="crm-page-title">Sales Units</h2>
 
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 
-<p>
+<div class="mb-3 text-end">
     <a asp-action="Create" class="btn btn-primary">Add Sales Unit</a>
-</p>
+</div>
 
-<table class="table table-bordered table-striped">
+    <div class="crm-grid-panel">
+
+    <table class="crm-grid-table">
     <thead>
         <tr>
             <th>Unit Code</th>
@@ -38,3 +43,5 @@
     }
     </tbody>
 </table>
+</div>
+</div>

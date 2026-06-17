@@ -4,12 +4,16 @@
     ViewData["Title"] = "Add Product Category";
 }
 
-<h2>Add Product Category</h2>
+<div class="crm-form-page">
 
-<form asp-action="Create" method="post">
+    <h1 class="crm-form-title">
+        Add Product Category
+     </h1>
+
+    <form asp-action="Create" method="post" class="crm-form-panel">
     <partial name="_Form" model="Model" />
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn crm-btn-primary">Save</button>
+        <a asp-action="Index" class="btn crm-btn-secondary">Back</a>
 </form>
 
 @section Scripts {

@@ -877,7 +877,7 @@
     text-align: center;
     color: #0d47ff;
     font-weight: 900;
-    font-size: 36px;
+    font-size: 36px !important;
     margin-bottom: 10px;
 }
 

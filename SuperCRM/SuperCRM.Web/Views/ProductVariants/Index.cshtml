@@ -4,17 +4,34 @@
     ViewData["Title"] = "Product Variants";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Product Variants</h2>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</div>
+
+
+<div class="crm-page">
+
+
+    <h2 class="crm-page-title">
+        Product Variants
+    </h2>
+
+    <div class="mb-3 text-end">
+
+        <a asp-action="Create"
+           class="btn crm-btn-primary">
+
+            Add Product Variants
+
+        </a>
+
+    </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 
-<table class="table table-bordered table-striped">
+<div class="crm-grid-panel">
+
+<table class="crm-grid-table">
     <thead>
         <tr>
             <th>Product</th>
@@ -43,7 +60,7 @@
                 <td>@(item.BasePrice.HasValue ? item.BasePrice.Value.ToString("0.00") : string.Empty)</td>
                     <td>@(item.ExpiryInMonth>0? item.ExpiryInMonth : "No expiry date")</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ProductVariantId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@item.ProductVariantId" class="btn btn-sm crm-btn-warning">Edit</a>
                 </td>
             </tr>
         }
@@ -56,3 +73,5 @@
     }
     </tbody>
 </table>
+</div>
+</div>
