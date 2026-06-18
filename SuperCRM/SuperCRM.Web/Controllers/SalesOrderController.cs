@@ -931,6 +931,7 @@ namespace SuperCRM.Web.Controllers
         DateTime? orderDateFrom,
         DateTime? orderDateTo,
         byte? salesOrderStatus,
+        string? salesOrderNo,
         int page = 1,
         int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -957,6 +958,7 @@ namespace SuperCRM.Web.Controllers
                 orderDateFrom,
                 orderDateTo,
                 salesOrderStatus,
+                salesOrderNo,
                 page,
                 pageSize,
                 cancellationToken);
@@ -967,6 +969,7 @@ namespace SuperCRM.Web.Controllers
                 OrderDateFrom = orderDateFrom,
                 OrderDateTo = orderDateTo,
                 SalesOrderStatus = salesOrderStatus,
+                SalesOrderNo = salesOrderNo,
                 Orders = result.Items,
                 TotalRecords = result.TotalRecords,
                 Page = page,
@@ -995,11 +998,16 @@ namespace SuperCRM.Web.Controllers
         DateTime? orderDateFrom,
         DateTime? orderDateTo,
         byte? salesOrderStatus,
+        string? salesOrderNo,
         int page = 1,
         int pageSize = 20,
         CancellationToken cancellationToken = default)
         {
 
+            if (!string.IsNullOrWhiteSpace(salesOrderNo))
+            {
+                salesOrderNo = salesOrderNo.Trim();
+            }
 
             if (!orderDateFrom.HasValue && !orderDateTo.HasValue)
             {
@@ -1007,11 +1015,13 @@ namespace SuperCRM.Web.Controllers
                 orderDateTo = DateTime.UtcNow.Date;
             }
 
+
             var result = await _salesOrderCreationService.GetSalesOrderHistoryAsync(
                 soldByUserId: null,
                 orderDateFrom,
                 orderDateTo,
                 salesOrderStatus,
+                salesOrderNo,
                 page,
                 pageSize,
                 cancellationToken);
@@ -1022,6 +1032,7 @@ namespace SuperCRM.Web.Controllers
                 OrderDateFrom = orderDateFrom,
                 OrderDateTo = orderDateTo,
                 SalesOrderStatus = salesOrderStatus,
+                SalesOrderNo = salesOrderNo,
                 Orders = result.Items,
                 TotalRecords = result.TotalRecords,
                 Page = page,
@@ -1081,6 +1092,28 @@ namespace SuperCRM.Web.Controllers
                 model,
                 cancellationToken);
 
+            if (IsAjaxRequest())
+            {
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Sales information updated successfully"
+                    });
+                }
+                else {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Update failed."
+                    });
+                }
+                    
+            }
+
+
             TempData[success ? "SuccessMessage" : "ErrorMessage"] =
                 success ? "Sales information updated successfully." : "Sales order was not found.";
 
@@ -1099,8 +1132,32 @@ namespace SuperCRM.Web.Controllers
                 model,
                 cancellationToken);
 
+            if (IsAjaxRequest())
+            {
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Agent commission updated successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Update failed."
+                    });
+                }
+
+            }
+
+
+
             TempData[success ? "SuccessMessage" : "ErrorMessage"] =
-                success ? "Commission updated successfully." : "Sales order was not found.";
+                success ? "Agent commission updated successfully." : "Sales order was not found.";
 
             return RedirectToAction(nameof(SalesOrderManagement));
         }
@@ -1116,6 +1173,29 @@ namespace SuperCRM.Web.Controllers
             var success = await _salesOrderCreationService.UpdateSalesOrderStatusAsync(
                 model,
                 cancellationToken);
+
+            if (IsAjaxRequest())
+            {
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Sales order status updated successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Update failed."
+                    });
+                }
+
+            }
+
 
             TempData[success ? "SuccessMessage" : "ErrorMessage"] =
                 success ? "Sales order status updated successfully." : "Sales order was not found.";
@@ -1136,6 +1216,29 @@ namespace SuperCRM.Web.Controllers
             var success = await _salesOrderCreationService.UpdateSuperCRMCommissionAsync(
                 model,
                 cancellationToken);
+
+            if (IsAjaxRequest())
+            {
+
+                if (success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "SuperCRM commission updated successfully"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Update failed."
+                    });
+                }
+
+            }
+
 
             TempData[success ? "SuccessMessage" : "ErrorMessage"] =
                 success
@@ -1558,6 +1661,12 @@ namespace SuperCRM.Web.Controllers
 
             return View(model);
         }
+
+        private bool IsAjaxRequest()
+        {
+            return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+        }
+
         // END
 
     }

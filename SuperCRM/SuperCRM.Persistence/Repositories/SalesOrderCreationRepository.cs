@@ -201,6 +201,7 @@ namespace SuperCRM.Persistence.Repositories
         DateTime? orderDateFrom,
         DateTime? orderDateTo,
         byte? salesOrderStatus,
+        string? salesOrderNo,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -208,15 +209,69 @@ namespace SuperCRM.Persistence.Repositories
                 page = page <= 0 ? 1 : page;
                 pageSize = pageSize <= 0 ? 20 : pageSize;
 
-                var salesQuery = _dbContext.Sales
-                    .AsNoTracking()
-                    .Where(s =>
-                        (!soldByUserId.HasValue || s.SoldByUserId == soldByUserId.Value) &&
-                        (!orderDateFrom.HasValue || s.OrderDate.Date >= orderDateFrom.Value.Date) &&
-                        (!orderDateTo.HasValue || s.OrderDate.Date <= orderDateTo.Value.Date) &&
-                        (!salesOrderStatus.HasValue || s.SalesOrderStatus == salesOrderStatus.Value));
 
-                var totalRecords = await salesQuery.CountAsync(cancellationToken);
+            //var salesQuery = _dbContext.Sales
+            //    .AsNoTracking()
+            //    .Where(s =>
+            //        (!soldByUserId.HasValue || s.SoldByUserId == soldByUserId.Value) &&
+            //        (!orderDateFrom.HasValue || s.OrderDate.Date >= orderDateFrom.Value.Date) &&
+            //        (!orderDateTo.HasValue || s.OrderDate.Date <= orderDateTo.Value.Date) &&
+            //        (!salesOrderStatus.HasValue || s.SalesOrderStatus == salesOrderStatus.Value));
+
+
+            var salesQuery =
+                    _dbContext.Sales
+                    .AsNoTracking()
+                    .AsQueryable();
+
+
+            //===================================================
+            // Search by Sales Order No
+            // Ignore all other search criteria
+            //===================================================
+
+            if (!string.IsNullOrWhiteSpace(salesOrderNo))
+            {
+                salesOrderNo = salesOrderNo.Trim();
+
+                salesQuery =
+                    salesQuery.Where(s =>
+
+                        s.OrderNo.Contains(salesOrderNo)
+
+                    );
+            }
+            else
+            {
+                salesQuery =
+                    salesQuery.Where(s =>
+
+                        (!soldByUserId.HasValue ||
+
+                            s.SoldByUserId == soldByUserId.Value)
+
+                        &&
+
+                        (!orderDateFrom.HasValue ||
+
+                            s.OrderDate.Date >= orderDateFrom.Value.Date)
+
+                        &&
+
+                        (!orderDateTo.HasValue ||
+
+                            s.OrderDate.Date <= orderDateTo.Value.Date)
+
+                        &&
+
+                        (!salesOrderStatus.HasValue ||
+
+                            s.SalesOrderStatus == salesOrderStatus.Value)
+
+                    );
+            }
+
+            var totalRecords = await salesQuery.CountAsync(cancellationToken);
 
                 var query =
                     from s in salesQuery

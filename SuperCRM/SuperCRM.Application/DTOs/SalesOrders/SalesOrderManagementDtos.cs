@@ -39,7 +39,7 @@
         public string? CancelledReason { get; set; }
         public decimal ProviderCommissionEarned { get; set; }
         public bool IsProviderCommissionReceived { get; set; }
-
+        public string? SalesOrderNo { get; set; }
         public List<AdminUserOptionDto> AdminUsers { get; set; } = new();
         public List<SalesOrderManagementLineDto> Lines { get; set; } = new();
     }

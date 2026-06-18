@@ -9,6 +9,8 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
 
         public DateTime? OrderDateFrom { get; set; }
         public DateTime? OrderDateTo { get; set; }
+
+        public string? SalesOrderNo { get; set; }
         public byte? SalesOrderStatus { get; set; }
 
         public List<SelectListItem> StatusOptions { get; set; } = new();

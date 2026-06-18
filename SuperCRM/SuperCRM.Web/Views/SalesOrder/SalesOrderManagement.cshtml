@@ -47,6 +47,18 @@
         <div>
             <div class="row g-3 align-items-end">
 
+                <div class="col-md-2">
+
+                    <label class="form-label">
+
+                        Sales Order No
+
+                    </label>
+
+                    <input asp-for="SalesOrderNo" name="SalesOrderNo" class="form-control" placeholder="eg. SO-2606-5765" />
+
+                </div>
+
                 <div class="col-md-3">
                     <label class="form-label">Order Date From</label>
                     
@@ -73,7 +85,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">Sales Order Status</label>
                     <select name="salesOrderStatus" class="form-select">
                         <option value="">All Status</option>
@@ -86,7 +98,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label">Page Size</label>
                     <select name="pageSize" class="form-select">
                         <option value="10" selected="@(Model.PageSize == 10)">10</option>
@@ -190,6 +202,7 @@
                                     <button type="button"
                                             class="btn btn-sm crm-action-btn btn-manage-sales-order"
                                             data-sale-id="@item.SaleId"
+                                            data-order-no="@item.OrderNo"
                                             data-bs-toggle="modal"
                                             data-bs-target="#salesOrderManageModal">
                                         Action
@@ -214,6 +227,7 @@
                        asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
                        asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
                        asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                       asp-route-salesOrderNo="@Model.SalesOrderNo"
                        asp-route-page="@(Model.Page - 1)"
                        asp-route-pageSize="@Model.PageSize">
                         Previous
@@ -230,6 +244,7 @@
                                asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
                                asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
                                asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                               asp-route-salesOrderNo="@Model.SalesOrderNo"
                                asp-route-page="@i"
                                asp-route-pageSize="@Model.PageSize">
                                 @i
@@ -244,6 +259,7 @@
                        asp-route-orderDateFrom="@(Model.OrderDateFrom?.ToString("yyyy-MM-dd"))"
                        asp-route-orderDateTo="@(Model.OrderDateTo?.ToString("yyyy-MM-dd"))"
                        asp-route-salesOrderStatus="@Model.SalesOrderStatus"
+                       asp-route-salesOrderNo="@Model.SalesOrderNo"
                        asp-route-page="@(Model.Page + 1)"
                        asp-route-pageSize="@Model.PageSize">
                         Next
@@ -260,12 +276,15 @@
         <div class="modal-content">
 
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Manage Sales Order</h5>
+                <h5 class="modal-title">Manage Sales Order 
+                    <span id="salesOrderNoTitle" class="ms-2 text-warning fw-bold">
+                    </span>
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-
+                <div id="salesOrderModalMessage"></div>
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
                         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabSalesInfo" type="button">
@@ -294,7 +313,7 @@
                 <div class="tab-content pt-3">
 
                     <div class="tab-pane fade show active" id="tabSalesInfo">
-                        <form method="post" asp-action="UpdateSalesInformation">
+                        <form method="post" asp-action="UpdateSalesInformation" class="sales-order-modal-update-form">
                             @Html.AntiForgeryToken()
 
                             <input type="hidden" name="SaleId" id="SalesInfo_SaleId" />
@@ -356,7 +375,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="tabCommission">
-                        <form method="post" asp-action="UpdateSalesCommission">
+                        <form method="post" asp-action="UpdateSalesCommission" class="sales-order-modal-update-form">
                             @Html.AntiForgeryToken()
 
                             <input type="hidden" name="SaleId" id="Commission_SaleId" />
@@ -369,7 +388,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="tabSuperCRMCommission">
-                        <form method="post" asp-action="UpdateSuperCRMCommission">
+                        <form method="post" asp-action="UpdateSuperCRMCommission" class="sales-order-modal-update-form">
                             @Html.AntiForgeryToken()
 
                             <input type="hidden" name="SaleId" id="SuperCRMCommission_SaleId" />
@@ -413,7 +432,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="tabStatus">
-                        <form method="post" asp-action="UpdateSalesOrderStatus">
+                        <form method="post" asp-action="UpdateSalesOrderStatus" class="sales-order-modal-update-form">
                             @Html.AntiForgeryToken()
 
                             <input type="hidden" name="SaleId" id="Status_SaleId" />
@@ -492,6 +511,8 @@
             if (!btn) return;
 
             const saleId = btn.dataset.saleId;
+            const orderNo = btn.dataset.orderNo;
+             document.getElementById('salesOrderNoTitle').innerHTML = `| ${orderNo}`;
 
             const response = await fetch('/SalesOrder/GetSalesOrderManagementDetail?saleId=' + encodeURIComponent(saleId));
             const result = await response.json();
@@ -502,6 +523,9 @@
             }
 
             const data = result.data;
+            
+            // New line 
+            document.getElementById('salesOrderModalMessage').innerHTML = '';
 
             document.getElementById('SalesInfo_SaleId').value = data.saleId;
             document.getElementById('Commission_SaleId').value = data.saleId;
@@ -767,6 +791,8 @@
             box.innerHTML = html;
         }
 
+        
+
         document.getElementById('salesOrderSearchForm')
         ?.addEventListener('submit', function (e) {
 
@@ -781,6 +807,82 @@
             e.preventDefault();
             return false;
         }
+        });
+
+         document.getElementById('salesOrderManageModal').addEventListener('hidden.bs.modal', function () {
+
+             document.getElementById('salesOrderNoTitle')
+                 .innerHTML = '';
+
+             document.getElementById('salesOrderModalMessage')
+                 .innerHTML = '';
+
+         });
+
+
+        // New Changes for Modal message
+
+       function showSalesOrderModalMessage(success, message) {
+
+            const messageBox = document.getElementById('salesOrderModalMessage');
+
+            if (!messageBox) return;
+
+            const alertClass = success ? 'alert-success' : 'alert-danger';
+
+            messageBox.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show mb-3">
+                    ${message || ''}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+        }
+
+        document.addEventListener('submit', async function (e) {
+
+            const form = e.target.closest('.sales-order-modal-update-form');
+
+            if (!form) return;
+
+            e.preventDefault();
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton ? submitButton.innerHTML : '';
+
+            try {
+
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = 'Updating...';
+                }
+
+                const formData = new FormData(form);
+
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const result = await response.json();
+
+                showSalesOrderModalMessage(
+                    result.success === true,
+                    result.message || (result.success ? 'Updated successfully.' : 'Update failed.')
+                );
+
+            } catch (error) {
+
+                showSalesOrderModalMessage(false, 'Unexpected error occurred while updating.');
+
+            } finally {
+
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            }
         });
 
     </script>

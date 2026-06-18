@@ -486,6 +486,7 @@ namespace SuperCRM.Application.Services
         DateTime? orderDateFrom,
         DateTime? orderDateTo,
         byte? salesOrderStatus,
+        string? salesOrderNo,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -495,6 +496,7 @@ namespace SuperCRM.Application.Services
                     orderDateFrom,
                     orderDateTo,
                     salesOrderStatus,
+                    salesOrderNo,
                     page,
                     pageSize,
                     cancellationToken);

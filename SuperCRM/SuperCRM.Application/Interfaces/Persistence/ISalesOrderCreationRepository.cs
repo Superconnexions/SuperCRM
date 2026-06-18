@@ -41,6 +41,7 @@ namespace SuperCRM.Application.Interfaces.Persistence
         DateTime? orderDateFrom,
         DateTime? orderDateTo,
         byte? salesOrderStatus,
+        string? salesOrderNo,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
