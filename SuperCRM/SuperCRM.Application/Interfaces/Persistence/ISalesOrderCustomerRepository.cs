@@ -64,6 +64,7 @@ namespace SuperCRM.Application.Interfaces.Persistence
         DateTime? createdDateFrom,
         DateTime? createdDateTo,
         string? customerCode,
+        string? EmailOrMobile,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);

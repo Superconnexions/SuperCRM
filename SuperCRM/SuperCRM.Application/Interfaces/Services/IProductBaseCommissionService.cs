@@ -8,7 +8,7 @@ namespace SuperCRM.Application.Interfaces.Services
         Task<ProductBaseCommissionDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<List<ProductBaseCommissionHistoryDto>> GetHistoryAsync(Guid productBaseCommissionId, CancellationToken cancellationToken = default);
         Task<List<ProductLookupDto>> GetActiveProductsAsync(CancellationToken cancellationToken = default);
-
+        Task<List<ProductLookupDto>> GetProductsAsync(CancellationToken cancellationToken = default);
         Task<(bool Success, string ErrorMessage)> CreateAsync(CreateProductBaseCommissionDto request, CancellationToken cancellationToken = default);
         Task<(bool Success, string ErrorMessage)> UpdateAsync(UpdateProductBaseCommissionDto request, CancellationToken cancellationToken = default);
         Task<(bool Success, string ErrorMessage)> SoftDeleteAsync(Guid id, Guid changedByUserId, string? note, CancellationToken cancellationToken = default);

@@ -32,13 +32,23 @@
           class="crm-search-panel">
 
         <div class="card-body">
+
             <div class="row g-3 align-items-end">
 
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <label class="form-label">Email or Mobile</label>
+                    <input type="text"
+                           name="EmailOrMobile"
+                           value="@Model.EmailOrMobile"
+                           class="form-control"
+                           placeholder="Email or Mobile" />
+                </div>
+
+                <div class="col-md-2">
                     <label class="form-label">Created Date From</label>
                     <div class="crm-date-wrap">
                         <input type="date"
-                               name="createdDateFrom"
+                               name="CreatedDateFrom"
                                value="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
                                class="form-control" />
                         <button type="button" class="crm-date-btn">
@@ -47,11 +57,11 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">Created Date To</label>
                     <div class="crm-date-wrap">
                         <input type="date"
-                               name="createdDateTo"
+                               name="CreatedDateTo"
                                value="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
                                class="form-control" />
                         <button type="button" class="crm-date-btn">
@@ -60,18 +70,18 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">Customer Code</label>
                     <input type="text"
-                           name="customerCode"
+                           name="CustomerCode"
                            value="@Model.CustomerCode"
                            class="form-control"
                            placeholder="CUS-..." />
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label class="form-label">Page Size</label>
-                    <select name="pageSize" class="form-select">
+                    <select name="PageSize" class="form-select">
                         <option value="10" selected="@(Model.PageSize == 10)">10</option>
                         <option value="20" selected="@(Model.PageSize == 20)">20</option>
                         <option value="50" selected="@(Model.PageSize == 50)">50</option>
@@ -79,14 +89,22 @@
                     </select>
                 </div>
 
-                <div class="col-md-1 d-grid">
-                    <input type="hidden" name="page" value="1" />
-                    <button type="submit" class="btn btn-primary">
+                <div class="col-md-3 d-flex gap-2">
+                    <input type="hidden" name="Page" id="CustomerManagement_Page" value="@Model.Page" />
+
+                    <button type="submit"
+                            class="btn crm-btn-primary">
                         Search
                     </button>
+
+                    <a asp-action="CustomerManagement"
+                       class="btn btn-sm crm-btn-warning">
+                        Reset
+                    </a>
                 </div>
 
             </div>
+            
         </div>
     </form>
 
@@ -180,60 +198,48 @@
                         }
                     }
                 </tbody>
-            </table>
+            </table>@if (Model.TotalPages > 1)
+            {
+                <nav class="crm-pagination">
+                    <ul class="pagination justify-content-end">
+
+                        <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                            <button type="button"
+                                    class="page-link customer-page-btn"
+                                    data-page="@(Model.Page - 1)">
+                                Previous
+                            </button>
+                        </li>
+
+                        @for (var i = 1; i <= Model.TotalPages; i++)
+                        {
+                            if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
+                            {
+                                <li class="page-item @(i == Model.Page ? "active" : "")">
+                                    <button type="button"
+                                            class="page-link customer-page-btn"
+                                            data-page="@i">
+                                        @i
+                                    </button>
+                                </li>
+                            }
+                        }
+
+                        <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                            <button type="button"
+                                    class="page-link customer-page-btn"
+                                    data-page="@(Model.Page + 1)">
+                                Next
+                            </button>
+                        </li>
+
+                    </ul>
+                </nav>
+            }
         </div>
     </div>
 
-    @if (Model.TotalPages > 1)
-    {
-        <nav class="mt-3">
-            <ul class="pagination justify-content-end">
 
-                <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="CustomerManagement"
-                       asp-route-createdDateFrom="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
-                       asp-route-createdDateTo="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
-                       asp-route-customerCode="@Model.CustomerCode"
-                       asp-route-page="@(Model.Page - 1)"
-                       asp-route-pageSize="@Model.PageSize">
-                        Previous
-                    </a>
-                </li>
-
-                @for (var i = 1; i <= Model.TotalPages; i++)
-                {
-                    if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.Page) <= 2)
-                    {
-                        <li class="page-item @(i == Model.Page ? "active" : "")">
-                            <a class="page-link"
-                               asp-action="CustomerManagement"
-                               asp-route-createdDateFrom="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
-                               asp-route-createdDateTo="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
-                               asp-route-customerCode="@Model.CustomerCode"
-                               asp-route-page="@i"
-                               asp-route-pageSize="@Model.PageSize">
-                                @i
-                            </a>
-                        </li>
-                    }
-                }
-
-                <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="CustomerManagement"
-                       asp-route-createdDateFrom="@(Model.CreatedDateFrom?.ToString("yyyy-MM-dd"))"
-                       asp-route-createdDateTo="@(Model.CreatedDateTo?.ToString("yyyy-MM-dd"))"
-                       asp-route-customerCode="@Model.CustomerCode"
-                       asp-route-page="@(Model.Page + 1)"
-                       asp-route-pageSize="@Model.PageSize">
-                        Next
-                    </a>
-                </li>
-
-            </ul>
-        </nav>
-    }
 </div>
 
 <div class="modal fade crm-modal" id="customerAddressModal" tabindex="-1">
@@ -396,5 +402,37 @@
             html += '</tbody></table>';
             box.innerHTML = html;
         }
+
+
+    //     document.addEventListener('click', function (e) {
+
+    //     const pageBtn = e.target.closest('.customer-page-btn');
+
+    //     if (!pageBtn) return;
+
+    //     const page = pageBtn.dataset.page;
+
+    //     if (!page || page <= 0) return;
+
+    //     const pageInput =
+    //         document.getElementById('CustomerManagement_Page');
+
+    //     const form =
+    //         document.getElementById('customerManagementSearchForm');
+
+    //     if (!pageInput || !form) return;
+
+    //     pageInput.value = page;
+
+    //     form.submit();
+    // });
+
+    document.getElementById('customerManagementSearchForm')
+    .addEventListener('submit', function () {
+
+    document.getElementById('CustomerManagement_Page').value = 1;
+
+});
+
     </script>
 }

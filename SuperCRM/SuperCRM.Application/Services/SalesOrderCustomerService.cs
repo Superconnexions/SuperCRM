@@ -942,6 +942,7 @@ namespace SuperCRM.Application.Services
         DateTime? createdDateFrom,
         DateTime? createdDateTo,
         string? customerCode,
+        string? EmailOrMobile,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -951,6 +952,7 @@ namespace SuperCRM.Application.Services
                 createdDateFrom,
                 createdDateTo,
                 customerCode,
+                EmailOrMobile,
                 page,
                 pageSize,
                 cancellationToken);

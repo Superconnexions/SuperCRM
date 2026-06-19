@@ -220,7 +220,10 @@ namespace SuperCRM.Web.Controllers
 
         private async Task BindProductsAsync(ProductBaseCommissionCreateEditViewModel vm, CancellationToken cancellationToken)
         {
-            var products = await _service.GetActiveProductsAsync(cancellationToken);
+            
+            //var products = await _service.GetActiveProductsAsync(cancellationToken);
+            var products = await _service.GetProductsAsync(cancellationToken);
+
             vm.ProductOptions = products
                 .Select(x => new SelectListItem
                 {

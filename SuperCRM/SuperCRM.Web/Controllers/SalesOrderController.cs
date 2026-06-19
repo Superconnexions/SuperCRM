@@ -1250,15 +1250,11 @@ namespace SuperCRM.Web.Controllers
 
 
         // Customer Managment
-
         [HttpGet]
+        [HttpPost]
         [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
         public async Task<IActionResult> CustomerManagement(
-        DateTime? createdDateFrom,
-        DateTime? createdDateTo,
-        string? customerCode,
-        int page = 1,
-        int pageSize = 20,
+        CustomerManagementViewModel model,
         CancellationToken cancellationToken = default)
         {
             var currentUserId = GetCurrentUserId();
@@ -1272,32 +1268,32 @@ namespace SuperCRM.Web.Controllers
                 isAgentView = true;
             }
 
-            if (!createdDateFrom.HasValue && !createdDateTo.HasValue)
+            model.Page = model.Page <= 0 ? 1 : model.Page;
+            model.PageSize = model.PageSize <= 0 ? 20 : model.PageSize;
+
+            if (string.IsNullOrWhiteSpace(model.EmailOrMobile))
             {
-                createdDateFrom = DateTime.UtcNow.Date.AddDays(-30);
-                createdDateTo = DateTime.UtcNow.Date;
+                if (!model.CreatedDateFrom.HasValue &&
+                    !model.CreatedDateTo.HasValue)
+                {
+                    model.CreatedDateFrom = DateTime.UtcNow.Date.AddDays(-30);
+                    model.CreatedDateTo = DateTime.UtcNow.Date;
+                }
             }
 
             var result = await _salesOrderCustomerService.GetCustomerManagementListAsync(
                 createdByUserId,
-                createdDateFrom,
-                createdDateTo,
-                customerCode,
-                page,
-                pageSize,
+                model.CreatedDateFrom,
+                model.CreatedDateTo,
+                model.CustomerCode,
+                model.EmailOrMobile,
+                model.Page,
+                model.PageSize,
                 cancellationToken);
 
-            var model = new CustomerManagementViewModel
-            {
-                IsAgentView = isAgentView,
-                CreatedDateFrom = createdDateFrom,
-                CreatedDateTo = createdDateTo,
-                CustomerCode = customerCode,
-                Customers = result.Items,
-                TotalRecords = result.TotalRecords,
-                Page = page,
-                PageSize = pageSize
-            };
+            model.IsAgentView = isAgentView;
+            model.Customers = result.Items;
+            model.TotalRecords = result.TotalRecords;
 
             return View(model);
         }

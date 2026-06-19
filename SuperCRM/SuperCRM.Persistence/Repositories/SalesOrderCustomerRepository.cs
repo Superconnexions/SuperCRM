@@ -344,6 +344,7 @@ namespace SuperCRM.Persistence.Repositories
         DateTime? createdDateFrom,
         DateTime? createdDateTo,
         string? customerCode,
+        string? emailOrMobile,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -352,14 +353,37 @@ namespace SuperCRM.Persistence.Repositories
             pageSize = pageSize <= 0 ? 20 : pageSize;
             customerCode = (customerCode ?? "").Trim();
 
+
+            //var query = _dbContext.Customers
+            //    .AsNoTracking()
+            //    .Where(c =>
+            //        c.IsActive &&
+            //        (!createdByUserId.HasValue || c.CreatedByUserId == createdByUserId.Value || c.UpdatedByUserId == createdByUserId.Value ) &&
+            //        (!createdDateFrom.HasValue || c.CreatedAt.Date >= createdDateFrom.Value.Date) &&
+            //        (!createdDateTo.HasValue || c.CreatedAt.Date <= createdDateTo.Value.Date) &&
+            //        (string.IsNullOrWhiteSpace(customerCode) || (c.CustomerCode ?? "").Contains(customerCode)));
+
+
             var query = _dbContext.Customers
-                .AsNoTracking()
-                .Where(c =>
-                    c.IsActive &&
-                    (!createdByUserId.HasValue || c.CreatedByUserId == createdByUserId.Value || c.UpdatedByUserId == createdByUserId.Value ) &&
-                    (!createdDateFrom.HasValue || c.CreatedAt.Date >= createdDateFrom.Value.Date) &&
-                    (!createdDateTo.HasValue || c.CreatedAt.Date <= createdDateTo.Value.Date) &&
-                    (string.IsNullOrWhiteSpace(customerCode) || (c.CustomerCode ?? "").Contains(customerCode)));
+                        .AsNoTracking()
+                        .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(emailOrMobile))
+            {
+                emailOrMobile = emailOrMobile.Trim();
+
+                query = query.Where(x =>
+                    (x.Email != null && x.Email.Contains(emailOrMobile)) ||
+                    (x.Mobile != null && x.Mobile.Contains(emailOrMobile)));
+            }
+            else
+            {
+                query = query.Where(x =>
+                    (!createdByUserId.HasValue || x.CreatedByUserId == createdByUserId.Value) &&
+                    (!createdDateFrom.HasValue || x.CreatedAt.Date >= createdDateFrom.Value.Date) &&
+                    (!createdDateTo.HasValue || x.CreatedAt.Date <= createdDateTo.Value.Date) &&
+                    (string.IsNullOrWhiteSpace(customerCode) || x.CustomerCode.Contains(customerCode)));
+            }
 
             var totalRecords = await query.CountAsync(cancellationToken);
 

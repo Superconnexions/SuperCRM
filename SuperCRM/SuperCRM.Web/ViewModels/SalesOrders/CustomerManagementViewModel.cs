@@ -10,6 +10,7 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
         public DateTime? CreatedDateTo { get; set; }
         public string? CustomerCode { get; set; }
 
+        public string? EmailOrMobile { get; set; }
         public List<CustomerManagementListDto> Customers { get; set; } = new();
 
         public int Page { get; set; } = 1;

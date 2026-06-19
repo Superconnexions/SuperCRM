@@ -11,8 +11,8 @@
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Mobile { get; set; }
+        public string? EmailOrMobile { get; set; }
         public DateTime CreatedAt { get; set; }
-
         public int SalesOrderCount { get; set; }
         public bool HasBusiness { get; set; }
         public bool HasBank { get; set; }

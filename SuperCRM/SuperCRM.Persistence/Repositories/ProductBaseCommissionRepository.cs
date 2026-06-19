@@ -77,6 +77,20 @@ namespace SuperCRM.Persistence.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<ProductLookupDto>> GetProductsAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Products
+                .OrderBy(x => x.ProductName)
+                .ThenBy(x => x.ProductCode)
+                .Select(x => new ProductLookupDto
+                {
+                    ProductId = x.ProductId,
+                    ProductCode = x.ProductCode,
+                    ProductName = x.ProductName
+                })
+                .ToListAsync(cancellationToken);
+        }
+
         public Task<Product?> GetProductByIdAsync(Guid productId, CancellationToken cancellationToken = default)
         {
             return _context.Products.FirstOrDefaultAsync(x => x.ProductId == productId && x.IsActive, cancellationToken);

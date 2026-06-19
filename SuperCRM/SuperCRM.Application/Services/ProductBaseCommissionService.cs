@@ -53,6 +53,11 @@ namespace SuperCRM.Application.Services
             return _repository.GetActiveProductsAsync(cancellationToken);
         }
 
+        public Task<List<ProductLookupDto>> GetProductsAsync(CancellationToken cancellationToken = default)
+        {
+            return _repository.GetProductsAsync(cancellationToken);
+        }
+
         public async Task<(bool Success, string ErrorMessage)> CreateAsync(CreateProductBaseCommissionDto request, CancellationToken cancellationToken = default)
         {
             var validation = await ValidateAsync(request.ProductId, request.CommissionType, request.FixedAmount, request.Percentage, request.EffectiveFrom, request.EffectiveTo, request.CurrencyCode ,null, cancellationToken);
