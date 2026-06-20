@@ -34,10 +34,10 @@
 }
 
 .crm-products {
-    color: #6a4dff;
-    font-weight: 500;
+    color: #0c8cf0cf;
+    font-weight: 450;
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 }
 
 .category-image, .product-image {
