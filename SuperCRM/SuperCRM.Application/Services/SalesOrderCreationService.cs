@@ -170,6 +170,8 @@ namespace SuperCRM.Application.Services
                         VariantName = draftLine.VariantName,
                         ProviderProductId = draftLine.ProviderProductId,
                         Quantity = quantity,
+
+
                         SettledQty = 0,
                         PaidQty = 0,
                         BasePriceType = draftLine.BasePriceType,

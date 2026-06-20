@@ -748,7 +748,12 @@ namespace SuperCRM.Web.Controllers
                 {
                     SalesOrderDraftId = draftId,
                     CurrentUserId = userId,
-                    OrderSourceType = GetOrderSourceType()
+                    OrderSourceType = GetOrderSourceType(),
+                    LineSpecialNotes = model.Products.Select(x => new CreateSalesOrderLineSpecialNoteDto
+                    {
+                        SalesOrderDraftLineId = x.SalesOrderDraftLineId,
+                        SpecialNotes = x.SpecialNotes
+                    }).ToList()
                 },
                 cancellationToken);
 

@@ -40,7 +40,8 @@ namespace SuperCRM.Domain.Entities
         public DateTime? FirstInstallmentDate { get; set; }
         public bool Completed { get; set; }
         public DateTime? CompletedDate { get; set; }
-
+        public string? SpecialNotes { get; set; }
+        public string? Remarks { get; set; }
         public bool CancelledOrRejected { get; set; }
         public DateTime? CancelledOrRejectedDate { get; set; }
         public Sale? Sale { get; set; }

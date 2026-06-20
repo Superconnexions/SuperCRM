@@ -125,5 +125,7 @@ namespace SuperCRM.Web.ViewModels.SalesOrders
         public bool IsInstallmentSelected { get; set; }
         public string InstallmentSummary { get; set; } = string.Empty;
         public string? SalesUnitCode { get; set; }
+        public string? SpecialNotes { get; set; }
+        public Guid SalesOrderDraftLineId { get; set; }
     }
 }

@@ -982,6 +982,11 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(x => x.FirstInstallmentDate)
                     .HasColumnType("date");
 
+                entity.Property(e => e.SpecialNotes)
+                .HasMaxLength(250);
+
+                entity.Property(e => e.Remarks)
+                    .HasMaxLength(250);
                 // New Col
                 entity.Property(x => x.Completed).HasDefaultValue(false);
                 entity.Property(x => x.CompletedDate).HasColumnType("date");
