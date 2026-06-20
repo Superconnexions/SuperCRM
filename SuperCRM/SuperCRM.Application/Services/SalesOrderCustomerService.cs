@@ -75,6 +75,8 @@ namespace SuperCRM.Application.Services
                     .Select(x => new SalesOrderSelectedProductSummaryDto
                     {
                         ProductId = x.ProductId,
+                        SalesOrderDraftLineId = x.SalesOrderDraftLineId,
+                        SpecialNotes = x.SpecialNotes,
                         ProductCode = x.ProductCode ?? string.Empty,
                         ProductName = x.ProductName ?? string.Empty,
                         ProductVariantId = x.ProductVariantId,
@@ -351,6 +353,12 @@ namespace SuperCRM.Application.Services
             draft.UpdatedAt = DateTime.UtcNow;
             draft.UpdatedByUserId = request.CurrentUserId;
 
+            // Special Notes
+            await UpdateDraftLineSpecialNotesAsync(
+            request.SalesOrderDraftId,
+            request.LineSpecialNotes,
+            cancellationToken);
+
             await _repository.SaveChangesAsync(cancellationToken);
 
             return new SalesOrderCustomerSaveResultDto
@@ -363,6 +371,24 @@ namespace SuperCRM.Application.Services
                 CustomerAddressId = customerAddressId,
                 CustomerBankAccountId = customerBankAccountId
             };
+        }
+
+        private async Task UpdateDraftLineSpecialNotesAsync(
+        Guid salesOrderDraftId,
+        List<SaveSalesOrderDraftLineSpecialNoteDto> notes,
+        CancellationToken cancellationToken)
+            {
+            if (salesOrderDraftId == Guid.Empty ||
+                notes == null ||
+                !notes.Any())
+            {
+                return;
+            }
+
+            await _repository.UpdateDraftLineSpecialNotesAsync(
+                salesOrderDraftId,
+                notes,
+                cancellationToken);
         }
 
         private static (bool Success, string Message) ValidateCustomerRequest(
@@ -919,6 +945,12 @@ namespace SuperCRM.Application.Services
             draft.DraftStatus = 2;
             draft.UpdatedAt = DateTime.UtcNow;
             draft.UpdatedByUserId = request.CurrentUserId;
+
+            // Special Notes
+            await UpdateDraftLineSpecialNotesAsync(
+            request.SalesOrderDraftId,
+            request.LineSpecialNotes,
+            cancellationToken);
 
             await _repository.SaveChangesAsync(cancellationToken);
 

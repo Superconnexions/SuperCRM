@@ -34,5 +34,6 @@ namespace SuperCRM.Domain.Entities
         public ProductVariant? ProductVariant { get; set; }
         public ProviderProduct? ProviderProduct { get; set; }
         public Provider? Provider { get; set; }
+        public string? SpecialNotes { get; set; }
     }
 }

@@ -401,30 +401,6 @@ namespace SuperCRM.Web.Controllers
             }
 
 
-            //if (!result.Success)
-            //{
-            //    ModelState.AddModelError("", result.Message);
-
-            //    var dto = await _salesOrderCustomerService.GetCustomerCreationPageAsync(
-            //        model.SalesOrderDraftId,
-            //        cancellationToken);
-
-            //    var vm = MapCustomerCreationViewModel(dto);
-
-            //    // Preserve user entered values
-            //    vm.Customer = model.Customer;
-            //    vm.PersonalAddress = model.PersonalAddress;
-            //    vm.Business = model.Business;
-            //    vm.BusinessAddress = model.BusinessAddress;
-            //    vm.BankAccount = model.BankAccount;
-
-            //    vm.BusinessType = model.BusinessType;
-            //    vm.IsBusinessAddressSameAsPersonal = model.IsBusinessAddressSameAsPersonal;
-            //    vm.ExistingCustomerId = model.ExistingCustomerId;
-
-            //    return View(nameof(SalesOrderCustomerCreation), vm);
-            //}
-
 
             TempData["SuccessMessage"] = result.Message;
             return RedirectToAction(nameof(SalesOrderCustomerCreation),
@@ -465,18 +441,7 @@ namespace SuperCRM.Web.Controllers
                 
                 RegistrationSource = GetRegistrationSource(),
 
-                //PersonalAddress = model.ShowPersonalAddress
-                //    ? new SaveSalesOrderAddressDto
-                //    {
-                //        HouseNo = model.PersonalAddress.HouseNo,
-                //        RoadName = model.PersonalAddress.RoadName,
-                //        PostCode = model.PersonalAddress.PostCode,
-                //        City = model.PersonalAddress.City,
-                //        CountryId = model.PersonalAddress.CountryId,
-                //        RegionId = model.PersonalAddress.RegionId,
-                //        AddressLine = model.PersonalAddress.AddressLine
-                //    }
-                //    : null,
+               
 
                 PersonalAddress = new SaveSalesOrderAddressDto
                 {
@@ -490,16 +455,6 @@ namespace SuperCRM.Web.Controllers
                     AddressLine = model.PersonalAddress.AddressLine
                 },
 
-                //PersonalAddress = new SaveSalesOrderAddressDto
-                //{
-                //    HouseNo = model.PersonalAddress.HouseNo,
-                //    RoadName = model.PersonalAddress.RoadName,
-                //    PostCode = model.PersonalAddress.PostCode,
-                //    City = model.PersonalAddress.City,
-                //    CountryId = model.PersonalAddress.CountryId,
-                //    RegionId = model.PersonalAddress.RegionId,
-                //    AddressLine = model.PersonalAddress.AddressLine
-                //},
                 Business = new SaveSalesOrderBusinessDto
                 {
                     BusinessName = model.Business.BusinessName,
@@ -527,92 +482,20 @@ namespace SuperCRM.Web.Controllers
                     AccountName = model.BankAccount.AccountName,
                     AccountNumber = model.BankAccount.AccountNumber,
                     SortCode = model.BankAccount.SortCode
-                }
+                },
+                LineSpecialNotes = model.Products
+                .Where(x => x.SalesOrderDraftLineId != Guid.Empty)
+                .Select(x => new SaveSalesOrderDraftLineSpecialNoteDto
+                {
+                    SalesOrderDraftLineId = x.SalesOrderDraftLineId,
+                    SpecialNotes = x.SpecialNotes
+                })
+                .ToList()
+
             }, cancellationToken);
         }
 
-        // Start Update Customer
-        private async Task<SalesOrderCustomerSaveResultDto> UpdateCustomerInternalAsync(
-        SalesOrderCustomerCreationViewModel model,
-        CancellationToken cancellationToken)
-        {
-            var userId = GetCurrentUserId();
 
-            if (userId == Guid.Empty)
-            {
-                return new SalesOrderCustomerSaveResultDto
-                {
-                    Success = false,
-                    Message = "Invalid login session.",
-                    SalesOrderDraftId = model.SalesOrderDraftId
-                };
-            }
-
-            return await _salesOrderCustomerService.UpdateCustomerAsync(new SaveSalesOrderCustomerDto
-            {
-                SalesOrderDraftId = model.SalesOrderDraftId,
-                CurrentUserId = userId,
-                ExistingCustomerId = model.ExistingCustomerId,
-
-                BusinessType = model.BusinessType,
-                IsBusinessFlow = model.IsBusinessFlow,
-                RequiresBankInformation = model.RequiresBankInformation,
-                IsBusinessAddressSameAsPersonal = model.IsBusinessAddressSameAsPersonal,
-
-                FirstName = model.Customer.FirstName,
-                LastName = model.Customer.LastName,
-                DisplayName = model.Customer.DisplayName,
-                Email = model.Customer.Email,
-                AlternativeEmail = model.Customer.AlternativeEmail,
-                Phone = model.Customer.Phone,
-                Mobile = model.Customer.Mobile,
-                RegistrationSource = GetRegistrationSource(),
-
-                PersonalAddress = new SaveSalesOrderAddressDto
-                {
-                    HouseNo = model.PersonalAddress.HouseNo,
-                    RoadName = model.PersonalAddress.RoadName,
-                    PostCode = model.PersonalAddress.PostCode,
-                    City = model.PersonalAddress.City,
-                    CityId = model.PersonalAddress.CityId,
-                    CountryId = model.PersonalAddress.CountryId,
-                    RegionId = model.PersonalAddress.RegionId,
-                    AddressLine = model.PersonalAddress.AddressLine
-                },
-
-                Business = new SaveSalesOrderBusinessDto
-                {
-                    BusinessName = model.Business.BusinessName,
-                    BusinessEmail = model.Business.BusinessEmail,
-                    TradingName = model.Business.TradingName,
-                    RegistrationNo = model.Business.RegistrationNo,
-                    ContactPersonName = model.Business.ContactPersonName,
-                    ContactPersonPhone = model.Business.ContactPersonPhone
-                },
-
-                BusinessAddress = new SaveSalesOrderAddressDto
-                {
-                    HouseNo = model.BusinessAddress.HouseNo,
-                    RoadName = model.BusinessAddress.RoadName,
-                    PostCode = model.BusinessAddress.PostCode,
-                    City = model.BusinessAddress.City,
-                    CityId = model.BusinessAddress.CityId,
-                    CountryId = model.BusinessAddress.CountryId,
-                    RegionId = model.BusinessAddress.RegionId,
-                    AddressLine = model.BusinessAddress.AddressLine
-                },
-
-                BankAccount = new SaveSalesOrderBankAccountDto
-                {
-                    BankName = model.BankAccount.BankName,
-                    AccountName = model.BankAccount.AccountName,
-                    AccountNumber = model.BankAccount.AccountNumber,
-                    SortCode = model.BankAccount.SortCode
-                }
-            }, cancellationToken);
-        }
-
-        // END Update Customer
 
         [HttpGet]
         public IActionResult SalesOrderPreview(Guid draftId)
@@ -645,6 +528,10 @@ namespace SuperCRM.Web.Controllers
                 Products = dto.Products.Select(x => new SalesOrderSelectedProductSummaryViewModel
                 {
                     ProductName = x.ProductName,
+
+                    SpecialNotes = x.SpecialNotes,
+                    
+
                     VariantName = x.VariantName,
                     ProviderName = x.ProviderName,
                     Quantity = x.Quantity,
@@ -653,6 +540,7 @@ namespace SuperCRM.Web.Controllers
                     CurrencyCode = x.CurrencyCode,
                     IsInstallmentSelected = x.IsInstallmentSelected,
                     SalesUnitCode = x.SalesUnitCode,
+                    SalesOrderDraftLineId = x.SalesOrderDraftLineId,
                     InstallmentSummary = x.InstallmentApplicable
                     ? (x.IsInstallmentSelected
                         ? $"Installment: Down {x.DownPaymentAmount:0.00}, {x.NoOfInstallment} x {x.MonthlyInstallmentAmount:0.00} monthly"
@@ -735,7 +623,7 @@ namespace SuperCRM.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateSalesOrder(Guid draftId, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateSalesOrder(SalesOrderCustomerCreationViewModel model, Guid draftId, CancellationToken cancellationToken = default)
         {
 
             TempData.Remove("SuccessMessage");
@@ -748,12 +636,7 @@ namespace SuperCRM.Web.Controllers
                 {
                     SalesOrderDraftId = draftId,
                     CurrentUserId = userId,
-                    OrderSourceType = GetOrderSourceType(),
-                    LineSpecialNotes = model.Products.Select(x => new CreateSalesOrderLineSpecialNoteDto
-                    {
-                        SalesOrderDraftLineId = x.SalesOrderDraftLineId,
-                        SpecialNotes = x.SpecialNotes
-                    }).ToList()
+                    OrderSourceType = GetOrderSourceType()
                 },
                 cancellationToken);
 
@@ -772,6 +655,29 @@ namespace SuperCRM.Web.Controllers
             TempData["SuccessMessage"] = emailResult? result.Message + " Customer email also sent successfully." : result.Message + " However, customer email could not be sent.";
 
             return RedirectToAction(nameof(SalesOrderCreatedSummary), new { saleIds });
+        }
+
+        private async Task SaveDraftLineSpecialNotesAsync(
+        SalesOrderCustomerCreationViewModel model,
+        CancellationToken cancellationToken)
+        {
+            if (model == null || model.SalesOrderDraftId == Guid.Empty)
+                return;
+
+            if (model.Products == null || !model.Products.Any())
+                return;
+
+            await _salesOrderCreationService.SaveDraftLineSpecialNotesAsync(
+                model.SalesOrderDraftId,
+                model.Products
+                    .Where(x => x.SalesOrderDraftLineId != Guid.Empty)
+                    .Select(x => new SaveDraftLineSpecialNoteDto
+                    {
+                        SalesOrderDraftLineId = x.SalesOrderDraftLineId,
+                        SpecialNotes = x.SpecialNotes
+                    })
+                    .ToList(),
+                cancellationToken);
         }
 
         [HttpGet]
@@ -898,6 +804,98 @@ namespace SuperCRM.Web.Controllers
             return RedirectToAction(nameof(SalesOrderCustomerCreation),
                 new { draftId = model.SalesOrderDraftId });
         }
+
+        // Start Update Customer
+        private async Task<SalesOrderCustomerSaveResultDto> UpdateCustomerInternalAsync(
+        SalesOrderCustomerCreationViewModel model,
+        CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+
+            if (userId == Guid.Empty)
+            {
+                return new SalesOrderCustomerSaveResultDto
+                {
+                    Success = false,
+                    Message = "Invalid login session.",
+                    SalesOrderDraftId = model.SalesOrderDraftId
+                };
+            }
+
+            return await _salesOrderCustomerService.UpdateCustomerAsync(new SaveSalesOrderCustomerDto
+            {
+                SalesOrderDraftId = model.SalesOrderDraftId,
+                CurrentUserId = userId,
+                ExistingCustomerId = model.ExistingCustomerId,
+
+                BusinessType = model.BusinessType,
+                IsBusinessFlow = model.IsBusinessFlow,
+                RequiresBankInformation = model.RequiresBankInformation,
+                IsBusinessAddressSameAsPersonal = model.IsBusinessAddressSameAsPersonal,
+
+                FirstName = model.Customer.FirstName,
+                LastName = model.Customer.LastName,
+                DisplayName = model.Customer.DisplayName,
+                Email = model.Customer.Email,
+                AlternativeEmail = model.Customer.AlternativeEmail,
+                Phone = model.Customer.Phone,
+                Mobile = model.Customer.Mobile,
+                RegistrationSource = GetRegistrationSource(),
+
+                PersonalAddress = new SaveSalesOrderAddressDto
+                {
+                    HouseNo = model.PersonalAddress.HouseNo,
+                    RoadName = model.PersonalAddress.RoadName,
+                    PostCode = model.PersonalAddress.PostCode,
+                    City = model.PersonalAddress.City,
+                    CityId = model.PersonalAddress.CityId,
+                    CountryId = model.PersonalAddress.CountryId,
+                    RegionId = model.PersonalAddress.RegionId,
+                    AddressLine = model.PersonalAddress.AddressLine
+                },
+
+                Business = new SaveSalesOrderBusinessDto
+                {
+                    BusinessName = model.Business.BusinessName,
+                    BusinessEmail = model.Business.BusinessEmail,
+                    TradingName = model.Business.TradingName,
+                    RegistrationNo = model.Business.RegistrationNo,
+                    ContactPersonName = model.Business.ContactPersonName,
+                    ContactPersonPhone = model.Business.ContactPersonPhone
+                },
+
+                BusinessAddress = new SaveSalesOrderAddressDto
+                {
+                    HouseNo = model.BusinessAddress.HouseNo,
+                    RoadName = model.BusinessAddress.RoadName,
+                    PostCode = model.BusinessAddress.PostCode,
+                    City = model.BusinessAddress.City,
+                    CityId = model.BusinessAddress.CityId,
+                    CountryId = model.BusinessAddress.CountryId,
+                    RegionId = model.BusinessAddress.RegionId,
+                    AddressLine = model.BusinessAddress.AddressLine
+                },
+
+                BankAccount = new SaveSalesOrderBankAccountDto
+                {
+                    BankName = model.BankAccount.BankName,
+                    AccountName = model.BankAccount.AccountName,
+                    AccountNumber = model.BankAccount.AccountNumber,
+                    SortCode = model.BankAccount.SortCode
+                },
+                LineSpecialNotes = model.Products
+                .Where(x => x.SalesOrderDraftLineId != Guid.Empty)
+                .Select(x => new SaveSalesOrderDraftLineSpecialNoteDto
+                {
+                    SalesOrderDraftLineId = x.SalesOrderDraftLineId,
+                    SpecialNotes = x.SpecialNotes
+                })
+                .ToList()
+
+            }, cancellationToken);
+        }
+
+        // END Update Customer
 
         [HttpGet]
         public async Task<IActionResult> CheckCustomerDuplicateForOrder(

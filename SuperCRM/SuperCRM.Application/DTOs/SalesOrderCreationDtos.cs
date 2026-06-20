@@ -6,10 +6,15 @@ namespace SuperCRM.Application.DTOs.SalesOrders
     {
         public Guid SalesOrderDraftId { get; set; }
         public Guid CurrentUserId { get; set; }
-
         public OrderSourceType OrderSourceType { get; set; }
+        public List<CreateSalesOrderLineSpecialNoteDto> LineSpecialNotes { get; set; } = new();
     }
 
+    public class CreateSalesOrderLineSpecialNoteDto
+    {
+        public Guid SalesOrderDraftLineId { get; set; }
+        public string? SpecialNotes { get; set; }
+    }
     public class CreateSalesOrderResultDto
     {
         public bool Success { get; set; }

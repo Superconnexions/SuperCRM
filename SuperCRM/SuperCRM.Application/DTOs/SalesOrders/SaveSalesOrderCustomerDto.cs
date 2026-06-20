@@ -26,8 +26,14 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public SaveSalesOrderBusinessDto Business { get; set; } = new();
         public SaveSalesOrderAddressDto BusinessAddress { get; set; } = new();
         public SaveSalesOrderBankAccountDto BankAccount { get; set; } = new();
+        public List<SaveSalesOrderDraftLineSpecialNoteDto> LineSpecialNotes { get; set; } = new();
     }
 
+    public class SaveSalesOrderDraftLineSpecialNoteDto
+    {
+        public Guid SalesOrderDraftLineId { get; set; }
+        public string? SpecialNotes { get; set; }
+    }
     public class SaveSalesOrderAddressDto
     {
         public string? HouseNo { get; set; }

@@ -64,22 +64,32 @@
                             <th class="text-end">Unit Price</th>
                             <th class="text-end">Total</th>
                             <th>Payment</th>
+                                <th>Special Notes</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.Products)
-                        {
-                            <tr>
-                                <td>@item.ProviderName</td>
-                                <td>@item.ProductName</td>
-                                <td>@item.VariantName</td>
-                                <td class="text-end">@item.Quantity</td>
-                                <td class="text-end">@item.SalesUnitCode</td>
-                                <td class="text-end">@item.CurrencyCode @item.SalePrice.ToString("0.00")</td>
-                                <td class="text-end">@item.CurrencyCode @item.LineTotalAmount.ToString("0.00")</td>
-                                <td>@item.InstallmentSummary</td>
-                            </tr>
-                        }
+                            @for (var i = 0; i < Model.Products.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        @Model.Products[i].ProviderName
+                                        <input type="hidden" asp-for="Products[i].SalesOrderDraftLineId" />
+                                    </td>
+                                    <td>@Model.Products[i].ProductName</td>
+                                    <td>@Model.Products[i].VariantName</td>
+                                    <td class="text-end">@Model.Products[i].Quantity</td>
+                                    <td class="text-end">@Model.Products[i].SalesUnitCode</td>
+                                    <td class="text-end">@Model.Products[i].CurrencyCode @Model.Products[i].SalePrice.ToString("0.00")</td>
+                                    <td class="text-end">@Model.Products[i].CurrencyCode @Model.Products[i].LineTotalAmount.ToString("0.00")</td>
+                                    <td>@Model.Products[i].InstallmentSummary</td>
+                                    <td>
+                                        <input asp-for="Products[i].SpecialNotes"
+                                               class="form-control"
+                                               maxlength="250"
+                                               placeholder="Special notes" />
+                                    </td>
+                                </tr>
+                            }
                     </tbody>
                 </table>
             </div>

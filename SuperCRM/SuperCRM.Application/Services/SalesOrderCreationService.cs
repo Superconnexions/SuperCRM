@@ -56,6 +56,14 @@ namespace SuperCRM.Application.Services
             var products = await _repository.GetProductsByIdsAsync(productIds, cancellationToken);
             var productMap = products.ToDictionary(x => x.ProductId, x => x);
 
+            //var specialNoteMap = request.LineSpecialNotes
+            //                    .Where(x => x.SalesOrderDraftLineId != Guid.Empty)
+            //                    .ToDictionary(
+            //                        x => x.SalesOrderDraftLineId,
+            //                        x => string.IsNullOrWhiteSpace(x.SpecialNotes)
+            //                    ? null
+            //                    : x.SpecialNotes.Trim());
+
             var commissions = await _repository.GetActiveProductBaseCommissionsAsync(productIds, orderDate, cancellationToken);
             var commissionMap = commissions
                 .GroupBy(x => x.ProductId)
@@ -170,7 +178,9 @@ namespace SuperCRM.Application.Services
                         VariantName = draftLine.VariantName,
                         ProviderProductId = draftLine.ProviderProductId,
                         Quantity = quantity,
-
+                        // Special Notes
+                        SpecialNotes = draftLine.SpecialNotes,
+                        Remarks = null,
 
                         SettledQty = 0,
                         PaidQty = 0,
@@ -723,6 +733,19 @@ namespace SuperCRM.Application.Services
                 pageSize,
                 cancellationToken);
         }
+
+
+        public async Task SaveDraftLineSpecialNotesAsync(
+        Guid salesOrderDraftId,
+        List<SaveDraftLineSpecialNoteDto> notes,
+        CancellationToken cancellationToken = default)
+        {
+            await _repository.SaveDraftLineSpecialNotesAsync(
+                salesOrderDraftId,
+                notes,
+                cancellationToken);
+        }
+
 
         // END
     }

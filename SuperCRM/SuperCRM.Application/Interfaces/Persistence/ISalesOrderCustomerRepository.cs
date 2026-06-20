@@ -85,5 +85,10 @@ namespace SuperCRM.Application.Interfaces.Persistence
             Guid customerId,
             CancellationToken cancellationToken = default);
 
+        Task UpdateDraftLineSpecialNotesAsync(
+        Guid salesOrderDraftId,
+        List<SaveSalesOrderDraftLineSpecialNoteDto> notes,
+        CancellationToken cancellationToken = default);
+
     }
 }

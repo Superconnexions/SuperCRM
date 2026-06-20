@@ -1227,6 +1227,39 @@ namespace SuperCRM.Persistence.Repositories
                 Items = rows
             };
         }
+
+
+        public async Task SaveDraftLineSpecialNotesAsync(
+        Guid salesOrderDraftId,
+        List<SaveDraftLineSpecialNoteDto> notes,
+        CancellationToken cancellationToken = default)
+        {
+            if (notes == null || !notes.Any())
+                return;
+
+            var noteMap = notes
+                .Where(x => x.SalesOrderDraftLineId != Guid.Empty)
+                .GroupBy(x => x.SalesOrderDraftLineId)
+                .ToDictionary(
+                    x => x.Key,
+                    x => string.IsNullOrWhiteSpace(x.First().SpecialNotes)
+                        ? null
+                        : x.First().SpecialNotes!.Trim());
+
+            var draftLines = await _dbContext.SalesOrderDraftLines
+                .Where(x => x.SalesOrderDraftId == salesOrderDraftId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var line in draftLines)
+            {
+                if (noteMap.TryGetValue(line.SalesOrderDraftLineId, out var note))
+                {
+                    line.SpecialNotes = note;
+                }
+            }
+        }
+
+
         // END
 
     }

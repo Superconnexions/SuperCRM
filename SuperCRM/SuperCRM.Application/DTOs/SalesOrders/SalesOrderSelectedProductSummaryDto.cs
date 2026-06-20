@@ -20,5 +20,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public decimal? MonthlyInstallmentAmount { get; set; }
         public DateTime? FirstInstallmentDate { get; set; }
         public string? SalesUnitCode { get; set; }
+        public Guid SalesOrderDraftLineId { get; set; }
+        public string? SpecialNotes { get; set; }
     }
 }

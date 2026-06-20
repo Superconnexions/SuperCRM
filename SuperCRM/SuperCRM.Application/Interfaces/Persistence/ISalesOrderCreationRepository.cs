@@ -90,6 +90,11 @@ namespace SuperCRM.Application.Interfaces.Persistence
         int pageSize,
         CancellationToken cancellationToken = default);
 
+        Task SaveDraftLineSpecialNotesAsync(
+        Guid salesOrderDraftId,
+        List<SaveDraftLineSpecialNoteDto> notes,
+        CancellationToken cancellationToken = default);
+
         // END
 
     }

@@ -790,7 +790,7 @@ namespace SuperCRM.Persistence.DbContexts
                 entity.Property(e => e.IsInstallmentSelected).IsRequired();
                 entity.Property(e => e.InstallmentApplicable).IsRequired();
                 entity.Property(e => e.NoOfInstallment).IsRequired();
-
+                entity.Property(e => e.SpecialNotes).HasMaxLength(250);
 
 
                 entity.HasOne(e => e.Product)
