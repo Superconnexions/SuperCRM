@@ -131,6 +131,7 @@
                                 <th class="text-end">Total</th>
                                 <th class="text-end">Commission(Draft)</th>
                                 <th>Installment</th>
+                                <th>Special Notes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -150,6 +151,7 @@
                                             <span>@line.NoOfInstallment x @line.MonthlyInstallmentAmount?.ToString("0.00") monthly</span>
                                         }
                                     </td>
+                                    <td> @line.SpecialNotes </td>
                                 </tr>
                             }
                         </tbody>
@@ -186,7 +188,7 @@
                                         <td class="text-end">@item.InstallmentNo</td>
                                         <td class="text-end">@item.InstallmentAmount.ToString("0.00")</td>
                                         <td>@item.DueDate.ToString("dd-MMM-yyyy")</td>
-                                        <td>Pending</td>
+                                        <td>@item.PaymentStatusText</td>
                                     </tr>
                                 }
                             </tbody>

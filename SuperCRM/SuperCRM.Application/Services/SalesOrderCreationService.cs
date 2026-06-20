@@ -365,6 +365,8 @@ namespace SuperCRM.Application.Services
                     Lines = saleLines.Select(x => new SalesOrderLineSummaryDto
                     {
                         SaleLineId = x.SaleLineId,
+                        
+                        SpecialNotes = x.SpecialNotes,
                         ProductName = x.ProductName ?? string.Empty,
                         VariantName = x.VariantName,
                         Quantity = x.Quantity,
@@ -387,7 +389,8 @@ namespace SuperCRM.Application.Services
                             InstallmentNo = i.InstallmentNo,
                             InstallmentAmount = i.InstallmentAmount,
                             DueDate = i.DueDate,
-                            PaymentStatus = i.PaymentStatus
+                            PaymentStatus = i.PaymentStatus,
+                            PaymentStatusText = ((InstallmentPaymentStatus)i.PaymentStatus).ToString()
                         }).ToList()
                 });
             }

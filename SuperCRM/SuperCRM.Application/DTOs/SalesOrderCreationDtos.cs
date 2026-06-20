@@ -69,6 +69,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public int? NoOfInstallment { get; set; }
         public decimal FinalAgentCommission { get; set; }
         public string CurrencyCode { get; set; } = "£";
+        public string? SpecialNotes { get; set; }
     }
 
     public class SalesOrderInstallmentScheduleSummaryDto
@@ -80,6 +81,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public decimal InstallmentAmount { get; set; }
         public DateTime DueDate { get; set; }
         public byte PaymentStatus { get; set; }
+        public string? PaymentStatusText { get; set; }
     }
 
     public class SalesOrderCustomerSummaryDto
