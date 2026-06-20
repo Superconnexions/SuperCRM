@@ -32,6 +32,14 @@
     text-transform: uppercase;
     margin-bottom: 12px;
 }
+
+.crm-products {
+    color: #6a4dff;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
 .category-image, .product-image {
     width: 100%;
     max-height: 175px;
