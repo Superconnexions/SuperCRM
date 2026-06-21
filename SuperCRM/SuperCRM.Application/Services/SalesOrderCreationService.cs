@@ -158,7 +158,7 @@ namespace SuperCRM.Application.Services
                         &&
 
                         draftLine.ProductCode.Equals(
-                            "ROLL",
+                            "ROLLS",
                             StringComparison.OrdinalIgnoreCase)
 
                         &&
