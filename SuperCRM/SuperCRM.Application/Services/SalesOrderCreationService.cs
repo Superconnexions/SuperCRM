@@ -56,14 +56,7 @@ namespace SuperCRM.Application.Services
             var products = await _repository.GetProductsByIdsAsync(productIds, cancellationToken);
             var productMap = products.ToDictionary(x => x.ProductId, x => x);
 
-            //var specialNoteMap = request.LineSpecialNotes
-            //                    .Where(x => x.SalesOrderDraftLineId != Guid.Empty)
-            //                    .ToDictionary(
-            //                        x => x.SalesOrderDraftLineId,
-            //                        x => string.IsNullOrWhiteSpace(x.SpecialNotes)
-            //                    ? null
-            //                    : x.SpecialNotes.Trim());
-
+           
             var commissions = await _repository.GetActiveProductBaseCommissionsAsync(productIds, orderDate, cancellationToken);
             var commissionMap = commissions
                 .GroupBy(x => x.ProductId)
@@ -71,12 +64,6 @@ namespace SuperCRM.Application.Services
 
             var createdSaleIds = new List<Guid>();
 
-            // Sales order split by Provdier product wise
-
-            //var salesGroups = draft.DraftLines
-            //    .GroupBy(x => x.ProviderId)
-            //    .OrderBy(x => x.Key.HasValue ? 1 : 0)
-            //    .ThenBy(x => x.First().ProviderName ?? "SuperCRM");
 
             // Sales order split by each product of Provdier product except SuperCRM
 
@@ -154,6 +141,37 @@ namespace SuperCRM.Application.Services
                         : draftLine.SalePrice * quantity;
 
                     var commissionAmount = CalculateCommission(commission, lineTotal, quantity);
+
+
+                    //=======================================
+                    // Temporary Business Rule
+                    // Product : ROLL
+                    // Variant : 57X40(BOX100)
+                    // Extra commission : +200
+                    //=======================================
+
+                    if (!string.IsNullOrWhiteSpace(draftLine.ProductCode)
+                        &&
+
+                        !string.IsNullOrWhiteSpace(draftLine.VariantCode)
+
+                        &&
+
+                        draftLine.ProductCode.Equals(
+                            "ROLL",
+                            StringComparison.OrdinalIgnoreCase)
+
+                        &&
+
+                        draftLine.VariantCode.Equals(
+                            "57X40(BOX100)",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        commissionAmount += 200m;
+                    }
+
+                    //END Special Commission Calculation for Roll
+
                     saleCommissionTotal += commissionAmount;
 
                     var firstInstallmentDate = draftLine.IsInstallmentSelected
