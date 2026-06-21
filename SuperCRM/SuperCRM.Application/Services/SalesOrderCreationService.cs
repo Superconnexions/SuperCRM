@@ -376,7 +376,8 @@ namespace SuperCRM.Application.Services
                         IsInstallment = x.NoOfInstallment.HasValue && x.NoOfInstallment.Value > 0,
                         MonthlyInstallmentAmount = x.MonthlyInstallmentAmount,
                         NoOfInstallment = x.NoOfInstallment,
-                        FinalAgentCommission = x.CalculatedAgentCommission
+                        CalculatedAgentCommission = x.CalculatedAgentCommission,
+                        FinalAgentCommission = x.FinalAgentCommission
                     }).ToList(),
                     Installments = installments
                         .Where(i => saleLineIds.Contains(i.SaleLineId))

@@ -999,6 +999,27 @@
     }
 
 
+/* Sales order contains Special Notes */
+
+.order-has-notes {
+    color: #ffc107 !important;
+    font-weight: 900;
+}
+
+    .order-has-notes:hover {
+        color: #ffd54f !important;
+    }
+
+.notes-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 12px;
+    background: #ffc107;
+    color: #000;
+}
 
 /* Mobile */
 

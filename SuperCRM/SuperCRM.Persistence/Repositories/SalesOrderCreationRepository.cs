@@ -220,14 +220,27 @@ namespace SuperCRM.Persistence.Repositories
 
 
             var salesQuery =
-                    _dbContext.Sales
-                    .AsNoTracking()
-                    .AsQueryable();
+                _dbContext.Sales
+                .AsNoTracking()
+                .AsQueryable();
+
+
+            //===================================================
+            // Agent security filter
+            // Agent can only see his/her own sales orders
+            //===================================================
+
+            if (soldByUserId.HasValue)
+            {
+                salesQuery =
+                    salesQuery.Where(s =>
+                        s.SoldByUserId == soldByUserId.Value);
+            }
 
 
             //===================================================
             // Search by Sales Order No
-            // Ignore all other search criteria
+            // Ignore date/status filters, but DO NOT ignore agent filter
             //===================================================
 
             if (!string.IsNullOrWhiteSpace(salesOrderNo))
@@ -236,101 +249,90 @@ namespace SuperCRM.Persistence.Repositories
 
                 salesQuery =
                     salesQuery.Where(s =>
-
-                        s.OrderNo.Contains(salesOrderNo)
-
-                    );
+                        s.OrderNo.Contains(salesOrderNo));
             }
             else
             {
                 salesQuery =
                     salesQuery.Where(s =>
 
-                        (!soldByUserId.HasValue ||
-
-                            s.SoldByUserId == soldByUserId.Value)
-
-                        &&
-
                         (!orderDateFrom.HasValue ||
-
                             s.OrderDate.Date >= orderDateFrom.Value.Date)
 
                         &&
 
                         (!orderDateTo.HasValue ||
-
                             s.OrderDate.Date <= orderDateTo.Value.Date)
 
                         &&
 
                         (!salesOrderStatus.HasValue ||
-
                             s.SalesOrderStatus == salesOrderStatus.Value)
-
                     );
             }
 
             var totalRecords = await salesQuery.CountAsync(cancellationToken);
 
-                var query =
-                    from s in salesQuery
-                    join c in _dbContext.Customers.AsNoTracking()
-                        on s.CustomerId equals c.CustomerId
-                    join p in _dbContext.Providers.AsNoTracking()
-                        on s.ProviderId equals p.ProviderId into providers
-                    from provider in providers.DefaultIfEmpty()
-                    join sl in _dbContext.SaleLines.AsNoTracking()
-                        on s.SaleId equals sl.SaleId into saleLines
-                    orderby s.OrderDate descending
-                    select new SalesOrderHistoryDto
-                    {
-                        SaleId = s.SaleId,
-                        OrderNo = s.OrderNo,
-                        OrderDate = s.OrderDate,
+            var query =
+                from s in salesQuery
+                join c in _dbContext.Customers.AsNoTracking()
+                    on s.CustomerId equals c.CustomerId
+                join p in _dbContext.Providers.AsNoTracking()
+                    on s.ProviderId equals p.ProviderId into providers
+                from provider in providers.DefaultIfEmpty()
+                join sl in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals sl.SaleId into saleLines
+                orderby s.OrderDate descending
+                select new SalesOrderHistoryDto
+                {
+                    SaleId = s.SaleId,
+                    OrderNo = s.OrderNo,
+                    OrderDate = s.OrderDate,
 
-                        CustomerId = c.CustomerId,
-                        CustomerCode = c.CustomerCode ?? "",
-                        CustomerName = c.DisplayName
-                            ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
-                        CustomerEmail = c.Email,
-                        CustomerMobile = c.Mobile,
+                    CustomerId = c.CustomerId,
+                    CustomerCode = c.CustomerCode ?? "",
+                    CustomerName = c.DisplayName
+                        ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+                    CustomerEmail = c.Email,
+                    CustomerMobile = c.Mobile,
 
-                        ProviderId = s.ProviderId,
-                        ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+                    ProviderId = s.ProviderId,
+                    ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
 
-                        SalesOrderStatus = s.SalesOrderStatus,
-                        SalesOrderStatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+                    SalesOrderStatus = s.SalesOrderStatus,
+                    SalesOrderStatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
 
-                        IsCommissionApplicable = s.IsCommissionApplicable,
+                    IsCommissionApplicable = s.IsCommissionApplicable,
 
-                        CommissionFinalizedText =
-                            !saleLines.Any()
-                                ? "No"
-                                : saleLines.All(l => l.IsCommissionFinalized)
-                                    ? "Yes"
-                                    : saleLines.All(l => !l.IsCommissionFinalized)
-                                        ? "No"
-                                        : "Partial",
+                    CommissionFinalizedText =
+                        !saleLines.Any()
+                            ? "No"
+                            : saleLines.All(l => l.IsCommissionFinalized)
+                                ? "Yes"
+                                : saleLines.All(l => !l.IsCommissionFinalized)
+                                    ? "No"
+                                    : "Partial",
 
-                        ServiceStartDate = s.ServiceStartDate,
-                        NextRenewDate = s.NextRenewDate,
-                        NoOfRenew = s.NoOfRenew,
+                    ServiceStartDate = s.ServiceStartDate,
+                    NextRenewDate = s.NextRenewDate,
+                    NoOfRenew = s.NoOfRenew,
 
-                        OrderTotal = saleLines.Sum(l => l.LineTotalAmount),
-                        AgentCommissionAmount = s.AgentCommissionAmount,
+                    OrderTotal = saleLines.Sum(l => l.LineTotalAmount),
+                    AgentCommissionAmount = s.AgentCommissionAmount,
 
-                        TotalLines = saleLines.Count(),
-                        CompletedLines = saleLines.Count(l => l.Completed),
-                        CancelledOrRejectedLines = saleLines.Count(l => l.CancelledOrRejected),
+                    TotalLines = saleLines.Count(),
+                    CompletedLines = saleLines.Count(l => l.Completed),
+                    CancelledOrRejectedLines = saleLines.Count(l => l.CancelledOrRejected),
 
-                        SoldByUserId = s.SoldByUserId,
-                        SoldByAgentId = s.SoldByAgentId,
-                        SoldByAgentCode = s.SoldByAgentCode,
+                    HasSpecialNotes = saleLines.Any(l =>!string.IsNullOrWhiteSpace(l.SpecialNotes)),
 
-                        EmailSentToCustomer = s.EmailSentToCustomer,
-                        EmailSentToProvider = s.EmailSentToProvider
-                    };
+                    SoldByUserId = s.SoldByUserId,
+                    SoldByAgentId = s.SoldByAgentId,
+                    SoldByAgentCode = s.SoldByAgentCode,
+
+                    EmailSentToCustomer = s.EmailSentToCustomer,
+                    EmailSentToProvider = s.EmailSentToProvider
+                };
 
                 var items = await query
                     .Skip((page - 1) * pageSize)

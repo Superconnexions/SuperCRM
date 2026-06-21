@@ -67,6 +67,7 @@ namespace SuperCRM.Application.DTOs.SalesOrders
         public bool IsInstallment { get; set; }
         public decimal? MonthlyInstallmentAmount { get; set; }
         public int? NoOfInstallment { get; set; }
+        public decimal CalculatedAgentCommission { get; set; }
         public decimal FinalAgentCommission { get; set; }
         public string CurrencyCode { get; set; } = "£";
         public string? SpecialNotes { get; set; }

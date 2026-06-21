@@ -153,7 +153,23 @@
                         {
                             <tr>
                                 <td>
-                                    <strong>@item.OrderNo</strong>
+                                    <a href="javascript:void(0);"
+                                       class="@(item.HasSpecialNotes ? "order-has-notes" : "link-blue") btn-view-sales-summary"
+                                       data-sale-id="@item.SaleId"
+                                       data-order-no="@item.OrderNo"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#salesOrderSummaryModal">
+
+                                        <strong>@item.OrderNo</strong>
+
+                                    </a>
+
+                                    @if (item.HasSpecialNotes)
+                                    {
+                                        <span class="notes-badge">
+                                            Notes
+                                        </span>
+                                    }
                                 </td>
 
                                 <td>@item.OrderDate.ToString("dd-MMM-yyyy")</td>
@@ -270,6 +286,8 @@
         </nav>
     }
 </div>
+
+
 
 <div class="modal fade crm-modal" id="salesOrderManageModal" tabindex="-1">
     <div class="modal-dialog modal-fullscreen-xl-down modal-xl">
@@ -470,6 +488,38 @@
         </div>
     </div>
 </div>
+
+
+
+
+<div class="modal fade crm-modal" id="salesOrderSummaryModal" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen-xl-down modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    Sales Order Summary
+                    <span id="salesOrderSummaryModalOrderNo"
+                          class="ms-2 text-warning fw-bold">
+                    </span>
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body" id="salesOrderSummaryModalBody">
+                <div class="crm-subtitle">
+                    Loading...
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
 
@@ -884,6 +934,85 @@
                 }
             }
         });
+
+
+        /// Sale Order Details Modal
+
+                document.addEventListener('click', async function (e) {
+
+            const btn = e.target.closest('.btn-view-sales-summary');
+
+            if (!btn) return;
+
+            const saleId = btn.dataset.saleId;
+            const orderNo = btn.dataset.orderNo;
+
+            const titleOrderNo =
+                document.getElementById('salesOrderSummaryModalOrderNo');
+
+            const modalBody =
+                document.getElementById('salesOrderSummaryModalBody');
+
+            if (titleOrderNo) {
+                titleOrderNo.innerHTML = '| ' + orderNo;
+            }
+
+            if (modalBody) {
+                modalBody.innerHTML =
+                    '<div class="crm-subtitle">Loading sales order summary...</div>';
+            }
+
+            try {
+                const response = await fetch(
+                    '/SalesOrder/SalesOrderSummaryModal?saleId=' +
+                    encodeURIComponent(saleId)
+                );
+
+                if (!response.ok) {
+
+                    modalBody.innerHTML =
+                        '<div class="alert alert-danger">Unable to load sales order summary.</div>';
+
+                        // const text = await response.text();
+
+                        // console.log(text);
+
+                        // modalBody.innerHTML =
+
+                        //     '<div class="alert alert-danger">'
+
+                        //     + response.status
+
+                        //     + ' '
+
+                        //     + response.statusText
+
+                        //     + '<br/>'
+
+                        //     + text
+
+                        //     + '</div>';
+
+                        return;
+                }
+
+                const html = await response.text();
+
+                modalBody.innerHTML = html;
+            }
+            catch {
+                modalBody.innerHTML =
+                    '<div class="alert alert-danger">Unexpected error while loading sales order summary.</div>';
+            }
+        });
+
+        document.getElementById('salesOrderSummaryModal')?.addEventListener('hidden.bs.modal', function () {
+
+                document.getElementById('salesOrderSummaryModalOrderNo').innerHTML = '';
+
+                document.getElementById('salesOrderSummaryModalBody').innerHTML =
+                    '<div class="crm-subtitle">Loading...</div>';
+            });
 
     </script>
 }

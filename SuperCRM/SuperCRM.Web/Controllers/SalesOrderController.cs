@@ -1666,6 +1666,32 @@ namespace SuperCRM.Web.Controllers
             return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
         }
 
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> SalesOrderSummaryModal(
+        Guid saleId,
+        CancellationToken cancellationToken = default)
+        {
+            if (saleId == Guid.Empty)
+            {
+                return BadRequest("Invalid sales order.");
+            }
+
+            var dto = await _salesOrderCreationService
+                .GetCreatedSalesOrderSummaryAsync(
+                    new List<Guid> { saleId },
+                    cancellationToken);
+
+            if (dto == null)
+            {
+                return NotFound("Sales order summary not found.");
+            }
+
+            var model = MapSalesOrderCreatedSummaryViewModel(dto);
+
+            return PartialView("_SalesOrderSummaryModal", model);
+        }
         // END
 
     }

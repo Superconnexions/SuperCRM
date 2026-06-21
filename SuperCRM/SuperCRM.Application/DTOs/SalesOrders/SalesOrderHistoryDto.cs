@@ -39,5 +39,6 @@
 
         public bool EmailSentToCustomer { get; set; }
         public bool EmailSentToProvider { get; set; }
+        public bool HasSpecialNotes { get; set; }
     }
 }
