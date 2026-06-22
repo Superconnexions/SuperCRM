@@ -62,6 +62,26 @@ namespace SuperCRM.Application.Services
                 .GroupBy(x => x.ProductId)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(c => c.EffectiveFrom ?? DateTime.MinValue).First());
 
+
+            // For Variant Product Commission
+            var variantCommissionOverrides =
+            await _repository.GetActiveProductVariantCommissionOverridesAsync(
+                productIds,
+                orderDate,
+                cancellationToken);
+
+            var variantCommissionOverrideMap = variantCommissionOverrides
+                .GroupBy(x => new
+                {
+                    ProductId = x.ProductId,
+                    VariantCode = (x.VariantCode ?? string.Empty).Trim().ToUpper()
+                })
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.First());
+
+            // END Variant Product Commission
+
             var createdSaleIds = new List<Guid>();
 
 
@@ -142,6 +162,23 @@ namespace SuperCRM.Application.Services
 
                     var commissionAmount = CalculateCommission(commission, lineTotal, quantity);
 
+                    // Calculte Variant Product Commission
+
+                    var variantOverrideKey = new
+                    {
+                        ProductId = draftLine.ProductId,
+                        VariantCode = (draftLine.VariantCode ?? string.Empty).Trim().ToUpper()
+                    };
+
+                    if (variantCommissionOverrideMap.TryGetValue(
+                            variantOverrideKey,
+                            out var variantOverride))
+                    {
+                        commissionAmount += variantOverride.ExtraCommissionAmount;
+                    }
+
+
+                    // Calculate Variant Product Commission
 
                     //=======================================
                     // Temporary Business Rule
@@ -150,25 +187,25 @@ namespace SuperCRM.Application.Services
                     // Extra commission : +200
                     //=======================================
 
-                    if (!string.IsNullOrWhiteSpace(draftLine.ProductCode)
-                        &&
+                    //if (!string.IsNullOrWhiteSpace(draftLine.ProductCode)
+                    //    &&
 
-                        !string.IsNullOrWhiteSpace(draftLine.VariantCode)
+                    //    !string.IsNullOrWhiteSpace(draftLine.VariantCode)
 
-                        &&
+                    //    &&
 
-                        draftLine.ProductCode.Equals(
-                            "ROLLS",
-                            StringComparison.OrdinalIgnoreCase)
+                    //    draftLine.ProductCode.Equals(
+                    //        "ROLLS",
+                    //        StringComparison.OrdinalIgnoreCase)
 
-                        &&
+                    //    &&
 
-                        draftLine.VariantCode.Equals(
-                            "57X40(BOX100)",
-                            StringComparison.OrdinalIgnoreCase))
-                    {
-                        commissionAmount += 200m;
-                    }
+                    //    draftLine.VariantCode.Equals(
+                    //        "57X40(BOX100)",
+                    //        StringComparison.OrdinalIgnoreCase))
+                    //{
+                    //    commissionAmount += 200m;
+                    //}
 
                     //END Special Commission Calculation for Roll
 
@@ -210,9 +247,10 @@ namespace SuperCRM.Application.Services
                         PriceFinalizedByUserId = request.CurrentUserId,
                         ProductBaseCommissionId = commission?.ProductBaseCommissionId,
                         CommissionType = commission?.CommissionType,
-                        CommissionValue = commission?.CommissionType == CommissionType.FixedAmount
-                            ? commission.FixedAmount
-                            : commission?.Percentage,
+                        //CommissionValue = commission?.CommissionType == CommissionType.FixedAmount
+                        //    ? commission.FixedAmount
+                        //    : commission?.Percentage,
+                        CommissionValue = commissionAmount,
                         CalculatedAgentCommission = commissionAmount,
                         //FinalAgentCommission = commissionAmount,
                         //SuperCRMCommissionEarned = commissionAmount,

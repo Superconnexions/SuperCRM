@@ -67,8 +67,8 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleLine> SaleLines { get; set; }
         public DbSet<InstallmentSchedule> InstallmentSchedules { get; set; }
-
         public DbSet<SalesOrderStatusHistory> SalesOrderStatusHistories { get; set; }
+        public DbSet<ProductVariantCommissionOverride> ProductVariantCommissionOverrides { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -1056,6 +1056,43 @@ namespace SuperCRM.Persistence.DbContexts
                     .WithMany()
                     .HasForeignKey(x => x.SaleId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<ProductVariantCommissionOverride>(entity =>
+            {
+                entity.ToTable("ProductVariantCommissionOverrides");
+
+                entity.HasKey(e => e.ProductVariantCommissionOverrideId);
+
+                entity.Property(e => e.ProductCode)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(e => e.VariantCode)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(e => e.ExtraCommissionAmount)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                entity.HasIndex(e => new
+                {
+                    e.ProductCode,
+                    e.VariantCode,
+                    e.IsActive,
+                    e.EffectiveFrom,
+                    e.EffectiveTo
+                })
+                .HasDatabaseName("IX_ProductVariantCommissionOverrides_ProductVariant");
             });
             /// END ALL
 

@@ -1261,6 +1261,31 @@ namespace SuperCRM.Persistence.Repositories
             }
         }
 
+        public async Task<List<ProductVariantCommissionOverrideDto>> GetActiveProductVariantCommissionOverridesAsync(
+        List<Guid> productIds,
+        DateTime orderDate,
+        CancellationToken cancellationToken = default)
+        {
+            if (productIds == null || !productIds.Any())
+                return new List<ProductVariantCommissionOverrideDto>();
+
+            return await _dbContext.ProductVariantCommissionOverrides
+                .AsNoTracking()
+                .Where(x =>
+                    productIds.Contains(x.ProductId) &&
+                    x.IsActive &&
+                    (!x.EffectiveFrom.HasValue || x.EffectiveFrom.Value <= orderDate) &&
+                    (!x.EffectiveTo.HasValue || x.EffectiveTo.Value >= orderDate))
+                .Select(x => new ProductVariantCommissionOverrideDto
+                {
+                    ProductId = x.ProductId,
+                    ProductCode = x.ProductCode,
+                    ProductVariantId = x.ProductVariantId,
+                    VariantCode = x.VariantCode,
+                    ExtraCommissionAmount = x.ExtraCommissionAmount
+                })
+                .ToListAsync(cancellationToken);
+        }
 
         // END
 

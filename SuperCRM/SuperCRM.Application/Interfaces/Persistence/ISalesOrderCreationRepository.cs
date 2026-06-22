@@ -95,6 +95,11 @@ namespace SuperCRM.Application.Interfaces.Persistence
         List<SaveDraftLineSpecialNoteDto> notes,
         CancellationToken cancellationToken = default);
 
+        Task<List<ProductVariantCommissionOverrideDto>> GetActiveProductVariantCommissionOverridesAsync(
+        List<Guid> productIds,
+        DateTime orderDate,
+        CancellationToken cancellationToken = default);
+
         // END
 
     }
