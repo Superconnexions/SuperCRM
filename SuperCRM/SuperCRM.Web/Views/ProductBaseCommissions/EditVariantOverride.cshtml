@@ -1,0 +1,40 @@
+﻿@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductVariantCommissionOverrideCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Product Variant Commission";
+}
+
+<div class="crm-form-page">
+
+    <h2 class="crm-form-title">
+        Edit Product Variant Commission
+    </h2>
+
+    <form asp-action="EditVariantOverride"
+          method="post"
+          class="crm-form-panel">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="ProductVariantCommissionOverrideId" type="hidden" />
+
+        <partial name="_VariantOverrideForm" model="Model" />
+
+        <div class="mt-3">
+            <button type="submit" class="btn crm-btn-primary">
+                Update
+            </button>
+            
+            <a asp-action="VariantOverrides" class="btn crm-btn-back">
+                Back o list
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_VariantOverrideScripts" />
+}

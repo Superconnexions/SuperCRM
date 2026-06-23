@@ -249,5 +249,433 @@ namespace SuperCRM.Web.Controllers
                 new SelectListItem { Value = "£", Text = "GBP" }
             };
         }
+
+
+        /// Productbase commission override
+        /// 
+
+        [HttpGet]
+
+        public async Task<IActionResult> VariantOverrides(
+        CancellationToken cancellationToken = default)
+        {
+            var dtoItems =
+                await _service
+                .GetProductVariantCommissionOverridesAsync(
+                    null,
+                    cancellationToken);
+
+            var model =
+                new ProductVariantCommissionOverrideIndexViewModel
+                {
+                    ProductKeyword = null,
+
+                    Items =
+                        MapVariantOverrideList(dtoItems)
+                };
+
+            return View(model);
+        }
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult>
+        GetProductVariantCommissionByProductNameOrCode(
+
+        ProductVariantCommissionOverrideIndexViewModel model,
+
+        CancellationToken cancellationToken = default)
+        {
+            var dtoItems =
+                await _service
+                .GetProductVariantCommissionOverridesAsync(
+
+                    model.ProductKeyword,
+
+                    cancellationToken);
+
+            model.Items =
+                MapVariantOverrideList(dtoItems);
+
+            return View(
+
+                "VariantOverrides",
+
+                model);
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult>
+        CreateVariantOverride(
+
+        CancellationToken cancellationToken = default)
+        {
+            var model =
+                new ProductVariantCommissionOverrideCreateEditViewModel
+                {
+                    IsActive = true,
+
+                    Products =
+                        await GetProductSelectListAsync(
+                            cancellationToken)
+                };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult>
+        CreateVariantOverride(
+
+        ProductVariantCommissionOverrideCreateEditViewModel model,
+
+        CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Products =
+                    await GetProductSelectListAsync(
+                        cancellationToken);
+
+                model.Variants =
+
+                    model.ProductId == Guid.Empty
+
+                    ? new()
+
+                    : await GetVariantSelectListAsync(
+
+                        model.ProductId,
+
+                        cancellationToken);
+
+                return View(model);
+            }
+
+
+            await _service
+                .CreateProductVariantCommissionOverrideAsync(
+
+                new SaveProductVariantCommissionOverrideDto
+                {
+                    ProductId = model.ProductId,
+
+                    ProductVariantId =
+                        model.ProductVariantId,
+
+                    ExtraCommissionAmount =
+                        model.ExtraCommissionAmount,
+
+                    EffectiveFrom =
+                        model.EffectiveFrom,
+
+                    EffectiveTo =
+                        model.EffectiveTo,
+
+                    IsActive =
+                        model.IsActive,
+
+                    Note =
+                        model.Note,
+
+                    CurrentUserId =
+                        GetCurrentUserId()
+                },
+
+                cancellationToken);
+
+
+            TempData["SuccessMessage"] =
+
+                "Commission override created successfully.";
+
+
+            return RedirectToAction(
+
+                nameof(VariantOverrides));
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult>
+        EditVariantOverride(
+
+        Guid id,
+
+        CancellationToken cancellationToken = default)
+        {
+            var dto =
+                await _service
+                .GetProductVariantCommissionOverrideByIdAsync(
+                    id,
+                    cancellationToken);
+
+            if (dto == null)
+            {
+                return NotFound();
+            }
+
+            var model =
+                new ProductVariantCommissionOverrideCreateEditViewModel
+                {
+                    ProductVariantCommissionOverrideId =
+                        dto.ProductVariantCommissionOverrideId,
+
+                    ProductId =
+                        dto.ProductId,
+
+                    ProductVariantId =
+                        dto.ProductVariantId,
+
+                    ExtraCommissionAmount =
+                        dto.ExtraCommissionAmount,
+
+                    EffectiveFrom =
+                        dto.EffectiveFrom,
+
+                    EffectiveTo =
+                        dto.EffectiveTo,
+
+                    IsActive =
+                        dto.IsActive,
+
+                    Note =
+                        dto.Note,
+
+                    Products =
+                        await GetProductSelectListAsync(
+                            cancellationToken),
+
+                    Variants =
+                        await GetVariantSelectListAsync(
+                            dto.ProductId,
+                            cancellationToken)
+                };
+
+            return View(model);
+        }
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult>
+        EditVariantOverride(
+
+        ProductVariantCommissionOverrideCreateEditViewModel model,
+
+        CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Products =
+                    await GetProductSelectListAsync(
+                        cancellationToken);
+
+                model.Variants =
+
+                    model.ProductId == Guid.Empty
+
+                    ? new()
+
+                    : await GetVariantSelectListAsync(
+
+                        model.ProductId,
+
+                        cancellationToken);
+
+                return View(model);
+            }
+
+
+            await _service
+                .UpdateProductVariantCommissionOverrideAsync(
+
+                new SaveProductVariantCommissionOverrideDto
+                {
+                    ProductVariantCommissionOverrideId =
+                        model.ProductVariantCommissionOverrideId,
+
+                    ProductId =
+                        model.ProductId,
+
+                    ProductVariantId =
+                        model.ProductVariantId,
+
+                    ExtraCommissionAmount =
+                        model.ExtraCommissionAmount,
+
+                    EffectiveFrom =
+                        model.EffectiveFrom,
+
+                    EffectiveTo =
+                        model.EffectiveTo,
+
+                    IsActive =
+                        model.IsActive,
+
+                    Note =
+                        model.Note,
+
+                    CurrentUserId =
+                        GetCurrentUserId()
+                },
+
+                cancellationToken);
+
+
+            TempData["SuccessMessage"] =
+
+                "Commission override updated successfully.";
+
+
+            return RedirectToAction(
+
+                nameof(VariantOverrides));
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult>
+        GetVariantsByProductId(
+
+        Guid productId,
+
+        CancellationToken cancellationToken = default)
+        {
+            var variants =
+                await _service
+                .GetVariantOptionsByProductIdAsync(
+
+                    productId,
+
+                    cancellationToken);
+
+            return Json(
+
+                variants.Select(x => new
+                {
+                    value = x.Id,
+
+                    text = x.Text
+                }));
+        }
+
+        // Helper VariantOverride
+
+        private List<ProductVariantCommissionOverrideListItemViewModel>
+        MapVariantOverrideList(
+
+        List<ProductVariantCommissionOverrideDto> dtoItems)
+        {
+            return dtoItems
+
+                .Select(x =>
+
+                new ProductVariantCommissionOverrideListItemViewModel
+                {
+                    ProductVariantCommissionOverrideId =
+                        x.ProductVariantCommissionOverrideId,
+
+                    ProductCode =
+                        x.ProductCode,
+
+                    ProductName =
+                        x.ProductName,
+
+                    VariantCode =
+                        x.VariantCode,
+
+                    VariantName =
+                        x.VariantName,
+
+                    ExtraCommissionAmount =
+                        x.ExtraCommissionAmount,
+
+                    EffectiveFrom =
+                        x.EffectiveFrom,
+
+                    EffectiveTo =
+                        x.EffectiveTo,
+
+                    IsActive =
+                        x.IsActive,
+
+                    Note =
+                        x.Note
+                })
+
+                .ToList();
+        }
+
+
+        private async Task<List<SelectListItem>>
+        GetProductSelectListAsync(
+        CancellationToken cancellationToken)
+        {
+            var items =
+                await _service
+                .GetProductOptionsAsync(
+                    cancellationToken);
+
+            return items
+
+                .Select(x =>
+
+                new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+
+                    Text = x.Text
+                })
+
+                .ToList();
+        }
+
+        private async Task<List<SelectListItem>>
+        GetVariantSelectListAsync(
+
+        Guid productId,
+
+        CancellationToken cancellationToken)
+        {
+            var items =
+                await _service
+                .GetVariantOptionsByProductIdAsync(
+
+                    productId,
+
+                    cancellationToken);
+
+            return items
+
+                .Select(x =>
+
+                new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+
+                    Text = x.Text
+                })
+
+                .ToList();
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            var raw = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Guid.TryParse(raw, out var id) ? id : Guid.Empty;
+        }
+
+        // END
+
+
     }
 }

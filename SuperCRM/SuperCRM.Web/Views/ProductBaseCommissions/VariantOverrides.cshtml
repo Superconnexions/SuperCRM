@@ -1,0 +1,119 @@
+﻿@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductVariantCommissionOverrideIndexViewModel
+
+@{
+    ViewData["Title"] = "Product Variant Commission";
+}
+
+<div class="crm-page">
+
+    <h2 class="crm-page-title">
+        Product Variant Commission
+    </h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success mb-3">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <form asp-action="GetProductVariantCommissionByProductNameOrCode"
+          method="post"
+          class="crm-search-panel mb-3">
+
+        @Html.AntiForgeryToken()
+
+        <div class="pvc-search-row">
+
+            <div class="pvc-search-left">
+
+                <div class="pvc-search-field">
+                    <label asp-for="ProductKeyword"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ProductKeyword"
+                           class="form-control"
+                           placeholder="Product code or product name" />
+                </div>
+
+                <button type="submit"
+                        class="btn crm-btn-primary pvc-btn-small">
+                    Search
+                </button>
+
+                <a asp-action="VariantOverrides"
+                   class="btn pvc-btn-reset pvc-btn-small">
+                    Reset
+                </a>
+
+            </div>
+
+            <div class="pvc-search-right">
+
+                <a asp-action="CreateVariantOverride"
+                   class="btn pvc-btn-add">
+                    Add Product Variant Commission
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <div class="crm-grid-panel">
+        <table class="crm-grid-table">
+            <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th>Variant Code</th>
+                    <th>Variant Name</th>
+                    <th class="text-end">Extra Commission</th>
+                    <th>Effective From</th>
+                    <th>Effective To</th>
+                    <th>Active</th>
+                    <th>Note</th>
+                    <th style="width:120px;">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Items.Any())
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.ProductCode</td>
+                            <td>@item.ProductName</td>
+                            <td>@item.VariantCode</td>
+                            <td>@item.VariantName</td>
+                            <td class="text-end">@item.ExtraCommissionAmount.ToString("N2")</td>
+                            <td>@item.EffectiveFrom?.ToString("dd-MMM-yyyy")</td>
+                            <td>@item.EffectiveTo?.ToString("dd-MMM-yyyy")</td>
+                            <td>@(item.IsActive ? "Yes" : "No")</td>
+                            <td>@item.Note</td>
+                            <td>
+                                <a asp-action="EditVariantOverride"
+                                   asp-route-id="@item.ProductVariantCommissionOverrideId"
+                                   class="btn btn-sm crm-btn-warning">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" style="text-align:center;padding:20px;">
+                            No records found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

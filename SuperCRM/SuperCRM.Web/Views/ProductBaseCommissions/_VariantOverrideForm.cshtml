@@ -1,0 +1,58 @@
+﻿@model SuperCRM.Web.ViewModels.ProductBaseCommissions.ProductVariantCommissionOverrideCreateEditViewModel
+
+<div class="row">
+
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductId" class="form-label"></label>
+        <select asp-for="ProductId"
+                asp-items="Model.Products"
+                class="form-select"
+                id="ProductId">
+            <option value="">-- Select Product --</option>
+        </select>
+        <span asp-validation-for="ProductId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductVariantId" class="form-label"></label>
+        <select asp-for="ProductVariantId"
+                asp-items="Model.Variants"
+                class="form-select"
+                id="ProductVariantId">
+            <option value="">-- Select Variant --</option>
+        </select>
+        <span asp-validation-for="ProductVariantId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="ExtraCommissionAmount" class="form-label"></label>
+        <input asp-for="ExtraCommissionAmount" class="form-control" />
+        <span asp-validation-for="ExtraCommissionAmount" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="EffectiveFrom" class="form-label"></label>
+        <input asp-for="EffectiveFrom" type="date" class="form-control" />
+        <span asp-validation-for="EffectiveFrom" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <label asp-for="EffectiveTo" class="form-label"></label>
+        <input asp-for="EffectiveTo" type="date" class="form-control" />
+        <span asp-validation-for="EffectiveTo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12 mb-3">
+        <label asp-for="Note" class="form-label"></label>
+        <input asp-for="Note" class="form-control" maxlength="500" />
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-12 mb-3">
+        <div class="form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+    </div>
+
+</div>

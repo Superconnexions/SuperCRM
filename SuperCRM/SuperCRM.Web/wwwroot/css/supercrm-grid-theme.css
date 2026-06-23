@@ -311,8 +311,11 @@
     }
 
 .crm-page .btn-secondary {
+    /*
     background: #3b3f44;
-    border-color: #3b3f44;
+    border-color: #3b3f44;*/
+    background: #ffc107;
+    border-color: #ffc107;
     color: #ffffff;
 }
 
@@ -984,7 +987,18 @@
 
 .crm-btn-secondary {
     font-weight: 700;
+    /*background: #f0d279;
+    border-color: #f0d279;
+    color: #000;*/
 }
+
+.crm-btn-back {
+    font-weight: 700;
+    background: #f0d279;
+    border-color: #f0d279;
+    color: #000;
+}
+
 
 .crm-btn-warning {
     background: #ffc107;
@@ -1020,6 +1034,60 @@
     background: #ffc107;
     color: #000;
 }
+
+
+/* ==========================================
+   Product Variant Commission Search Panel
+========================================== */
+/* Product Variant Commission search layout */
+
+.pvc-search-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 15px;
+    width: 100%;
+}
+
+.pvc-search-left {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex: 1;
+}
+
+.pvc-search-right {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.pvc-search-field {
+    flex: 1;
+    max-width: 520px;
+}
+
+.pvc-btn-small {
+    height: 45px;
+    min-width: 90px;
+}
+
+.pvc-btn-reset {
+    background: #6c757d !important;
+    border: 1px solid #6c757d !important;
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.pvc-btn-add {
+    background: #198754 !important;
+    border: 1px solid #198754 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    height: 45px;
+    min-width: 260px;
+}
+
 
 /* Mobile */
 

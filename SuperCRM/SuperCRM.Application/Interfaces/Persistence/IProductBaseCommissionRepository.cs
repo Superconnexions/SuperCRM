@@ -17,5 +17,27 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Task AddHistoryAsync(ProductBaseCommissionHistory entity, CancellationToken cancellationToken = default);
         Task UpdateAsync(ProductBaseCommission entity, CancellationToken cancellationToken = default);
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<List<ProductVariantCommissionOverrideDto>> GetProductVariantCommissionOverridesAsync(
+        string? productKeyword,
+        CancellationToken cancellationToken = default);
+
+        Task<ProductVariantCommissionOverrideDto?> GetProductVariantCommissionOverrideByIdAsync(
+            Guid id,
+            CancellationToken cancellationToken = default);
+
+        Task CreateProductVariantCommissionOverrideAsync(
+            SaveProductVariantCommissionOverrideDto dto,
+            CancellationToken cancellationToken = default);
+
+        Task UpdateProductVariantCommissionOverrideAsync(
+            SaveProductVariantCommissionOverrideDto dto,
+            CancellationToken cancellationToken = default);
+
+        Task<List<ProductOptionDto>> GetProductOptionsAsync(
+            CancellationToken cancellationToken = default);
+
+        Task<List<ProductOptionDto>> GetVariantOptionsByProductIdAsync(
+            Guid productId,
+            CancellationToken cancellationToken = default);
     }
 }

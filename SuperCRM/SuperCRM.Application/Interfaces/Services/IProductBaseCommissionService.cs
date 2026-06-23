@@ -13,6 +13,35 @@ namespace SuperCRM.Application.Interfaces.Services
         Task<(bool Success, string ErrorMessage)> UpdateAsync(UpdateProductBaseCommissionDto request, CancellationToken cancellationToken = default);
         Task<(bool Success, string ErrorMessage)> SoftDeleteAsync(Guid id, Guid changedByUserId, string? note, CancellationToken cancellationToken = default);
 
+        // Product Variant Override
+
+        Task<List<ProductVariantCommissionOverrideDto>>
+        GetProductVariantCommissionOverridesAsync(
+        string? productKeyword,
+        CancellationToken cancellationToken = default);
+
+        Task<ProductVariantCommissionOverrideDto?>
+        GetProductVariantCommissionOverrideByIdAsync(
+            Guid id,
+            CancellationToken cancellationToken = default);
+
+        Task CreateProductVariantCommissionOverrideAsync(
+            SaveProductVariantCommissionOverrideDto dto,
+            CancellationToken cancellationToken = default);
+
+        Task UpdateProductVariantCommissionOverrideAsync(
+            SaveProductVariantCommissionOverrideDto dto,
+            CancellationToken cancellationToken = default);
+
+        Task<List<ProductOptionDto>>
+        GetProductOptionsAsync(
+            CancellationToken cancellationToken = default);
+
+        Task<List<ProductOptionDto>>
+        GetVariantOptionsByProductIdAsync(
+            Guid productId,
+            CancellationToken cancellationToken = default);
+
         Task<ProductBaseCommissionDto?> GetSmartCommissionAsync(Guid productId, DateTime orderDate, CancellationToken cancellationToken = default);
         Task<CommissionCalculationResultDto> CalculateCommissionAsync(Guid productId, DateTime orderDate, decimal orderAmount, CancellationToken cancellationToken = default);
     }

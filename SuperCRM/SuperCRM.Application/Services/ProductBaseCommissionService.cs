@@ -306,5 +306,78 @@ namespace SuperCRM.Application.Services
                 UpdatedAt = x.UpdatedAt
             };
         }
+
+        // Product Variant Cmmission Override
+
+        public async Task<List<ProductVariantCommissionOverrideDto>>
+        GetProductVariantCommissionOverridesAsync(
+        string? productKeyword,
+        CancellationToken cancellationToken = default)
+        {
+            return await _repository
+                .GetProductVariantCommissionOverridesAsync(
+                    productKeyword,
+                    cancellationToken);
+        }
+
+
+        public async Task<ProductVariantCommissionOverrideDto?>
+        GetProductVariantCommissionOverrideByIdAsync(
+            Guid id,
+            CancellationToken cancellationToken = default)
+        {
+            return await _repository
+                .GetProductVariantCommissionOverrideByIdAsync(
+                    id,
+                    cancellationToken);
+        }
+
+
+        public async Task CreateProductVariantCommissionOverrideAsync(
+            SaveProductVariantCommissionOverrideDto dto,
+            CancellationToken cancellationToken = default)
+        {
+            await _repository
+                .CreateProductVariantCommissionOverrideAsync(
+                    dto,
+                    cancellationToken);
+        }
+
+
+        public async Task UpdateProductVariantCommissionOverrideAsync(
+            SaveProductVariantCommissionOverrideDto dto,
+            CancellationToken cancellationToken = default)
+        {
+            await _repository
+                .UpdateProductVariantCommissionOverrideAsync(
+                    dto,
+                    cancellationToken);
+        }
+
+
+        public async Task<List<ProductOptionDto>>
+        GetProductOptionsAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return await _repository
+                .GetProductOptionsAsync(
+                    cancellationToken);
+        }
+
+
+        public async Task<List<ProductOptionDto>>
+        GetVariantOptionsByProductIdAsync(
+            Guid productId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _repository
+                .GetVariantOptionsByProductIdAsync(
+                    productId,
+                    cancellationToken);
+        }
+
+
+        // END
+
     }
 }
