@@ -189,7 +189,7 @@ namespace SuperCRM.Persistence.Repositories
                 .AsNoTracking()
                 .AnyAsync(x =>
                     x.UserId == userId &&
-                    x.IsApproved,
+                    x.IsApproved && x.RegistrationStatus == (byte)AgentRegistrationStatus.Active,
                     cancellationToken);
         }
 

@@ -66,6 +66,8 @@ namespace SuperCRM.Application.Services
             agent.UpdatedAt = utcNow;
             agent.UpdatedByUserId = request.UpdatedByUserId;
 
+            agent.IsApproved = false;  // Default is False. It will be work if Active to Reject or Suspended by admin
+
             if (request.RegistrationStatus == (byte)AgentRegistrationStatus.Active)
             {
                 agent.IsApproved = true;
@@ -75,7 +77,6 @@ namespace SuperCRM.Application.Services
                 if (!agent.JoinedAt.HasValue)
                     agent.JoinedAt = utcNow;
             }
-
             await _repository.SaveChangesAsync(cancellationToken);
             return (true, string.Empty);
         }
