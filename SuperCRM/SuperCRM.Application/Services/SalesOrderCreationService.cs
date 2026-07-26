@@ -164,7 +164,7 @@ namespace SuperCRM.Application.Services
                     var commissionAmount = 0m;
 
 
-                    if (request.IsAgent && commission != null) {
+                    if (commission != null) {
 
                         commissionAmount = CalculateCommission(commission, lineTotal, quantity);
                     }
@@ -179,7 +179,7 @@ namespace SuperCRM.Application.Services
                     };
 
 
-                    if (request.IsAgent && commission != null)
+                    if ( commission != null)
                     {
                         if (variantCommissionOverrideMap.TryGetValue(
                             variantOverrideKey,
