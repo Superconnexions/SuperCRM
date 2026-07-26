@@ -1,5 +1,7 @@
 ﻿@model SuperCRM.Web.ViewModels.SalesOrders.CustomerManagementViewModel
 
+<link rel="stylesheet" href="~/css/customer-management-edit.css" asp-append-version="true" />
+
 @{
     ViewData["Title"] = "Customer Management";
     var startRecord = Model.TotalRecords == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
@@ -26,7 +28,8 @@
         }
     </div>
 
-    <form asp-action="CustomerManagement"
+    <form id="customerManagementSearchForm"
+          asp-action="CustomerManagement"
           asp-controller="SalesOrder"
           method="get"
           class="crm-search-panel">
@@ -104,7 +107,7 @@
                 </div>
 
             </div>
-            
+
         </div>
     </form>
 
@@ -122,9 +125,7 @@
                         <th>Mobile</th>
                         <th class="text-nowrap">Created At</th>
                         <th>Sales Orders</th>
-                        <th>Address</th>
-                        <th>Business</th>
-                        <th>Bank</th>
+                        <th>View/Edit</th>
                     </tr>
                 </thead>
 
@@ -132,7 +133,7 @@
                     @if (!Model.Customers.Any())
                     {
                         <tr>
-                            <td colspan="12" class="text-center crm-subtitle py-4">
+                            <td colspan="10" class="text-center crm-subtitle py-4">
                                 No customer found.
                             </td>
                         </tr>
@@ -165,6 +166,15 @@
 
                                 <td class="text-nowrap">
                                     <button type="button"
+                                            class="btn btn-sm btn-primary btn-customer-view-edit"
+                                            data-customer-id="@item.CustomerId">
+                                        View/Edit
+                                    </button>
+                                </td>
+
+@* 
+                                <td class="text-nowrap">
+                                    <button type="button"
                                             class="btn btn-sm crm-action-btn btn-view-address"
                                             data-customer-id="@item.CustomerId"
                                             data-bs-toggle="modal"
@@ -185,7 +195,7 @@
                                 </td>
 
                                 <td class="text-nowrap">
-                                    <button type="button"s
+                                    <button type="button"
                                             class="btn btn-sm crm-action-btn btn-view-bank"
                                             data-customer-id="@item.CustomerId"
                                             data-bs-toggle="modal"
@@ -193,7 +203,8 @@
                                             @(item.HasBank ? "" : "disabled")>
                                         View Bank
                                     </button>
-                                </td>
+                                </td> *@
+
                             </tr>
                         }
                     }
@@ -242,6 +253,21 @@
 
 </div>
 
+
+<div class="modal fade" id="customerEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Customer View/Edit</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customerEditModalBody">
+                <div class="text-muted">Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade crm-modal" id="customerAddressModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -280,159 +306,161 @@
 
 
 @section Scripts {
+    <script src="~/js/customer-management-edit.js" asp-append-version="true"></script>
     <script>
-        document.addEventListener('click', async function (e) {
-            const addressBtn = e.target.closest('.btn-view-address');
-            const businessBtn = e.target.closest('.btn-view-business');
-            const bankBtn = e.target.closest('.btn-view-bank');
+                document.addEventListener('click', async function (e) {
+                    const addressBtn = e.target.closest('.btn-view-address');
+                    const businessBtn = e.target.closest('.btn-view-business');
+                    const bankBtn = e.target.closest('.btn-view-bank');
 
-            if (addressBtn) {
-                await loadCustomerAddresses(addressBtn.dataset.customerId);
-            }
+                    if (addressBtn) {
+                        await loadCustomerAddresses(addressBtn.dataset.customerId);
+                    }
 
-            if (businessBtn) {
-                await loadCustomerBusiness(businessBtn.dataset.customerId);
-            }
+                    if (businessBtn) {
+                        await loadCustomerBusiness(businessBtn.dataset.customerId);
+                    }
 
-            if (bankBtn) {
-                await loadCustomerBank(bankBtn.dataset.customerId);
-            }
+                    if (bankBtn) {
+                        await loadCustomerBank(bankBtn.dataset.customerId);
+                    }
+                });
+
+
+                async function loadCustomerAddresses(customerId) {
+                    const box = document.getElementById('customerAddressModalBody');
+                    box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
+
+                    const response = await fetch('/SalesOrder/GetCustomerAddresses?customerId=' + encodeURIComponent(customerId));
+                    const items = await response.json();
+
+                    if (!items || items.length === 0) {
+                        box.innerHTML = '<div class="alert alert-info">No address found.</div>';
+                        return;
+                    }
+
+                    let html = `
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>House No</th>
+                                    <th>Road Name</th>
+                                    <th>Post Code</th>
+                                    <th>City</th>
+                                    <th>Country</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                    items.forEach(x => {
+                        html += `
+                            <tr>
+                                <td>${x.addressTypeText || ''}</td>
+                                <td>${x.houseNo || ''}</td>
+                                <td>${x.roadName || ''}</td>
+                                <td>${x.postCode || ''}</td>
+                                <td>${x.city || ''}</td>
+                                <td>${x.countryName || ''}</td>
+                            </tr>`;
+                    });
+
+                    html += '</tbody></table>';
+                    box.innerHTML = html;
+                }
+
+                async function loadCustomerBusiness(customerId) {
+                    const box = document.getElementById('customerBusinessModalBody');
+                    box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
+
+                    const response = await fetch('/SalesOrder/GetCustomerBusiness?customerId=' + encodeURIComponent(customerId));
+                    const x = await response.json();
+
+                    if (!x) {
+                        box.innerHTML = '<div class="alert alert-info">No business information found.</div>';
+                        return;
+                    }
+
+                    box.innerHTML = `
+                        <table class="crm-grid-table">
+                            <tr><th>Business Name</th><td>${x.businessName || ''}</td></tr>
+                            <tr><th>Business Type</th><td>${x.businessTypeText || ''}</td></tr>
+                            <tr><th>Business Email</th><td>${x.businessEmail || ''}</td></tr>
+                            <tr><th>Trading Name</th><td>${x.tradingName || ''}</td></tr>
+                            <tr><th>Registration No</th><td>${x.registrationNo || ''}</td></tr>
+                            <tr><th>Contact Person</th><td>${x.contactPersonName || ''}</td></tr>
+                            <tr><th>Contact Phone</th><td>${x.contactPersonPhone || ''}</td></tr>
+                        </table>`;
+                }
+
+                async function loadCustomerBank(customerId) {
+                    const box = document.getElementById('customerBankModalBody');
+                    box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
+
+                    const response = await fetch('/SalesOrder/GetCustomerBankAccounts?customerId=' + encodeURIComponent(customerId));
+                    const items = await response.json();
+
+                    if (!items || items.length === 0) {
+                        box.innerHTML = '<div class="alert alert-info">No bank information found.</div>';
+                        return;
+                    }
+
+                    let html = `
+                        <table class="crm-grid-table">
+                            <thead>
+                                <tr>
+                                    <th>Bank Name</th>
+                                    <th>Account Name</th>
+                                    <th>Account Number</th>
+                                    <th>Sort Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                    items.forEach(x => {
+                        html += `
+                            <tr>
+                                <td>${x.bankName || ''}</td>
+                                <td>${x.accountName || ''}</td>
+                                <td>${x.accountNumber || ''}</td>
+                                <td>${x.sortCode || ''}</td>
+                            </tr>`;
+                    });
+
+                    html += '</tbody></table>';
+                    box.innerHTML = html;
+                }
+
+
+            //     document.addEventListener('click', function (e) {
+
+            //     const pageBtn = e.target.closest('.customer-page-btn');
+
+            //     if (!pageBtn) return;
+
+            //     const page = pageBtn.dataset.page;
+
+            //     if (!page || page <= 0) return;
+
+            //     const pageInput =
+            //         document.getElementById('CustomerManagement_Page');
+
+            //     const form =
+            //         document.getElementById('customerManagementSearchForm');
+
+            //     if (!pageInput || !form) return;
+
+            //     pageInput.value = page;
+
+            //     form.submit();
+            // });
+
+            document.getElementById('customerManagementSearchForm')
+            .addEventListener('submit', function () {
+
+            document.getElementById('CustomerManagement_Page').value = 1;
+
         });
-
-        async function loadCustomerAddresses(customerId) {
-            const box = document.getElementById('customerAddressModalBody');
-            box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
-
-            const response = await fetch('/SalesOrder/GetCustomerAddresses?customerId=' + encodeURIComponent(customerId));
-            const items = await response.json();
-
-            if (!items || items.length === 0) {
-                box.innerHTML = '<div class="alert alert-info">No address found.</div>';
-                return;
-            }
-
-            let html = `
-                <table class="table table-bordered table-sm">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>House No</th>
-                            <th>Road Name</th>
-                            <th>Post Code</th>
-                            <th>City</th>
-                            <th>Country</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-            items.forEach(x => {
-                html += `
-                    <tr>
-                        <td>${x.addressTypeText || ''}</td>
-                        <td>${x.houseNo || ''}</td>
-                        <td>${x.roadName || ''}</td>
-                        <td>${x.postCode || ''}</td>
-                        <td>${x.city || ''}</td>
-                        <td>${x.countryName || ''}</td>
-                    </tr>`;
-            });
-
-            html += '</tbody></table>';
-            box.innerHTML = html;
-        }
-
-        async function loadCustomerBusiness(customerId) {
-            const box = document.getElementById('customerBusinessModalBody');
-            box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
-
-            const response = await fetch('/SalesOrder/GetCustomerBusiness?customerId=' + encodeURIComponent(customerId));
-            const x = await response.json();
-
-            if (!x) {
-                box.innerHTML = '<div class="alert alert-info">No business information found.</div>';
-                return;
-            }
-
-            box.innerHTML = `
-                <table class="crm-grid-table">
-                    <tr><th>Business Name</th><td>${x.businessName || ''}</td></tr>
-                    <tr><th>Business Type</th><td>${x.businessTypeText || ''}</td></tr>
-                    <tr><th>Business Email</th><td>${x.businessEmail || ''}</td></tr>
-                    <tr><th>Trading Name</th><td>${x.tradingName || ''}</td></tr>
-                    <tr><th>Registration No</th><td>${x.registrationNo || ''}</td></tr>
-                    <tr><th>Contact Person</th><td>${x.contactPersonName || ''}</td></tr>
-                    <tr><th>Contact Phone</th><td>${x.contactPersonPhone || ''}</td></tr>
-                </table>`;
-        }
-
-        async function loadCustomerBank(customerId) {
-            const box = document.getElementById('customerBankModalBody');
-            box.innerHTML = '<div class="crm-subtitle">Loading...</div>';
-
-            const response = await fetch('/SalesOrder/GetCustomerBankAccounts?customerId=' + encodeURIComponent(customerId));
-            const items = await response.json();
-
-            if (!items || items.length === 0) {
-                box.innerHTML = '<div class="alert alert-info">No bank information found.</div>';
-                return;
-            }
-
-            let html = `
-                <table class="crm-grid-table">
-                    <thead>
-                        <tr>
-                            <th>Bank Name</th>
-                            <th>Account Name</th>
-                            <th>Account Number</th>
-                            <th>Sort Code</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-            items.forEach(x => {
-                html += `
-                    <tr>
-                        <td>${x.bankName || ''}</td>
-                        <td>${x.accountName || ''}</td>
-                        <td>${x.accountNumber || ''}</td>
-                        <td>${x.sortCode || ''}</td>
-                    </tr>`;
-            });
-
-            html += '</tbody></table>';
-            box.innerHTML = html;
-        }
-
-
-    //     document.addEventListener('click', function (e) {
-
-    //     const pageBtn = e.target.closest('.customer-page-btn');
-
-    //     if (!pageBtn) return;
-
-    //     const page = pageBtn.dataset.page;
-
-    //     if (!page || page <= 0) return;
-
-    //     const pageInput =
-    //         document.getElementById('CustomerManagement_Page');
-
-    //     const form =
-    //         document.getElementById('customerManagementSearchForm');
-
-    //     if (!pageInput || !form) return;
-
-    //     pageInput.value = page;
-
-    //     form.submit();
-    // });
-
-    document.getElementById('customerManagementSearchForm')
-    .addEventListener('submit', function () {
-
-    document.getElementById('CustomerManagement_Page').value = 1;
-
-});
 
     </script>
 }

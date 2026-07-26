@@ -160,7 +160,15 @@ namespace SuperCRM.Application.Services
                         ? draftLine.LineTotalAmount
                         : draftLine.SalePrice * quantity;
 
-                    var commissionAmount = CalculateCommission(commission, lineTotal, quantity);
+
+                    var commissionAmount = 0m;
+
+
+                    if (request.IsAgent && commission != null) {
+
+                        commissionAmount = CalculateCommission(commission, lineTotal, quantity);
+                    }
+                        
 
                     // Calculte Variant Product Commission
 
@@ -170,44 +178,17 @@ namespace SuperCRM.Application.Services
                         VariantCode = (draftLine.VariantCode ?? string.Empty).Trim().ToUpper()
                     };
 
-                    if (variantCommissionOverrideMap.TryGetValue(
+
+                    if (request.IsAgent && commission != null)
+                    {
+                        if (variantCommissionOverrideMap.TryGetValue(
                             variantOverrideKey,
                             out var variantOverride))
-                    {
-                        commissionAmount += variantOverride.ExtraCommissionAmount;
+                        {
+                            commissionAmount += variantOverride.ExtraCommissionAmount;
+                        }
                     }
-
-
-                    // Calculate Variant Product Commission
-
-                    //=======================================
-                    // Temporary Business Rule
-                    // Product : ROLL
-                    // Variant : 57X40(BOX100)
-                    // Extra commission : +200
-                    //=======================================
-
-                    //if (!string.IsNullOrWhiteSpace(draftLine.ProductCode)
-                    //    &&
-
-                    //    !string.IsNullOrWhiteSpace(draftLine.VariantCode)
-
-                    //    &&
-
-                    //    draftLine.ProductCode.Equals(
-                    //        "ROLLS",
-                    //        StringComparison.OrdinalIgnoreCase)
-
-                    //    &&
-
-                    //    draftLine.VariantCode.Equals(
-                    //        "57X40(BOX100)",
-                    //        StringComparison.OrdinalIgnoreCase))
-                    //{
-                    //    commissionAmount += 200m;
-                    //}
-
-                    //END Special Commission Calculation for Roll
+                    // END Variant Commission
 
                     saleCommissionTotal += commissionAmount;
 

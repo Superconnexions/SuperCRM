@@ -1,0 +1,26 @@
+.required-label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+#customerEditModal .modal-body {
+    min-height: 520px;
+}
+
+#customerEditModal .nav-tabs .nav-link {
+    font-weight: 600;
+}
+
+#customerEditModal .tab-content {
+    background: #fff;
+}
+
+#customerAddressGrid td,
+#customerAddressGrid th {
+    vertical-align: middle;
+}
+
+.customer-edit-shell .form-label {
+    margin-bottom: .35rem;
+    font-weight: 500;
+}

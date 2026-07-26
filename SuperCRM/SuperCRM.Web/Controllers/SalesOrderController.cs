@@ -18,6 +18,7 @@ namespace SuperCRM.Web.Controllers
         private readonly ISalesOrderDraftService _salesOrderDraftService;
         private readonly ISalesOrderCustomerService _salesOrderCustomerService;
         private readonly ISalesOrderCreationService _salesOrderCreationService;
+        private readonly ICustomerManagementService _customerManagementService;
         private readonly IEmailHelper _emailHelper;
         private readonly IAppSettingsHelper _appSettingsHelper;
         private readonly ILogger<SalesOrderController> _logger;
@@ -27,14 +28,16 @@ namespace SuperCRM.Web.Controllers
             ISalesOrderDraftService salesOrderDraftService,
             ISalesOrderCustomerService salesOrderCustomerService,
             ISalesOrderCreationService salesOrderCreationService,
+            ICustomerManagementService customerManagementService,
             IEmailHelper emailHelper,
-            IAppSettingsHelper appSettingsHelper, 
+            IAppSettingsHelper appSettingsHelper,
             ILogger<SalesOrderController> logger)
         {
             _salesOrderService = salesOrderService;
             _salesOrderDraftService = salesOrderDraftService;
             _salesOrderCustomerService = salesOrderCustomerService;
             _salesOrderCreationService = salesOrderCreationService;
+            _customerManagementService = customerManagementService;
             _emailHelper = emailHelper;
             _appSettingsHelper = appSettingsHelper;
             _logger = logger;
@@ -200,7 +203,7 @@ namespace SuperCRM.Web.Controllers
                         ProviderProductId = x.ProviderProductId,
                         Quantity = x.Quantity,
                         SalePrice = x.SalePrice,
-                        
+
                         InstallmentApplicable = x.InstallmentApplicable,
                         IsInstallmentSelected = x.IsInstallmentSelected,
                         DownPaymentAmount = x.DownPaymentAmount,
@@ -358,7 +361,7 @@ namespace SuperCRM.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMyCustomers( CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetMyCustomers(CancellationToken cancellationToken = default)
         {
             var currentUserId = GetCurrentUserId();
 
@@ -389,7 +392,7 @@ namespace SuperCRM.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveCustomer( SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> SaveCustomer(SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
         {
             var result = await SaveCustomerInternalAsync(model, cancellationToken);
 
@@ -438,10 +441,10 @@ namespace SuperCRM.Web.Controllers
                 AlternativeEmail = model.Customer.AlternativeEmail,
                 Phone = model.Customer.Phone,
                 Mobile = model.Customer.Mobile,
-                
+
                 RegistrationSource = GetRegistrationSource(),
 
-               
+
 
                 PersonalAddress = new SaveSalesOrderAddressDto
                 {
@@ -530,7 +533,7 @@ namespace SuperCRM.Web.Controllers
                     ProductName = x.ProductName,
 
                     SpecialNotes = x.SpecialNotes,
-                    
+
 
                     VariantName = x.VariantName,
                     ProviderName = x.ProviderName,
@@ -630,13 +633,15 @@ namespace SuperCRM.Web.Controllers
             TempData.Remove("ErrorMessage");
 
             var userId = GetCurrentUserId();
+            bool isAgent = User.IsInRole("Agent");
 
             var result = await _salesOrderCreationService.CreateSalesOrderFromDraftAsync(
                 new CreateSalesOrderFromDraftRequestDto
                 {
                     SalesOrderDraftId = draftId,
                     CurrentUserId = userId,
-                    OrderSourceType = GetOrderSourceType()
+                    OrderSourceType = GetOrderSourceType(),
+                    IsAgent = isAgent
                 },
                 cancellationToken);
 
@@ -648,11 +653,11 @@ namespace SuperCRM.Web.Controllers
 
             var saleIds = string.Join(",", result.SaleIds);
 
-            var emailResult = await SendCustomerSalesOrderEmailAsync( result.SaleIds, userId, cancellationToken);
+            var emailResult = await SendCustomerSalesOrderEmailAsync(result.SaleIds, userId, cancellationToken);
 
 
             //TempData["SuccessMessage"] = result.Message;
-            TempData["SuccessMessage"] = emailResult? result.Message + " Customer email also sent successfully." : result.Message + " However, customer email could not be sent.";
+            TempData["SuccessMessage"] = emailResult ? result.Message + " Customer email also sent successfully." : result.Message + " However, customer email could not be sent.";
 
             return RedirectToAction(nameof(SalesOrderCreatedSummary), new { saleIds });
         }
@@ -795,7 +800,7 @@ namespace SuperCRM.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateCustomer( SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdateCustomer(SalesOrderCustomerCreationViewModel model, CancellationToken cancellationToken = default)
         {
             var result = await UpdateCustomerInternalAsync(model, cancellationToken);
 
@@ -901,7 +906,7 @@ namespace SuperCRM.Web.Controllers
         public async Task<IActionResult> CheckCustomerDuplicateForOrder(
         string? email,
         string? mobile,
-        
+
         string? accountNumber,
         Guid? excludeCustomerId,
         Guid? excludeBankAccountId,
@@ -910,7 +915,7 @@ namespace SuperCRM.Web.Controllers
             var result = await _salesOrderCustomerService.CheckCustomerDuplicateForOrderAsync(
                 email,
                 mobile,
-                
+
                 accountNumber,
                 excludeCustomerId,
                 excludeBankAccountId,
@@ -1106,14 +1111,15 @@ namespace SuperCRM.Web.Controllers
                         message = "Sales information updated successfully"
                     });
                 }
-                else {
+                else
+                {
                     return Json(new
                     {
                         success = false,
                         message = "Update failed."
                     });
                 }
-                    
+
             }
 
 
@@ -1303,6 +1309,196 @@ namespace SuperCRM.Web.Controllers
 
         [HttpGet]
         [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> GetCustomerEdit(
+            Guid customerId,
+            CancellationToken cancellationToken = default)
+        {
+            var currentUserId = GetCurrentUserId();
+            var canManageAll = User.IsInRole("SuperAdmin") || User.IsInRole("SuperCRMAdmin");
+
+            var dto = await _customerManagementService.GetCustomerEditPageAsync(
+                customerId, currentUserId, canManageAll, cancellationToken);
+
+            if (dto == null)
+                return StatusCode(StatusCodes.Status403Forbidden, "Customer was not found or you are not authorized to edit it.");
+
+            var model = MapCustomerEditViewModel(dto);
+            return PartialView("_CustomerEditModalContent", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> UpdateCustomerBasicInfo(
+            CustomerBasicInfoEditViewModel model,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _customerManagementService.UpdateCustomerBasicInfoAsync(new UpdateCustomerBasicInfoDto
+            {
+                CustomerId = model.CustomerId,
+                CurrentUserId = GetCurrentUserId(),
+                CanManageAllCustomers = CanManageAllCustomers(),
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                DisplayName = model.DisplayName,
+                Email = model.Email,
+                AlternativeEmail = model.AlternativeEmail,
+                Phone = model.Phone,
+                Mobile = model.Mobile,
+                IsCompanyDirector = model.IsCompanyDirector
+            }, cancellationToken);
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> SaveCustomerAddress(
+            CustomerAddressEditViewModel model,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _customerManagementService.SaveCustomerAddressAsync(new SaveCustomerAddressDto
+            {
+                CustomerId = model.CustomerId,
+                CustomerAddressId = model.CustomerAddressId,
+                CurrentUserId = GetCurrentUserId(),
+                CanManageAllCustomers = CanManageAllCustomers(),
+                AddressType = model.AddressType,
+                AddressLine = model.AddressLine,
+                HouseNo = model.HouseNo,
+                RoadName = model.RoadName,
+                PostCode = model.PostCode,
+                City = model.City,
+                CountryId = model.CountryId,
+                RegionId = model.RegionId,
+                CityId = model.CityId,
+                IsDefault = model.IsDefault
+            }, cancellationToken);
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> UpdateCustomerBusiness(
+            CustomerBusinessEditViewModel model,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _customerManagementService.UpdateCustomerBusinessAsync(new UpdateCustomerBusinessDto
+            {
+                CustomerId = model.CustomerId,
+                CustomerBusinessId = model.CustomerBusinessId,
+                CurrentUserId = GetCurrentUserId(),
+                CanManageAllCustomers = CanManageAllCustomers(),
+                BusinessType = model.BusinessType,
+                BusinessName = model.BusinessName,
+                BusinessEmail = model.BusinessEmail,
+                TradingName = model.TradingName,
+                RegistrationNo = model.RegistrationNo,
+                ContactPersonName = model.ContactPersonName,
+                ContactPersonPhone = model.ContactPersonPhone
+            }, cancellationToken);
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
+        public async Task<IActionResult> UpdateCustomerBankAccount(
+            CustomerBankAccountEditViewModel model,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _customerManagementService.UpdateCustomerBankAccountAsync(new UpdateCustomerBankAccountDto
+            {
+                CustomerId = model.CustomerId,
+                CustomerBankAccountId = model.CustomerBankAccountId,
+                CurrentUserId = GetCurrentUserId(),
+                CanManageAllCustomers = CanManageAllCustomers(),
+                BankName = model.BankName,
+                AccountName = model.AccountName,
+                AccountNumber = model.AccountNumber,
+                SortCode = model.SortCode
+            }, cancellationToken);
+
+            return Json(result);
+        }
+
+        private bool CanManageAllCustomers()
+        {
+            return User.IsInRole("SuperAdmin") || User.IsInRole("SuperCRMAdmin");
+        }
+
+        private static CustomerEditViewModel MapCustomerEditViewModel(CustomerEditPageDto dto)
+        {
+            return new CustomerEditViewModel
+            {
+                CustomerId = dto.CustomerId,
+                CustomerCode = dto.CustomerCode,
+                RegistrationSourceText = dto.RegistrationSourceText,
+                Customer = new CustomerBasicInfoEditViewModel
+                {
+                    CustomerId = dto.CustomerId,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    DisplayName = dto.DisplayName,
+                    Email = dto.Email,
+                    AlternativeEmail = dto.AlternativeEmail,
+                    Phone = dto.Phone,
+                    Mobile = dto.Mobile,
+                    IsCompanyDirector = dto.IsCompanyDirector
+                },
+                Addresses = dto.Addresses.Select(x => new CustomerAddressEditViewModel
+                {
+                    CustomerId = dto.CustomerId,
+                    CustomerAddressId = x.CustomerAddressId,
+                    AddressType = x.AddressType,
+                    AddressTypeText = x.AddressTypeText,
+                    AddressLine = x.AddressLine,
+                    HouseNo = x.HouseNo,
+                    RoadName = x.RoadName,
+                    PostCode = x.PostCode,
+                    City = x.City,
+                    CountryId = x.CountryId,
+                    RegionId = x.RegionId,
+                    CityId = x.CityId,
+                    CountryName = x.CountryName,
+                    IsDefault = x.IsDefault
+                }).ToList(),
+                Business = new CustomerBusinessEditViewModel
+                {
+                    CustomerId = dto.CustomerId,
+                    CustomerBusinessId = dto.Business.CustomerBusinessId,
+                    BusinessType = dto.Business.BusinessType,
+                    BusinessName = dto.Business.BusinessName,
+                    BusinessEmail = dto.Business.BusinessEmail,
+                    TradingName = dto.Business.TradingName,
+                    RegistrationNo = dto.Business.RegistrationNo,
+                    ContactPersonName = dto.Business.ContactPersonName,
+                    ContactPersonPhone = dto.Business.ContactPersonPhone
+                },
+                BankAccount = new CustomerBankAccountEditViewModel
+                {
+                    CustomerId = dto.CustomerId,
+                    CustomerBankAccountId = dto.BankAccount.CustomerBankAccountId,
+                    BankName = dto.BankAccount.BankName,
+                    AccountName = dto.BankAccount.AccountName,
+                    AccountNumber = dto.BankAccount.AccountNumber,
+                    SortCode = dto.BankAccount.SortCode
+                },
+                CountryOptions = dto.Countries.Select(x => new SelectListItem(x.Text, x.Value)).ToList(),
+                RegionOptions = dto.Regions.Select(x => new SelectListItem(x.Text, x.Value)).ToList(),
+                AddressTypeOptions = Enum.GetValues(typeof(AddressType)).Cast<AddressType>()
+                    .Select(x => new SelectListItem(x.ToString(), ((byte)x).ToString())).ToList(),
+                BusinessTypeOptions = Enum.GetValues(typeof(CustomerBusinessType)).Cast<CustomerBusinessType>()
+                    .Select(x => new SelectListItem(x.ToString(), ((byte)x).ToString(), (byte)x == dto.Business.BusinessType)).ToList()
+            };
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,SuperCRMAdmin,Agent")]
         public async Task<IActionResult> CustomerSalesOrders(
             Guid customerId,
             string customerName = "",
@@ -1418,7 +1614,7 @@ namespace SuperCRM.Web.Controllers
 
         }
 
-        private static string BuildCustomerSalesOrderEmailSubject( SalesOrderCreatedSummaryDto dto)
+        private static string BuildCustomerSalesOrderEmailSubject(SalesOrderCreatedSummaryDto dto)
         {
             var orderNos = dto.Orders == null || !dto.Orders.Any()
                 ? "Sales Order"
@@ -1427,7 +1623,7 @@ namespace SuperCRM.Web.Controllers
             return $"SuperCRM Sales Order Confirmation - {orderNos}";
         }
 
-        private static string BuildCustomerSalesOrderEmailBody( SalesOrderCreatedSummaryDto dto)
+        private static string BuildCustomerSalesOrderEmailBody(SalesOrderCreatedSummaryDto dto)
         {
             var customerName = dto.Customer.DisplayName;
             var generatedAt = DateTime.UtcNow.ToString("dd-MMM-yyyy hh:mm tt");
@@ -1474,9 +1670,9 @@ namespace SuperCRM.Web.Controllers
                             </tr>
                         </table>";
 
-                        foreach (var order in dto.Orders)
-                        {
-                            html += $@"
+            foreach (var order in dto.Orders)
+            {
+                html += $@"
                         <div style='border:1px solid #dbeafe; border-radius:8px; margin-bottom:22px; overflow:hidden;'>
 
                             <div style='background:#eff6ff; padding:12px 16px; border-bottom:1px solid #dbeafe;'>
@@ -1499,9 +1695,9 @@ namespace SuperCRM.Web.Controllers
                                 </thead>
                                 <tbody>";
 
-                            foreach (var line in order.Lines)
-                            {
-                                html += $@"
+                foreach (var line in order.Lines)
+                {
+                    html += $@"
                                     <tr>
                                         <td style='border:1px solid #e5e7eb; padding:8px;'>{line.ProductName}</td>
                                         <td style='border:1px solid #e5e7eb; padding:8px;'>{line.VariantName}</td>
@@ -1509,9 +1705,9 @@ namespace SuperCRM.Web.Controllers
                                         <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{line.UnitPrice:N2}</td>
                                         <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{line.LineTotalAmount:N2}</td>
                                     </tr>";
-                            }
+                }
 
-                            html += $@"
+                html += $@"
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -1521,9 +1717,9 @@ namespace SuperCRM.Web.Controllers
                                 </tfoot>
                             </table>";
 
-                            if (order.Installments != null && order.Installments.Any())
-                            {
-                                html += @"
+                if (order.Installments != null && order.Installments.Any())
+                {
+                    html += @"
                             <div style='padding:12px 16px;'>
                                 <strong>Installment Schedule</strong>
                                 <table style='width:100%; border-collapse:collapse; margin-top:8px;'>
@@ -1537,28 +1733,28 @@ namespace SuperCRM.Web.Controllers
                                     </thead>
                                     <tbody>";
 
-                                foreach (var ins in order.Installments)
-                                {
-                                    html += $@"
+                    foreach (var ins in order.Installments)
+                    {
+                        html += $@"
                                         <tr>
                                             <td style='border:1px solid #e5e7eb; padding:8px;'>{ins.ProductName}</td>
                                             <td style='border:1px solid #e5e7eb; padding:8px;'>{ins.InstallmentNo}</td>
                                             <td style='border:1px solid #e5e7eb; padding:8px;'>{ins.DueDate:dd-MMM-yyyy}</td>
                                             <td style='border:1px solid #e5e7eb; padding:8px; text-align:right;'>{ins.InstallmentAmount:N2}</td>
                                         </tr>";
-                                }
+                    }
 
-                                html += @"
+                    html += @"
                                     </tbody>
                                 </table>
                             </div>";
-                            }
+                }
 
-                            html += @"
+                html += @"
                         </div>";
-                        }
+            }
 
-                        html += @"
+            html += @"
                         <p>
                             If you have any questions regarding this order, please contact SuperCRM support.
                         </p>

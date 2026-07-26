@@ -1,0 +1,218 @@
+@model SuperCRM.Web.ViewModels.SalesOrders.CustomerEditViewModel
+
+<div class="customer-edit-shell" data-customer-id="@Model.CustomerId">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h5 class="mb-1">@Model.CustomerCode</h5>
+            <div class="text-muted small">Registration Source: @Model.RegistrationSourceText</div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="customerEditTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#customer-basic-tab" type="button">Customer Information</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#customer-address-tab" type="button">Addresses</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#customer-business-tab" type="button">Business Information</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#customer-bank-tab" type="button">Bank Account</button>
+        </li>
+    </ul>
+
+    <div class="tab-content border border-top-0 rounded-bottom p-3">
+        <div class="tab-pane fade show active" id="customer-basic-tab">
+            <div id="customerBasicMessage"></div>
+            <form id="customerBasicForm" action="/SalesOrder/UpdateCustomerBasicInfo" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="CustomerId" value="@Model.Customer.CustomerId" />
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label required-label">First Name</label>
+                        <input class="form-control" name="FirstName" value="@Model.Customer.FirstName" maxlength="100" />
+                        <div class="invalid-feedback" data-error-for="FirstName"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required-label">Last Name</label>
+                        <input class="form-control" name="LastName" value="@Model.Customer.LastName" maxlength="100" />
+                        <div class="invalid-feedback" data-error-for="LastName"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Display Name</label>
+                        <input class="form-control" name="DisplayName" value="@Model.Customer.DisplayName" maxlength="200" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required-label">Email</label>
+                        <input type="email" class="form-control" name="Email" value="@Model.Customer.Email" maxlength="150" />
+                        <div class="invalid-feedback" data-error-for="Email"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Alternative Email</label>
+                        <input type="email" class="form-control" name="AlternativeEmail" value="@Model.Customer.AlternativeEmail" maxlength="150" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Phone</label>
+                        <input class="form-control" name="Phone" value="@Model.Customer.Phone" maxlength="50" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label required-label">Mobile</label>
+                        <input class="form-control" name="Mobile" value="@Model.Customer.Mobile" maxlength="50" />
+                        <div class="invalid-feedback" data-error-for="Mobile"></div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="IsCompanyDirector" value="true" id="editCustomer_IsCompanyDirector" @(Model.Customer.IsCompanyDirector ? "checked" : null) />
+                            <input type="hidden" name="IsCompanyDirector" value="false" />
+                            <label class="form-check-label" for="editCustomer_IsCompanyDirector">Company Director</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">Save Customer Information</button>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="tab-pane fade" id="customer-address-tab">
+            <div id="customerAddressMessage"></div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Customer Addresses</h6>
+                <button type="button" class="btn btn-sm btn-primary" id="btnAddCustomerAddress">Add Address</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle" id="customerAddressGrid">
+                    <thead>
+                        <tr><th>Type</th><th>Default</th><th>Address</th><th>Country</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Addresses.Any())
+                        {
+                            <tr class="no-address-row"><td colspan="5" class="text-center text-muted">No address found.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var address in Model.Addresses)
+                            {
+                                <tr data-address-id="@address.CustomerAddressId"
+                                    data-address-type="@address.AddressType"
+                                    data-address-line="@address.AddressLine"
+                                    data-house-no="@address.HouseNo"
+                                    data-road-name="@address.RoadName"
+                                    data-post-code="@address.PostCode"
+                                    data-city="@address.City"
+                                    data-country-id="@address.CountryId"
+                                    data-region-id="@address.RegionId"
+                                    data-city-id="@address.CityId"
+                                    data-is-default="@address.IsDefault.ToString().ToLowerInvariant()">
+                                    <td>@address.AddressTypeText</td>
+                                    <td>@(address.IsDefault ? "Yes" : "No")</td>
+                                    <td>@string.Join(", ", new[] { address.HouseNo, address.RoadName, address.PostCode, address.City, address.AddressLine }.Where(x => !string.IsNullOrWhiteSpace(x)))</td>
+                                    <td>@address.CountryName</td>
+                                    <td><button type="button" class="btn btn-sm btn-outline-primary btn-edit-customer-address">Edit</button></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="customer-business-tab">
+            <div id="customerBusinessMessage"></div>
+            <form id="customerBusinessForm" action="/SalesOrder/UpdateCustomerBusiness" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="CustomerId" value="@Model.Business.CustomerId" />
+                <input type="hidden" name="CustomerBusinessId" value="@Model.Business.CustomerBusinessId" />
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label required-label">Business Type</label>
+                        <select class="form-select" name="BusinessType" id="editBusiness_BusinessType" asp-items="Model.BusinessTypeOptions"></select>
+                        <div class="invalid-feedback" data-error-for="BusinessType"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required-label">Business Name</label>
+                        <input class="form-control" name="BusinessName" value="@Model.Business.BusinessName" maxlength="200" />
+                        <div class="invalid-feedback" data-error-for="BusinessName"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required-label">Business Email</label>
+                        <input type="email" class="form-control" name="BusinessEmail" value="@Model.Business.BusinessEmail" maxlength="150" />
+                        <div class="invalid-feedback" data-error-for="BusinessEmail"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trading Name</label>
+                        <input class="form-control" name="TradingName" value="@Model.Business.TradingName" maxlength="200" />
+                    </div>
+                    <div class="col-md-4 ltd-business-field">
+                        <label class="form-label">Registration No</label>
+                        <input class="form-control" name="RegistrationNo" value="@Model.Business.RegistrationNo" maxlength="100" />
+                        <div class="invalid-feedback" data-error-for="RegistrationNo"></div>
+                    </div>
+                    <div class="col-md-4 ltd-business-field">
+                        <label class="form-label">Contact Person</label>
+                        <input class="form-control" name="ContactPersonName" value="@Model.Business.ContactPersonName" maxlength="150" />
+                        <div class="invalid-feedback" data-error-for="ContactPersonName"></div>
+                    </div>
+                    <div class="col-md-4 ltd-business-field">
+                        <label class="form-label">Contact Phone</label>
+                        <input class="form-control" name="ContactPersonPhone" value="@Model.Business.ContactPersonPhone" maxlength="50" />
+                        <div class="invalid-feedback" data-error-for="ContactPersonPhone"></div>
+                    </div>
+                </div>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">Save Business Information</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="customer-bank-tab">
+            <div id="customerBankMessage"></div>
+            <form id="customerBankForm" action="/SalesOrder/UpdateCustomerBankAccount" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="CustomerId" value="@Model.BankAccount.CustomerId" />
+                <input type="hidden" name="CustomerBankAccountId" value="@Model.BankAccount.CustomerBankAccountId" />
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Bank Name</label><input class="form-control" name="BankName" value="@Model.BankAccount.BankName" maxlength="150" /></div>
+                    <div class="col-md-6"><label class="form-label">Account Name</label><input class="form-control" name="AccountName" value="@Model.BankAccount.AccountName" maxlength="150" /></div>
+                    <div class="col-md-6"><label class="form-label">Account Number</label><input class="form-control" name="AccountNumber" value="@Model.BankAccount.AccountNumber" maxlength="100" /><div class="invalid-feedback" data-error-for="AccountNumber"></div></div>
+                    <div class="col-md-6"><label class="form-label">Sort Code</label><input class="form-control" name="SortCode" value="@Model.BankAccount.SortCode" maxlength="50" /></div>
+                </div>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">Save Bank Information</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="customerAddressEditModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="customerAddressEditTitle">Add Address</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <form id="customerAddressForm" action="/SalesOrder/SaveCustomerAddress" method="post">
+                    <div class="modal-body">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="CustomerId" value="@Model.CustomerId" />
+                        <input type="hidden" name="CustomerAddressId" id="editAddress_CustomerAddressId" />
+                        <div id="customerAddressFormMessage"></div>
+                        <div class="row g-3">
+                            <div class="col-md-4"><label class="form-label required-label">Address Type</label><select class="form-select" name="AddressType" id="editAddress_AddressType" asp-items="Model.AddressTypeOptions"></select><div class="invalid-feedback" data-error-for="AddressType"></div></div>
+                            <div class="col-md-4"><label class="form-label required-label">House No</label><input class="form-control" name="HouseNo" id="editAddress_HouseNo" maxlength="100" /><div class="invalid-feedback" data-error-for="HouseNo"></div></div>
+                            <div class="col-md-4"><label class="form-label">Road Name</label><input class="form-control" name="RoadName" id="editAddress_RoadName" maxlength="150" /></div>
+                            <div class="col-md-4"><label class="form-label required-label">Post Code</label><input class="form-control" name="PostCode" id="editAddress_PostCode" maxlength="20" /><div class="invalid-feedback" data-error-for="PostCode"></div></div>
+                            <div class="col-md-4"><label class="form-label required-label">Country</label><select class="form-select" name="CountryId" id="editAddress_CountryId" asp-items="Model.CountryOptions"><option value="">-- Select Country --</option></select><div class="invalid-feedback" data-error-for="CountryId"></div></div>
+                            <input type="hidden" name="RegionId" id="editAddress_RegionId" />
+                            <div class="col-md-6"><label class="form-label required-label">City</label><select class="form-select" name="CityId" id="editAddress_CityId"><option value="">-- Select City --</option></select><input type="hidden" name="City" id="editAddress_City" /><div class="invalid-feedback" data-error-for="CityId"></div></div>
+                            <div class="col-md-6"><label class="form-label">Address Line</label><input class="form-control" name="AddressLine" id="editAddress_AddressLine" maxlength="250" /></div>
+                            <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" name="IsDefault" value="true" id="editAddress_IsDefault" /><input type="hidden" name="IsDefault" value="false" /><label class="form-check-label" for="editAddress_IsDefault">Default for this address type</label></div></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Save Address</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

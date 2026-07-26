@@ -7,7 +7,6 @@
     {
         Personal = 1,
         Business = 2,
-        Mailing = 3,
-        Shipping = 4
+        Shipping = 3
     }
 }

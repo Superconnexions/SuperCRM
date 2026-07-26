@@ -157,6 +157,10 @@ builder.Services.AddScoped<ISalesOrderCustomerService, SalesOrderCustomerService
 builder.Services.AddScoped<ISalesOrderCreationRepository, SalesOrderCreationRepository>();
 builder.Services.AddScoped<ISalesOrderCreationService, SalesOrderCreationService>();
 
+// Register Customer Management dependencies
+builder.Services.AddScoped<ICustomerManagementRepository, CustomerManagementRepository>();
+builder.Services.AddScoped<ICustomerManagementService, CustomerManagementService>();
+
 /// END Register services
 
 builder.Services.AddControllersWithViews();
