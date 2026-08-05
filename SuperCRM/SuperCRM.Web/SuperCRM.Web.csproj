@@ -23,5 +23,8 @@
     <ProjectReference Include="..\SuperCRM.Persistence\SuperCRM.Persistence.csproj" />
     <ProjectReference Include="..\SuperCRM.Shared\SuperCRM.Shared.csproj" />
   </ItemGroup>
-
+  <!--this will stop the appsettings.json file to override in live publish-->
+  <ItemGroup>
+    <Content Update="appsettings.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>
