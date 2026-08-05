@@ -32,9 +32,7 @@ namespace SuperCRM.Application.Interfaces.Persistence
         Guid userId,
         CancellationToken cancellationToken = default);
 
-        Task<bool> IsApprovedAgentAsync(
-        Guid userId,
-        CancellationToken cancellationToken = default);
+        Task<bool> IsApprovedAgentAsync(Guid userId, CancellationToken cancellationToken = default);
 
         Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderHistoryAsync(
         Guid? soldByUserId,
