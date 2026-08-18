@@ -130,7 +130,7 @@
             <div class="card-body row g-3">
                 <div class="col-md-4"><label asp-for="Customer.FirstName" class="form-label"></label><input asp-for="Customer.FirstName" class="form-control" /></div>
                 <div class="col-md-4"><label asp-for="Customer.LastName" class="form-label"></label><input asp-for="Customer.LastName" class="form-control" /></div>
-                <div class="col-md-4"><label asp-for="Customer.DisplayName" class="form-label"></label><input asp-for="Customer.DisplayName" class="form-control" placeholder="Auto if blank" /></div>
+                <div class="col-md-4"><label asp-for="Customer.DisplayName" class="form-label"></label><input asp-for="Customer.DisplayName" class="form-control" placeholder="Auto Save First name + last Name if blank" /></div>
                 <div class="col-md-4"><label asp-for="Customer.Email" class="form-label"></label><input asp-for="Customer.Email" class="form-control" /></div>
                 @* <div class="col-md-4"><label asp-for="Customer.AlternativeEmail" class="form-label"></label><input asp-for="Customer.AlternativeEmail" class="form-control" /></div> *@
                 <div class="col-md-4"><label asp-for="Customer.Mobile" class="form-label"></label><input asp-for="Customer.Mobile" class="form-control" /></div>
@@ -242,6 +242,10 @@
                     @(Model.IsCustomerSavedForOrder ? "" : "disabled")>
                 Create Sales Order
             </button>
+
+            <span class="text-info">
+                Notes: First Save/Update Customer, then Create Sales Order
+            </span>
         </div>
     </div>
 </form>
