@@ -61,8 +61,8 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Order Date From</label>
-                    
 
+                    
                     <div class="crm-date-wrap">
                         <input type="date"
                                name="orderDateFrom"
@@ -74,8 +74,8 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Order Date To</label>
-                    
 
+                    
                     <div class="crm-date-wrap">
                         <input type="date"
                                name="orderDateTo"
@@ -294,7 +294,8 @@
         <div class="modal-content">
 
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Manage Sales Order 
+                <h5 class="modal-title">
+                    Manage Sales Order
                     <span id="salesOrderNoTitle" class="ms-2 text-warning fw-bold">
                     </span>
                 </h5>
@@ -315,11 +316,15 @@
                         </button>
                     </li>
 
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSuperCRMCommission" type="button">
-                            SuperCRM Commission
-                        </button>
-                    </li>
+
+                    @if (User.Identity.Name == "admin@supercrm.local" || User.Identity.Name == "Shamubd@yahoo.com")
+                    {
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSuperCRMCommission" type="button">
+                                SuperCRM Commission
+                            </button>
+                        </li>
+                    }
 
                     <li class="nav-item">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabStatus" type="button">
@@ -339,8 +344,8 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label>Service Start Date</label>
-                                    
 
+                                    
                                     <div class="crm-date-wrap">
                                         <input type="date"
                                                name="ServiceStartDate"
@@ -356,9 +361,9 @@
                                     <label>Next Renew Date</label>
                                     <div class="crm-date-wrap">
                                         <input type="date"
-                                                   name="NextRenewDate"
-                                                   id="SalesInfo_NextRenewDate"
-                                                   class="form-control" />
+                                               name="NextRenewDate"
+                                               id="SalesInfo_NextRenewDate"
+                                               class="form-control" />
                                         <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
                                     </div>
                                 </div>
@@ -405,6 +410,7 @@
                         </form>
                     </div>
 
+
                     <div class="tab-pane fade" id="tabSuperCRMCommission">
                         <form method="post" asp-action="UpdateSuperCRMCommission" class="sales-order-modal-update-form">
                             @Html.AntiForgeryToken()
@@ -448,6 +454,9 @@
                             </div>
                         </form>
                     </div>
+
+                        
+                    
 
                     <div class="tab-pane fade" id="tabStatus">
                         <form method="post" asp-action="UpdateSalesOrderStatus" class="sales-order-modal-update-form">
@@ -538,10 +547,10 @@
 
         function buildAdminUserDropdown(fieldName, selectedValue, adminUsers, labelText) {
             let html = `
-                <div class="col-md-4">
-                    <label>${labelText}</label>
-                    <select name="${fieldName}" class="form-select">
-                        <option value="">-- Select User --</option>`;
+                        <div class="col-md-4">
+                            <label>${labelText}</label>
+                            <select name="${fieldName}" class="form-select">
+                                <option value="">-- Select User --</option>`;
 
             adminUsers.forEach(x => {
                 const selected =
@@ -556,13 +565,13 @@
             return html;
         }
 
-        document.addEventListener('click', async function (e) {
+        document.addEventListener('click', async function(e) {
             const btn = e.target.closest('.btn-manage-sales-order');
             if (!btn) return;
 
             const saleId = btn.dataset.saleId;
             const orderNo = btn.dataset.orderNo;
-             document.getElementById('salesOrderNoTitle').innerHTML = `| ${orderNo}`;
+            document.getElementById('salesOrderNoTitle').innerHTML = `| ${orderNo}`;
 
             const response = await fetch('/SalesOrder/GetSalesOrderManagementDetail?saleId=' + encodeURIComponent(saleId));
             const result = await response.json();
@@ -573,8 +582,8 @@
             }
 
             const data = result.data;
-            
-            // New line 
+
+            // New line
             document.getElementById('salesOrderModalMessage').innerHTML = '';
 
             document.getElementById('SalesInfo_SaleId').value = data.saleId;
@@ -597,7 +606,7 @@
             renderStatusFields(parseInt(data.salesOrderStatus), data);
         });
 
-        document.getElementById('Status_SalesOrderStatus')?.addEventListener('change', function () {
+        document.getElementById('Status_SalesOrderStatus')?.addEventListener('change', function() {
             renderStatusFields(parseInt(this.value), window.currentSalesOrderManagementData || {});
         });
 
@@ -605,38 +614,38 @@
             const box = document.getElementById('commissionLinesContainer');
 
             let html = `
-                <table class="table table-bordered table-sm">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Product</th>
-                            <th>Variant</th>
-                            <th class="text-end">Line Total</th>
-                            <th class="text-end">Calculated Commission</th>
-                            <th class="text-end">Final Commission</th>
-                            <th>Finalized</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th class="text-end">Line Total</th>
+                                    <th class="text-end">Calculated Commission</th>
+                                    <th class="text-end">Final Commission</th>
+                                    <th>Finalized</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
             lines.forEach((line, index) => {
                 html += `
-                    <tr>
-                        <td>
-                            ${line.productName || ''}
-                            <input type="hidden" name="Lines[${index}].SaleLineId" value="${line.saleLineId}" />
-                        </td>
-                        <td>${line.variantName || ''}</td>
-                        <td class="text-end">${Number(line.lineTotalAmount || 0).toFixed(2)}</td>
-                        <td class="text-end">${Number(line.calculatedAgentCommission || 0).toFixed(2)}</td>
-                        <td>
-                            <input type="number"
-                                   step="0.01"
-                                   name="Lines[${index}].FinalAgentCommission"
-                                   value="${Number(line.finalAgentCommission || 0).toFixed(2)}"
-                                   class="form-control form-control-sm text-end" />
-                        </td>
-                        <td>${line.isCommissionFinalized ? 'Yes' : 'No'}</td>
-                    </tr>`;
+                            <tr>
+                                <td>
+                                    ${line.productName || ''}
+                                    <input type="hidden" name="Lines[${index}].SaleLineId" value="${line.saleLineId}" />
+                                </td>
+                                <td>${line.variantName || ''}</td>
+                                <td class="text-end">${Number(line.lineTotalAmount || 0).toFixed(2)}</td>
+                                <td class="text-end">${Number(line.calculatedAgentCommission || 0).toFixed(2)}</td>
+                                <td>
+                                    <input type="number"
+                                           step="0.01"
+                                           name="Lines[${index}].FinalAgentCommission"
+                                           value="${Number(line.finalAgentCommission || 0).toFixed(2)}"
+                                           class="form-control form-control-sm text-end" />
+                                </td>
+                                <td>${line.isCommissionFinalized ? 'Yes' : 'No'}</td>
+                            </tr>`;
             });
 
             html += '</tbody></table>';
@@ -655,56 +664,56 @@
             }
 
             let html = `
-                <table class="table table-bordered table-sm align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Product</th>
-                            <th>Variant</th>
-                            <th class="text-end">Qty</th>
-                            <th class="text-end">Line Total</th>
-                            <th class="text-end">Agent Commission</th>
-                            <th>Agent Finalized</th>
-                            <th class="text-end">SuperCRM Earned</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Line Total</th>
+                                    <th class="text-end">Agent Commission</th>
+                                    <th>Agent Finalized</th>
+                                    <th class="text-end">SuperCRM Earned</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
             lines.forEach((line, index) => {
                 html += `
-                    <tr>
-                        <td>
-                            ${line.productName || ''}
-                            <input type="hidden"
-                                   name="Lines[${index}].SaleLineId"
-                                   value="${line.saleLineId}" />
-                        </td>
+                            <tr>
+                                <td>
+                                    ${line.productName || ''}
+                                    <input type="hidden"
+                                           name="Lines[${index}].SaleLineId"
+                                           value="${line.saleLineId}" />
+                                </td>
 
-                        <td>${line.variantName || ''}</td>
+                                <td>${line.variantName || ''}</td>
 
-                        <td class="text-end">
-                            ${line.quantity || 0}
-                        </td>
+                                <td class="text-end">
+                                    ${line.quantity || 0}
+                                </td>
 
-                        <td class="text-end">
-                            ${Number(line.lineTotalAmount || 0).toFixed(2)}
-                        </td>
+                                <td class="text-end">
+                                    ${Number(line.lineTotalAmount || 0).toFixed(2)}
+                                </td>
 
-                        <td class="text-end">
-                            ${Number(line.finalAgentCommission || 0).toFixed(2)}
-                        </td>
+                                <td class="text-end">
+                                    ${Number(line.finalAgentCommission || 0).toFixed(2)}
+                                </td>
 
-                        <td>
-                            ${line.isCommissionFinalized ? 'Yes' : 'No'}
-                        </td>
+                                <td>
+                                    ${line.isCommissionFinalized ? 'Yes' : 'No'}
+                                </td>
 
-                        <td>
-                            <input type="number"
-                                   step="0.01"
-                                   name="Lines[${index}].SuperCRMCommissionEarned"
-                                   value="${Number(line.superCRMCommissionEarned || 0).toFixed(2)}"
-                                   class="form-control form-control-sm text-end supercrm-earned-input" />
-                        </td>
-                    </tr>`;
+                                <td>
+                                    <input type="number"
+                                           step="0.01"
+                                           name="Lines[${index}].SuperCRMCommissionEarned"
+                                           value="${Number(line.superCRMCommissionEarned || 0).toFixed(2)}"
+                                           class="form-control form-control-sm text-end supercrm-earned-input" />
+                                </td>
+                            </tr>`;
             });
 
             html += '</tbody></table>';
@@ -714,7 +723,7 @@
             calculateSuperCRMTotal();
 
             document.querySelectorAll('.supercrm-earned-input')
-                .forEach(function (input) {
+                .forEach(function(input) {
                     input.addEventListener('input', calculateSuperCRMTotal);
                 });
         }
@@ -723,7 +732,7 @@
             let total = 0;
 
             document.querySelectorAll('.supercrm-earned-input')
-                .forEach(function (input) {
+                .forEach(function(input) {
                     const value = parseFloat(input.value || '0');
                     if (!isNaN(value)) {
                         total += value;
@@ -747,95 +756,95 @@
 
             if (status === 2) {
                 html = `
-                    <div class="col-md-4">
-                    <label>Sent To Provider Date</label>
-                    <div class="crm-date-wrap">
-                        <input type="date" name="SentToProviderDate" class="form-control" value="${formatDate(data.sentToProviderDate)}" />
-                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                    </div>
-                    </div>
-                    ${buildAdminUserDropdown('SentToProviderUserId', data.sentToProviderUserId, adminUsers, 'Communicated By')}`;
+                            <div class="col-md-4">
+                            <label>Sent To Provider Date</label>
+                            <div class="crm-date-wrap">
+                                <input type="date" name="SentToProviderDate" class="form-control" value="${formatDate(data.sentToProviderDate)}" />
+                                <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                            </div>
+                            </div>
+                            ${buildAdminUserDropdown('SentToProviderUserId', data.sentToProviderUserId, adminUsers, 'Communicated By')}`;
             }
 
             if (status === 3) {
                 html = `
-                    <div class="col-md-4">
-                        <label>Provider Accepted Date</label>
-                        <div class="crm-date-wrap">
-                            <input type="date" name="ProviderAcceptedDate" class="form-control" value="${formatDate(data.providerAcceptedDate)}" />
-                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>
-                    ${buildAdminUserDropdown('ProviderAcceptedUserId', data.providerAcceptedUserId, adminUsers, 'Accepted By')}`;
+                            <div class="col-md-4">
+                                <label>Provider Accepted Date</label>
+                                <div class="crm-date-wrap">
+                                    <input type="date" name="ProviderAcceptedDate" class="form-control" value="${formatDate(data.providerAcceptedDate)}" />
+                                    <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>
+                            ${buildAdminUserDropdown('ProviderAcceptedUserId', data.providerAcceptedUserId, adminUsers, 'Accepted By')}`;
             }
 
             if (status === 4) {
                 html = `
-                    <div class="col-md-4">
-                        <label>Provider Rejected Date</label>
-                        <div class="crm-date-wrap">
-                            <input type="date" name="ProviderRejectedDate" class="form-control" value="${formatDate(data.providerRejectedDate)}" />
-                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>
-                    ${buildAdminUserDropdown('ProviderRejectedUserId', data.providerRejectedUserId, adminUsers, 'Rejected By')}`;
+                            <div class="col-md-4">
+                                <label>Provider Rejected Date</label>
+                                <div class="crm-date-wrap">
+                                    <input type="date" name="ProviderRejectedDate" class="form-control" value="${formatDate(data.providerRejectedDate)}" />
+                                    <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>
+                            ${buildAdminUserDropdown('ProviderRejectedUserId', data.providerRejectedUserId, adminUsers, 'Rejected By')}`;
             }
 
             if (status === 7) {
                 html = `
-                    <div class="col-md-4">
-                        <label>Completed Date</label>
-                        <div class="crm-date-wrap">
-                            <input type="date" name="CompletedDate" class="form-control" value="${formatDate(data.completedDate)}" />
-                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Service Start Date</label>
-                        <div class="crm-date-wrap">
-                            <input type="date" name="ServiceStartDate" class="form-control" value="${formatDate(data.serviceStartDate)}" />
-                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Next Renew Date</label>
-                        <div class="crm-date-wrap">
-                        <input type="date" name="NextRenewDate" class="form-control" value="${formatDate(data.nextRenewDate)}" />
-                        <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>`;
+                            <div class="col-md-4">
+                                <label>Completed Date</label>
+                                <div class="crm-date-wrap">
+                                    <input type="date" name="CompletedDate" class="form-control" value="${formatDate(data.completedDate)}" />
+                                    <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Service Start Date</label>
+                                <div class="crm-date-wrap">
+                                    <input type="date" name="ServiceStartDate" class="form-control" value="${formatDate(data.serviceStartDate)}" />
+                                    <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Next Renew Date</label>
+                                <div class="crm-date-wrap">
+                                <input type="date" name="NextRenewDate" class="form-control" value="${formatDate(data.nextRenewDate)}" />
+                                <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>`;
             }
 
             if (status === 9) {
                 html = `
-                    <div class="col-md-4">
-                        <label>On Hold Date</label>
-                        <div class="crm-date-wrap">
-                            <input type="date" name="OnHoldDate" class="form-control" value="${formatDate(data.onHoldDate)}" />
-                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>
-                    ${buildAdminUserDropdown('OnHoldByUserId', data.onHoldByUserId, adminUsers, 'On Hold By')}
-                    <div class="col-md-12">
-                        <label>On Hold Reason</label>
-                        <textarea name="OnHoldReason" class="form-control">${data.onHoldReason || ''}</textarea>
-                    </div>`;
+                            <div class="col-md-4">
+                                <label>On Hold Date</label>
+                                <div class="crm-date-wrap">
+                                    <input type="date" name="OnHoldDate" class="form-control" value="${formatDate(data.onHoldDate)}" />
+                                    <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>
+                            ${buildAdminUserDropdown('OnHoldByUserId', data.onHoldByUserId, adminUsers, 'On Hold By')}
+                            <div class="col-md-12">
+                                <label>On Hold Reason</label>
+                                <textarea name="OnHoldReason" class="form-control">${data.onHoldReason || ''}</textarea>
+                            </div>`;
             }
 
             if (status === 10) {
                 html = `
-                    <div class="col-md-4">
-                        <label>Cancelled Date</label>
-                        <div class="crm-date-wrap">
-                            <input type="date" name="CancelledDate" class="form-control" value="${formatDate(data.cancelledDate)}" />
-                            <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
-                        </div>
-                    </div>
-                    ${buildAdminUserDropdown('CancelledByUserId', data.cancelledByUserId, adminUsers, 'Cancelled By')}
-                    <div class="col-md-12">
-                        <label>Cancelled Reason</label>
-                        <textarea name="CancelledReason" class="form-control">${data.cancelledReason || ''}</textarea>
-                    </div>`;
+                            <div class="col-md-4">
+                                <label>Cancelled Date</label>
+                                <div class="crm-date-wrap">
+                                    <input type="date" name="CancelledDate" class="form-control" value="${formatDate(data.cancelledDate)}" />
+                                    <button type="button" class="crm-date-btn"><i class="bi bi-calendar3"></i></button>
+                                </div>
+                            </div>
+                            ${buildAdminUserDropdown('CancelledByUserId', data.cancelledByUserId, adminUsers, 'Cancelled By')}
+                            <div class="col-md-12">
+                                <label>Cancelled Reason</label>
+                                <textarea name="CancelledReason" class="form-control">${data.cancelledReason || ''}</textarea>
+                            </div>`;
             }
 
             box.innerHTML = html;
@@ -844,35 +853,35 @@
         
 
         document.getElementById('salesOrderSearchForm')
-        ?.addEventListener('submit', function (e) {
+            ?.addEventListener('submit', function(e) {
 
-        const fromDate =
-            document.getElementById('orderDateFrom')?.value;
+                const fromDate =
+                    document.getElementById('orderDateFrom')?.value;
 
-        const toDate =
-            document.getElementById('orderDateTo')?.value;
+                const toDate =
+                    document.getElementById('orderDateTo')?.value;
 
-        if (fromDate > toDate) {
-            alert('Order Date From cannot be greater than Order Date To.');
-            e.preventDefault();
-            return false;
-        }
+                if (fromDate > toDate) {
+                    alert('Order Date From cannot be greater than Order Date To.');
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+        document.getElementById('salesOrderManageModal').addEventListener('hidden.bs.modal', function() {
+
+            document.getElementById('salesOrderNoTitle')
+                .innerHTML = '';
+
+            document.getElementById('salesOrderModalMessage')
+                .innerHTML = '';
+
         });
-
-         document.getElementById('salesOrderManageModal').addEventListener('hidden.bs.modal', function () {
-
-             document.getElementById('salesOrderNoTitle')
-                 .innerHTML = '';
-
-             document.getElementById('salesOrderModalMessage')
-                 .innerHTML = '';
-
-         });
 
 
         // New Changes for Modal message
 
-       function showSalesOrderModalMessage(success, message) {
+        function showSalesOrderModalMessage(success, message) {
 
             const messageBox = document.getElementById('salesOrderModalMessage');
 
@@ -881,13 +890,13 @@
             const alertClass = success ? 'alert-success' : 'alert-danger';
 
             messageBox.innerHTML = `
-                <div class="alert ${alertClass} alert-dismissible fade show mb-3">
-                    ${message || ''}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>`;
+                        <div class="alert ${alertClass} alert-dismissible fade show mb-3">
+                            ${message || ''}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>`;
         }
 
-        document.addEventListener('submit', async function (e) {
+        document.addEventListener('submit', async function(e) {
 
             const form = e.target.closest('.sales-order-modal-update-form');
 
@@ -938,7 +947,7 @@
 
         /// Sale Order Details Modal
 
-                document.addEventListener('click', async function (e) {
+        document.addEventListener('click', async function(e) {
 
             const btn = e.target.closest('.btn-view-sales-summary');
 
@@ -973,27 +982,27 @@
                     modalBody.innerHTML =
                         '<div class="alert alert-danger">Unable to load sales order summary.</div>';
 
-                        // const text = await response.text();
+                    // const text = await response.text();
 
-                        // console.log(text);
+                    // console.log(text);
 
-                        // modalBody.innerHTML =
+                    // modalBody.innerHTML =
 
-                        //     '<div class="alert alert-danger">'
+                    //     '<div class="alert alert-danger">'
 
-                        //     + response.status
+                    //     + response.status
 
-                        //     + ' '
+                    //     + ' '
 
-                        //     + response.statusText
+                    //     + response.statusText
 
-                        //     + '<br/>'
+                    //     + '<br/>'
 
-                        //     + text
+                    //     + text
 
-                        //     + '</div>';
+                    //     + '</div>';
 
-                        return;
+                    return;
                 }
 
                 const html = await response.text();
@@ -1006,13 +1015,13 @@
             }
         });
 
-        document.getElementById('salesOrderSummaryModal')?.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('salesOrderSummaryModal')?.addEventListener('hidden.bs.modal', function() {
 
-                document.getElementById('salesOrderSummaryModalOrderNo').innerHTML = '';
+            document.getElementById('salesOrderSummaryModalOrderNo').innerHTML = '';
 
-                document.getElementById('salesOrderSummaryModalBody').innerHTML =
-                    '<div class="crm-subtitle">Loading...</div>';
-            });
+            document.getElementById('salesOrderSummaryModalBody').innerHTML =
+                '<div class="crm-subtitle">Loading...</div>';
+        });
 
     </script>
 }

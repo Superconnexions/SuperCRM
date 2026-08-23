@@ -20,11 +20,7 @@ namespace SuperCRM.Web.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Index(
-        string searchMode,
-        Guid? agentUserId,
-        Guid? adminUserId,
-        CancellationToken cancellationToken)
+        public async Task<IActionResult> Index(string searchMode, Guid? agentUserId, Guid? adminUserId, CancellationToken cancellationToken)
         {
             var model =
                 await _salesOrderCreationService.GetAdminDashboardAsync(
