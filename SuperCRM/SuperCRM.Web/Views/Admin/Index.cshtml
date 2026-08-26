@@ -67,7 +67,7 @@
             color: #ffffff;
         }
 
-       /*  // Added END  */
+    /*  // Added END  */
 
     .admin-dashboard {
         background: #222426;
@@ -268,40 +268,37 @@
 
 
     .btn-search-agent {
-    background: #0d47ff;
-    color: white;
-    border: 3px solid #1d4ed8;
-    border-radius: 12px;
-    height: 46px;
-    font-weight: 800;
-}
+        background: #0d47ff;
+        color: white;
+        border: 3px solid #1d4ed8;
+        border-radius: 12px;
+        height: 46px;
+        font-weight: 800;
+    }
 
-.btn-search-admin {
-    background: #047857;
-    color: white;
-    border: 3px solid #059669;
-    border-radius: 12px;
-    height: 46px;
-    font-weight: 800;
-}
+    .btn-search-admin {
+        background: #047857;
+        color: white;
+        border: 3px solid #059669;
+        border-radius: 12px;
+        height: 46px;
+        font-weight: 800;
+    }
 
-.btn-search-all {
-    background: #ea580c;
-    color: white;
-    border: 3px solid #fb923c;
-    border-radius: 12px;
-    height: 46px;
-    font-weight: 800;
-}
+    .btn-search-all {
+        background: #ea580c;
+        color: white;
+        border: 3px solid #fb923c;
+        border-radius: 12px;
+        height: 46px;
+        font-weight: 800;
+    }
 
-.btn-search-agent:hover,
-.btn-search-admin:hover,
-.btn-search-all:hover {
-    color: white;
-}
-
-
-
+        .btn-search-agent:hover,
+        .btn-search-admin:hover,
+        .btn-search-all:hover {
+            color: white;
+        }
 
 </style>
 
@@ -473,14 +470,18 @@
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="metric-card">
-                <div class="metric-label">Received Commission by SuperCRM</div>
-                <div class="metric-value">@Model.ReceivedCommissionBySuperCRM.ToString("N2")</div>
-                <div class="metric-note">Distribute to SuperCRM</div>
+        @if (User.Identity.Name == "admin@supercrm.local" || User.Identity.Name == "Shamubd@yahoo.com")
+        {
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-label">Received Commission by SuperCRM</div>
+                    <div class="metric-value">@Model.ReceivedCommissionBySuperCRM.ToString("N2")</div>
+                    <div class="metric-note">Distribute to SuperCRM</div>
+                </div>
             </div>
-        </div>
+        }
 
+        
         <div class="col-md-3">
             <div class="dashboard-block h-100">
                 <div class="dashboard-block-header">Order Status Summary</div>
@@ -586,56 +587,56 @@
                         <th class="text-end">Total</th>
                         <th>Action</th>
                     </tr>
-                    </tr>
-                </thead>
+                </tr>
+            </thead>
 
-                <tbody>
-                    @if (!Model.RecentOrders.Any())
+            <tbody>
+                @if (!Model.RecentOrders.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="empty-row">No recent sales order found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.RecentOrders)
                     {
                         <tr>
-                            <td colspan="9" class="empty-row">No recent sales order found.</td>
+                            <td class="text-nowrap"><strong class="blue-text">@item.OrderNo</strong></td>
+                            <td class="text-nowrap">@item.OrderDate.ToString("dd-MMM-yyyy")</td>
+                            <td>@item.CustomerName</td>
+                            <td>@item.ProviderName</td>
+                            <td>@item.StatusText</td>
+                            <td>@(item.AgentDisplayName ?? "-")</td>
+                            <td>@(item.AdminDisplayName ?? "-")</td>
+                            <td class="text-end">@item.OrderTotal.ToString("N2")</td>
+                            <td>
+                                <a asp-controller="SalesOrder"
+                                   asp-action="SalesOrderCreatedSummary"
+                                   asp-route-saleIds="@item.SaleId"
+                                   class="btn-view">
+                                    View Detail
+                                </a>
+                            </td>
                         </tr>
                     }
-                    else
-                    {
-                        foreach (var item in Model.RecentOrders)
-                        {
-                            <tr>
-                                <td class="text-nowrap"><strong class="blue-text">@item.OrderNo</strong></td>
-                                <td class="text-nowrap">@item.OrderDate.ToString("dd-MMM-yyyy")</td>
-                                <td>@item.CustomerName</td>
-                                <td>@item.ProviderName</td>
-                                <td>@item.StatusText</td>
-                                <td>@(item.AgentDisplayName ?? "-")</td>
-                                <td>@(item.AdminDisplayName ?? "-")</td>
-                                <td class="text-end">@item.OrderTotal.ToString("N2")</td>
-                                <td>
-                                    <a asp-controller="SalesOrder"
-                                       asp-action="SalesOrderCreatedSummary"
-                                       asp-route-saleIds="@item.SaleId"
-                                       class="btn-view">
-                                        View Detail
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
+</div>
 
 </div>
 
 @section Scripts {
     <script>
-        document.getElementById('agentUserId')?.addEventListener('change', function () {
+        document.getElementById('agentUserId')?.addEventListener('change', function() {
             if (this.value) {
                 document.getElementById('adminUserId').value = '';
             }
         });
 
-        document.getElementById('adminUserId')?.addEventListener('change', function () {
+        document.getElementById('adminUserId')?.addEventListener('change', function() {
             if (this.value) {
                 document.getElementById('agentUserId').value = '';
             }
