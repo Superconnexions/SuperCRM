@@ -25,8 +25,6 @@
 
                     @if (User.IsInRole(AppRoles.SuperAdmin))
                     {
-
-
                         <li>
                             <a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">Admin Users</a>
                         </li>
@@ -49,8 +47,6 @@
                             </a>
                         </li>
 
-
-
                         <li>
                             <a class="dropdown-item" asp-controller="Providers" asp-action="Index">
                                 Providers
@@ -68,7 +64,6 @@
                                 Product Variants
                             </a>
                         </li>
-
 
                         <li>
                             <a class="dropdown-item" asp-controller="ProductVariantTypes" asp-action="Index">
@@ -93,11 +88,8 @@
                                 Provider Products
                             </a>
                         </li>
-
                         
                     }
-
-
 
 
                     <li>
@@ -105,11 +97,15 @@
                             Product base Commission
                         </a>
                     </li>
-
                     
                     <li>
                         <a class="dropdown-item" asp-controller="EmailSettings" asp-action="Index">
                             Email Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-controller="PromotionSetup" asp-action="Index">
+                            Promotion Setup
                         </a>
                     </li>
 
