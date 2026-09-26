@@ -1,0 +1,98 @@
+@model List<SuperCRM.Application.DTOs.PromotionSetup.AgentActivePromotionDto>
+
+@{
+    ViewData["Title"] = "Active Promotions";
+}
+
+<div class="agent-promotions-page">
+
+    <div class="promotion-page-heading mb-4">
+        <div>
+            <h3 class="promotion-page-title">Active Promotions</h3>
+            <div class="promotion-page-subtitle">
+                View currently active sales promotions and promotional commission details.
+            </div>
+        </div>
+    </div>
+
+    <div class="promotion-list-panel">
+        <div class="promotion-list-panel-header">
+            <span>Current Promotions</span>
+            <span class="promotion-total-pill">@Model.Count</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table promotion-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Promotion Code</th>
+                        <th>Promotion Name</th>
+                        <th>Promotion Summary</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th class="text-center">Active Items</th>
+                        <th class="text-center">Promotion Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="promotion-empty-row">
+                                No active promotions are available today.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var promotion in Model)
+                        {
+                            <tr data-promotion-row="@promotion.PromotionId"
+                                class="@(promotion.IsNew ? "promotion-row-new" : "")">
+                                <td class="text-nowrap fw-bold">
+                                    @promotion.PromotionCode
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <span>@promotion.PromotionName</span>
+                                        @if (promotion.IsNew)
+                                        {
+                                            <span class="promotion-new-row-badge">NEW</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>@(promotion.PromotionSummary ?? "-")</td>
+                                <td class="text-nowrap">@promotion.PromotionStartDate.ToString("dd-MMM-yyyy")</td>
+                                <td class="text-nowrap">@promotion.PromotionEndDate.ToString("dd-MMM-yyyy")</td>
+                                <td class="text-center">
+                                    <span class="promotion-item-count-pill">
+                                        @promotion.ActiveItemCount
+                                    </span>
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <button type="button"
+                                            class="btn btn-sm btn-view-promotion-items"
+                                            data-promotion-id="@promotion.PromotionId">
+                                        View Items
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <form id="promotionAjaxTokenForm" class="d-none">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <div id="promotionItemsSection" class="mt-4 d-none">
+        <div id="promotionItemsContainer"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/agent-promotions.js" asp-append-version="true"></script>
+}

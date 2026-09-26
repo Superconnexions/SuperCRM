@@ -1,0 +1,233 @@
+@model SuperCRM.Web.ViewModels.PromotionSetup.PromotionCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Promotion";
+}
+
+<div class="crm-form-page promotion-setup-page">
+
+    <h2 class="crm-form-title">
+        Promotion Setup - @Model.PromotionCode
+    </h2>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-controller="PromotionSetup"
+           asp-action="Index"
+           class="btn btn-warning fw-bold">
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to List
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model.Cancelled)
+    {
+        <div class="alert alert-danger">
+            This promotion has been cancelled and is inactive.
+            @if (Model.CancelledAt.HasValue)
+            {
+                <span>
+                    Cancelled on
+                    @Model.CancelledAt.Value.ToLocalTime().ToString("dd-MMM-yyyy hh:mm tt").
+                </span>
+            }
+        </div>
+    }
+
+    <form asp-action="Update"
+          method="post"
+          id="promotionForm"
+          class="crm-form-panel">
+
+        @Html.AntiForgeryToken()
+
+        <partial name="_Form" model="Model" />
+
+        @if (!Model.Cancelled)
+        {
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    Update
+                </button>
+            </div>
+        }
+    </form>
+
+
+    @if (!Model.Cancelled)
+    {
+        <div class="crm-form-panel mt-3">
+
+            <h5 class="mb-3">
+                Test Promotion Email
+            </h5>
+
+            <form asp-action="SendTestEmail"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.PromotionId" />
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-8">
+
+                        <label for="testEmail"
+                               class="form-label">
+                            Test Email Address
+                        </label>
+
+                        <input type="email"
+                               id="testEmail"
+                               name="testEmail"
+                               class="form-control"
+                               maxlength="256"
+                               placeholder="Enter test recipient email"
+                               required />
+
+                        <small class="text-muted">
+                            This sends the same promotion email to the test address only.
+                            It does not update the promotion notification counter.
+                        </small>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <button type="submit"
+                                class="btn btn-outline-primary">
+                            Send Test Email
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    }
+
+
+    @if (!Model.Cancelled
+        && Model.Submitted
+        && !Model.Published)
+    {
+        <div class="d-flex flex-wrap gap-2 justify-content-end mt-3">
+
+            <form asp-action="Publish"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.PromotionId" />
+
+                <button type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('Publish this promotion?');">
+                    Publish
+                </button>
+            </form>
+
+            <form asp-action="PublishWithEmail"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.PromotionId" />
+
+                <button type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('Publish and send email notification to all active agents?');">
+                    Publish with Email Notification
+                </button>
+            </form>
+
+        </div>
+    }
+
+    @if (!Model.Cancelled
+        && Model.Published)
+    {
+        <div class="d-flex justify-content-end mt-3">
+
+            <form asp-action="ResendEmailNotification"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.PromotionId" />
+
+                <button type="submit"
+                        class="btn btn-outline-primary">
+
+                    @(Model.EmailNotificationToAgents
+                        ? "Resend Email Notification"
+                        : "Send Email Notification")
+
+                </button>
+            </form>
+
+        </div>
+
+        <div class="text-end small text-muted mt-1">
+            Notification send count:
+            @Model.NoOfEmailNotificationSend
+        </div>
+    }
+
+    @if (!Model.Cancelled)
+    {
+        <div class="d-flex justify-content-end mt-3">
+
+            <form asp-action="Cancel"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.PromotionId" />
+
+                <button type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('Cancel this promotion? The promotion will become inactive and cannot be updated or published.');">
+                    Cancel Promotion
+                </button>
+            </form>
+
+        </div>
+    }
+    
+   
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/promotion-setup.js"
+            asp-append-version="true"></script>
+}

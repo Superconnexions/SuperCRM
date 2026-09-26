@@ -1,0 +1,32 @@
+@model SuperCRM.Application.DTOs.PromotionSetup.AgentPromotionNotificationDto
+
+@{
+    var stateClass = Model.ActivePromotionCount == 0
+        ? "promotion-state-zero"
+        : Model.HasNewPromotion
+            ? "promotion-state-new"
+            : "promotion-state-active";
+}
+
+<li class="nav-item d-flex align-items-center me-2">
+    <a asp-controller="AgentPromotions"
+       asp-action="Index"
+       id="agentPromotionAlert"
+       class="nav-link agent-promotion-alert @stateClass"
+       title="View Active Promotions">
+
+        <span class="promotion-icon" aria-hidden="true">📣</span>
+
+        <span class="promotion-label">Active Promotions</span>
+
+        <span id="agentPromotionCount"
+              class="promotion-notification-count">
+            @Model.ActivePromotionCount
+        </span>
+
+        <span id="agentPromotionNewBadge"
+              class="promotion-new-header-badge @(Model.HasNewPromotion ? "" : "d-none")">
+            NEW
+        </span>
+    </a>
+</li>

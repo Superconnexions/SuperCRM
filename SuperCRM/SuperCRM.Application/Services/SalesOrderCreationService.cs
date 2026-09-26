@@ -1,3 +1,4 @@
+using SuperCRM.Application.DTOs.PromotionSetup;
 using SuperCRM.Application.DTOs.SalesOrders;
 using SuperCRM.Application.Interfaces.Persistence;
 using SuperCRM.Application.Interfaces.Services;
@@ -9,10 +10,12 @@ namespace SuperCRM.Application.Services
     public class SalesOrderCreationService : ISalesOrderCreationService
     {
         private readonly ISalesOrderCreationRepository _repository;
+        private readonly IPromotionSetupRepository _promotionSetupRepository;
 
-        public SalesOrderCreationService(ISalesOrderCreationRepository repository)
+        public SalesOrderCreationService(ISalesOrderCreationRepository repository, IPromotionSetupRepository promotionSetupRepository)
         {
             _repository = repository;
+            _promotionSetupRepository = promotionSetupRepository;
         }
 
         public async Task<CreateSalesOrderResultDto> CreateSalesOrderFromDraftAsync(
@@ -61,6 +64,29 @@ namespace SuperCRM.Application.Services
             var commissionMap = commissions
                 .GroupBy(x => x.ProductId)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(c => c.EffectiveFrom ?? DateTime.MinValue).First());
+
+           
+
+            // Get active promotion setups for the products in the draft
+            // -----------------------------------------------------
+            // APPLICABLE PROMOTION COMMISSION
+            // -----------------------------------------------------
+
+            var promotionCommissions =
+                await _promotionSetupRepository
+                    .GetApplicablePromotionCommissionsAsync(
+                        productIds,
+                        orderDate,
+                        cancellationToken);
+
+            var promotionCommissionMap =
+                promotionCommissions
+                    .GroupBy(x => x.ProductId)
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.First());
+
+            // END APPLICABLE PROMOTION COMMISSION
 
 
             // For Variant Product Commission
@@ -161,34 +187,84 @@ namespace SuperCRM.Application.Services
                         : draftLine.SalePrice * quantity;
 
 
+
+                    //var commissionAmount = 0m;
+
+                    //if (commission != null) {
+
+                    //    commissionAmount = CalculateCommission(commission, lineTotal, quantity);
+                    //}
+
+                    // -----------------------------------------------------
+                    // AGENT COMMISSION CALCULATION
+                    // Priority:
+                    // 1. Promotion Commission
+                    // 2. Standard Product Base Commission
+                    // 3. Add Variant Extra Commission, if applicable
+                    // -----------------------------------------------------
+
                     var commissionAmount = 0m;
 
+                    ApplicablePromotionCommissionDto?
+                        applicablePromotion = null;
 
-                    if (commission != null) {
+                    promotionCommissionMap.TryGetValue(
+                        draftLine.ProductId,
+                        out applicablePromotion);
 
-                        commissionAmount = CalculateCommission(commission, lineTotal, quantity);
+
+                    // -----------------------------------------------------
+                    // 1. PROMOTION OR STANDARD COMMISSION
+                    // -----------------------------------------------------
+
+                    if (applicablePromotion != null)
+                    {
+                        // Promotion replaces the standard Product Base
+                        // Commission for this SaleLine.
+                        commissionAmount =
+                            applicablePromotion.FinalCommissionAmount * quantity;
                     }
-                        
-
-                    // Calculte Variant Product Commission
-
-                    var variantOverrideKey = new
+                    else if (commission != null)
                     {
-                        ProductId = draftLine.ProductId,
-                        VariantCode = (draftLine.VariantCode ?? string.Empty).Trim().ToUpper()
-                    };
+                        // No promotion:
+                        // retain the existing standard commission logic.
+                        commissionAmount =
+                            CalculateCommission(
+                                commission,
+                                lineTotal,
+                                quantity);
+                    }
 
 
-                    if ( commission != null)
-                    {
-                        if (variantCommissionOverrideMap.TryGetValue(
+                    // -----------------------------------------------------
+                    // 2. VARIANT EXTRA COMMISSION
+                    // -----------------------------------------------------
+
+                    var variantOverrideKey =
+                        new
+                        {
+                            ProductId =
+                                draftLine.ProductId,
+
+                            VariantCode =
+                                (draftLine.VariantCode
+                                    ?? string.Empty)
+                                .Trim()
+                                .ToUpper()
+                        };
+
+                    if (variantCommissionOverrideMap.TryGetValue(
                             variantOverrideKey,
                             out var variantOverride))
-                        {
-                            commissionAmount += variantOverride.ExtraCommissionAmount;
-                        }
+                    {
+                        // Variant extra is independent of whether the
+                        // base came from Promotion or Product Base Commission.
+                        commissionAmount +=
+                            variantOverride.ExtraCommissionAmount* quantity;
                     }
-                    // END Variant Commission
+
+                    // END AGENT COMMISSION CALCULATION
+
 
                     saleCommissionTotal += commissionAmount;
 
@@ -227,17 +303,29 @@ namespace SuperCRM.Application.Services
                         PriceFinalizedAt = orderDate,
                         PriceFinalizedByUserId = request.CurrentUserId,
                         ProductBaseCommissionId = commission?.ProductBaseCommissionId,
+
+                        // -----------------------------------------------------
+                        // PROMOTION AUDIT
+                        // -----------------------------------------------------
+
+                        PromotionId =
+                        applicablePromotion?.PromotionId,
+
+                        PromotionItemId =
+                        applicablePromotion?.PromotionItemId,
+
+                        IsPromotionApplied =
+                        applicablePromotion != null,
+
+                        // -----------------------------------------------------
+
                         CommissionType = commission?.CommissionType,
-                        //CommissionValue = commission?.CommissionType == CommissionType.FixedAmount
-                        //    ? commission.FixedAmount
-                        //    : commission?.Percentage,
+                        
                         CommissionValue = commissionAmount,
                         CalculatedAgentCommission = commissionAmount,
-                        //FinalAgentCommission = commissionAmount,
-                        //SuperCRMCommissionEarned = commissionAmount,
+                        
                         FinalAgentCommission = 0, // finalyze by admin
                         SuperCRMCommissionEarned = 0, // finalyze by admin
-                        //IsCommissionFinalized = commission != null,
                         IsCommissionFinalized = false, // Commission finalyze by admin
                         CreatedAt = orderDate,
                         SalesUnitId = product?.SalesUnitId ?? 0,

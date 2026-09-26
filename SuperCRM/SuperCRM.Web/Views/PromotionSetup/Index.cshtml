@@ -1,0 +1,358 @@
+@model SuperCRM.Web.ViewModels.PromotionSetup.PromotionListViewModel
+
+<link rel="stylesheet"
+      href="~/css/promotion-setup-list.css"
+      asp-append-version="true" />
+
+@{
+    ViewData["Title"] = "Promotion Setup";
+
+    var startRecord =
+        Model.TotalRecords == 0
+            ? 0
+            : ((Model.Page - 1) * Model.PageSize) + 1;
+
+    var endRecord =
+        Math.Min(
+            Model.Page * Model.PageSize,
+            Model.TotalRecords);
+}
+
+<div class="promotion-list-page">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="promotion-list-title mb-1">
+                Promotion Setup
+            </h4>
+
+            <small class="promotion-list-subtitle">
+                Showing @startRecord - @endRecord of @Model.TotalRecords records
+            </small>
+        </div>
+
+        <a asp-controller="PromotionSetup"
+           asp-action="Create"
+           class="btn btn-primary promotion-create-btn">
+            Add Promotion
+        </a>
+    </div>
+
+    <form asp-controller="PromotionSetup"
+          asp-action="Index"
+          method="post"
+          id="promotionSearchForm"
+          class="promotion-search-panel">
+
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <label class="form-label">
+                    Promotion Name
+                </label>
+
+                <input type="text"
+                       name="promotionName"
+                       value="@Model.PromotionName"
+                       class="form-control"
+                       maxlength="200"
+                       placeholder="Promotion Name" />
+            </div>
+
+            <div class="col-xl-2 col-lg-3 col-md-6">
+                <label class="form-label">
+                    Promotion Start Date
+                </label>
+
+                <input type="date"
+                       name="promotionStartDate"
+                       value="@(Model.PromotionStartDate?.ToString("yyyy-MM-dd"))"
+                       class="form-control" />
+            </div>
+
+            <div class="col-xl-2 col-lg-3 col-md-6">
+                <label class="form-label">
+                    Promotion End Date
+                </label>
+
+                <input type="date"
+                       name="promotionEndDate"
+                       value="@(Model.PromotionEndDate?.ToString("yyyy-MM-dd"))"
+                       class="form-control" />
+            </div>
+
+            <div class="col-xl-2 col-lg-2 col-md-6">
+                <label class="form-label">
+                    Published
+                </label>
+
+                <select name="published"
+                        class="form-select">
+                    <option value=""
+                            selected="@(Model.Published == null)">
+                        All
+                    </option>
+                    <option value="true"
+                            selected="@(Model.Published == true)">
+                        Yes
+                    </option>
+                    <option value="false"
+                            selected="@(Model.Published == false)">
+                        No
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-xl-1 col-lg-2 col-md-4">
+                <label class="form-label">
+                    Page Size
+                </label>
+
+                <select name="pageSize"
+                        class="form-select">
+                    <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                    <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                    <option value="50" selected="@(Model.PageSize == 50)">50</option>
+                    <option value="100" selected="@(Model.PageSize == 100)">100</option>
+                </select>
+            </div>
+
+            <div class="col-xl-2 col-lg-4 col-md-8 d-flex gap-2">
+                <input type="hidden"
+                       name="Page"
+                       id="Promotion_Page"
+                       value="@Model.Page" />
+
+                <button type="submit"
+                        class="btn btn-primary promotion-search-btn"
+                        id="promotionSearchButton">
+                    Search
+                </button>
+
+                <a asp-controller="PromotionSetup"
+                   asp-action="Index"
+                   class="btn btn-warning promotion-reset-btn">
+                    Reset
+                </a>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="promotion-grid-panel">
+        <div class="table-responsive">
+            <table class="promotion-grid-table">
+                <thead>
+                    <tr>
+                        <th class="text-nowrap">Promotion Code</th>
+                        <th>Promotion Name</th>
+                        <th class="text-nowrap">Start Date</th>
+                        <th class="text-nowrap">End Date</th>
+                        <th class="text-nowrap text-center">Products</th>
+                        <th class="text-center">Published</th>
+                        <th class="text-center">Active</th>
+                        <th class="text-center">Cancelled</th>
+                        <th class="text-nowrap text-center">Email Sent</th>
+                        <th class="text-nowrap">Submitted At</th>
+                        <th class="text-nowrap">Last Updated</th>
+                        <th class="text-nowrap">View/Edit</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.Promotions.Any())
+                    {
+                        <tr>
+                            <td colspan="12"
+                                class="text-center promotion-list-subtitle py-4">
+                                No promotion found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Promotions)
+                        {
+                            <tr>
+                                <td class="text-nowrap">
+                                    <strong>@item.PromotionCode</strong>
+                                </td>
+
+                                <td>
+                                    @item.PromotionName
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @item.PromotionStartDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @item.PromotionEndDate.ToString("dd-MMM-yyyy")
+                                </td>
+
+                                <td class="text-center text-nowrap">
+                                    <span class="badge bg-secondary promotion-status-badge">
+                                        @item.ActiveProducts / @item.TotalProducts
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.Published)
+                                    {
+                                        <span class="badge bg-success promotion-status-badge">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary promotion-status-badge">No</span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success promotion-status-badge">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary promotion-status-badge">No</span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    @if (item.Cancelled)
+                                    {
+                                        <span class="badge bg-danger promotion-status-badge">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary promotion-status-badge">No</span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge bg-info text-dark promotion-status-badge">
+                                        @item.NoOfEmailNotificationSend
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @(item.SubmittedAt?.ToString("dd-MMM-yyyy HH:mm") ?? "-")
+                                </td>
+
+                                <td class="text-nowrap">
+                                    @(item.UpdatedAt?.ToString("dd-MMM-yyyy HH:mm") ?? "-")
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <a asp-controller="PromotionSetup"
+                                       asp-action="Edit"
+                                       asp-route-id="@item.PromotionId"
+                                       class="btn btn-sm btn-primary promotion-view-edit-btn">
+                                        View/Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="promotion-pagination"
+                 aria-label="Promotion list pages">
+                <ul class="pagination justify-content-end mb-0">
+
+                    <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                        <button type="button"
+                                class="page-link promotion-page-btn"
+                                data-page="@(Model.Page - 1)">
+                            Previous
+                        </button>
+                    </li>
+
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        if (i == 1
+                            || i == Model.TotalPages
+                            || Math.Abs(i - Model.Page) <= 2)
+                        {
+                            <li class="page-item @(i == Model.Page ? "active" : "")">
+                                <button type="button"
+                                        class="page-link promotion-page-btn"
+                                        data-page="@i">
+                                    @i
+                                </button>
+                            </li>
+                        }
+                        else if (i == 2 && Model.Page > 4)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                        else if (i == Model.TotalPages - 1
+                                 && Model.Page < Model.TotalPages - 3)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                        <button type="button"
+                                class="page-link promotion-page-btn"
+                                data-page="@(Model.Page + 1)">
+                            Next
+                        </button>
+                    </li>
+
+                </ul>
+            </nav>
+        }
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('promotionSearchForm');
+            const pageInput = document.getElementById('Promotion_Page');
+            const searchButton = document.getElementById('promotionSearchButton');
+
+            if (!form || !pageInput) {
+                return;
+            }
+
+            if (searchButton) {
+                searchButton.addEventListener('click', function () {
+                    pageInput.value = '1';
+                });
+            }
+
+            document.querySelectorAll('.promotion-page-btn').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    if (button.closest('.page-item')?.classList.contains('disabled')) {
+                        return;
+                    }
+
+                    const page = parseInt(button.dataset.page || '0');
+
+                    if (page <= 0) {
+                        return;
+                    }
+
+                    pageInput.value = page.toString();
+                    form.submit();
+                });
+            });
+        });
+    </script>
+}

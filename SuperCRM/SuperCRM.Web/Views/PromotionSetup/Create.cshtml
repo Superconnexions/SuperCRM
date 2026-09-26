@@ -1,0 +1,26 @@
+@model SuperCRM.Web.ViewModels.PromotionSetup.PromotionCreateEditViewModel
+
+@{
+    ViewData["Title"] = "Create Promotion Setup";
+}
+
+<div class="crm-form-page promotion-setup-page">
+
+    <h2 class="crm-form-title">Create Promotion Setup</h2>
+
+    <form asp-action="Create" method="post" id="promotionForm" class="crm-form-panel">
+        @Html.AntiForgeryToken()
+
+        <partial name="_Form" model="Model" />
+
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-primary px-4">Submit</button>
+        </div>
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/promotion-setup.js" asp-append-version="true"></script>
+}

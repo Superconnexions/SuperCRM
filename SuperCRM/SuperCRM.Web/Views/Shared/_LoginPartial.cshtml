@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using SuperCRM.Persistence.Identity
 @using SuperCRM.Shared
 @inject SignInManager<ApplicationUser> SignInManager
@@ -34,6 +34,12 @@
                         <li>
                             <a class="dropdown-item" asp-controller="ProductBaseCommissions" asp-action="VariantOverrides">
                                 Product variant wise commission
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" asp-controller="PromotionSetup" asp-action="Index">
+                                Promotion Setup
                             </a>
                         </li>
 
@@ -177,57 +183,56 @@
 
         @if (User.IsInRole(AppRoles.Agent))
         {
+            @await Component.InvokeAsync("AgentPromotionNotification")
 
+            <!-- Agent Menu -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle text-dark"
                    href="#"
-                   id="masterSetupDropdown"
+                   id="agentMenuDropdown"
                    role="button"
                    data-bs-toggle="dropdown"
                    aria-expanded="false">
                     Agents
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="masterSetupDropdown">
+
+                <ul class="dropdown-menu"
+                    aria-labelledby="agentMenuDropdown">
 
                     <li>
-                        <a class="dropdown-item" asp-controller="AgentDashboard" asp-action="Index">Agent Dashboard</a>
+                        <a class="dropdown-item"
+                           asp-controller="AgentDashboard"
+                           asp-action="Index">
+                            Agent Dashboard
+                        </a>
                     </li>
 
                     <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="SalesOrderProductList">
                             Sales Order Creation
                         </a>
                     </li>
 
                     <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderHistory" class="nav-link">
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="SalesOrderHistory">
                             Sales Order History
                         </a>
                     </li>
 
                     <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="CustomerManagement">
+                        <a class="dropdown-item"
+                           asp-controller="SalesOrder"
+                           asp-action="CustomerManagement">
                             Customer Management
                         </a>
                     </li>
-@* 
-                    <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
-                            Pending Sales Commission
-                        </a>
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item" asp-controller="SalesOrder" asp-action="SalesOrderProductList" class="nav-link">
-                            Sales Commission History
-                        </a>
-                    </li> *@
-
-
 
                 </ul>
             </li>
-
         }
 
         <li class="nav-item">

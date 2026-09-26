@@ -23,6 +23,12 @@ namespace SuperCRM.Domain.Entities
         public DateTime? PriceFinalizedAt { get; set; }
         public Guid? PriceFinalizedByUserId { get; set; }
         public Guid? ProductBaseCommissionId { get; set; }
+
+        // Promotion audit
+        public Guid? PromotionId { get; set; }
+        public Guid? PromotionItemId { get; set; }
+        public bool IsPromotionApplied { get; set; }
+
         public CommissionType? CommissionType { get; set; }
         public decimal? CommissionValue { get; set; }
         public decimal CalculatedAgentCommission { get; set; }
@@ -49,6 +55,10 @@ namespace SuperCRM.Domain.Entities
         public ProductVariant? ProductVariant { get; set; }
         public ProviderProduct? ProviderProduct { get; set; }
         public ProductBaseCommission? ProductBaseCommission { get; set; }
+        
+        // Promotion audit navigation
+        public PromotionSetup? PromotionSetup { get; set; }
+        public PromotionItem? PromotionItem { get; set; }
         public ICollection<InstallmentSchedule> InstallmentSchedules { get; set; } = new List<InstallmentSchedule>();
     }
 }

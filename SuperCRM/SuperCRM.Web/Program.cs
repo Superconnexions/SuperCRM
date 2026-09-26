@@ -131,6 +131,10 @@ builder.Services.AddScoped<IProductImageService, ProductImageService>();
 //.Services.AddScoped<IProductLookupService, ProductLookupService>();
 // END Product Management
 
+// Promotion Setup
+builder.Services.AddScoped<IPromotionSetupRepository, PromotionSetupRepository>();
+builder.Services.AddScoped<IPromotionSetupService, PromotionSetupService>();
+
 builder.Services.AddDataProtection();
 
 builder.Services.AddScoped<IEmailSettingRepository, EmailSettingRepository>();

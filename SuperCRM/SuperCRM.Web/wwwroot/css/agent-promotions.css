@@ -1,0 +1,298 @@
+/* =========================================================
+   SuperCRM - Agent Active Promotions
+   Header notification + agent promotion list + AJAX items
+   ========================================================= */
+
+.agent-promotion-alert {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 7px;
+    margin-right: 4px;
+    padding: 7px 12px !important;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .20);
+    color: #fff !important;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none !important;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.agent-promotion-alert:hover {
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.agent-promotion-alert .promotion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.agent-promotion-alert .promotion-label {
+    white-space: nowrap;
+}
+
+.promotion-notification-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 25px;
+    height: 25px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #0d47ff;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, .90);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.promotion-new-header-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #fff;
+    color: #d84315;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .4px;
+}
+
+/* No active promotion: always visible, calm state. */
+.agent-promotion-alert.promotion-state-zero {
+    background: linear-gradient(135deg, #46515d, #2d343b);
+    box-shadow: 0 0 5px rgba(108, 117, 125, .35);
+}
+
+.agent-promotion-alert.promotion-state-zero .promotion-notification-count {
+    background: #6c757d;
+}
+
+/* Active promotions exist and all have already been viewed. */
+.agent-promotion-alert.promotion-state-active {
+    background: linear-gradient(135deg, #00897b, #00695c);
+    box-shadow: 0 0 9px rgba(0, 137, 123, .50);
+}
+
+/* One or more active promotions have not yet been viewed. */
+.agent-promotion-alert.promotion-state-new {
+    background: linear-gradient(135deg, #ff9800 0%, #ff6d00 45%, #f4511e 100%);
+    animation: promotionNotificationPulse 2.2s infinite;
+}
+
+@keyframes promotionNotificationPulse {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(255, 111, 0, .45);
+    }
+    50% {
+        box-shadow:
+            0 0 18px rgba(255, 111, 0, .95),
+            0 0 28px rgba(255, 152, 0, .35);
+    }
+}
+
+/* Active Promotions page */
+.agent-promotions-page {
+    background: #222426;
+    color: #d6d6d6;
+    min-height: calc(100vh - 70px);
+    padding: 18px;
+}
+
+.promotion-page-title {
+    color: #0d47ff;
+    font-size: 18pt;
+    font-weight: 900;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.promotion-page-subtitle {
+    color: #b5b5b5;
+    font-size: 12pt;
+}
+
+.promotion-list-panel,
+.promotion-items-panel {
+    background: #17191b;
+    border: 2px solid #2d3033;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.promotion-list-panel-header,
+.promotion-items-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #000;
+    color: #fff;
+    padding: 14px 18px;
+    font-weight: 800;
+}
+
+.promotion-total-pill,
+.promotion-item-count-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 27px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background: #0d47ff;
+    color: #fff;
+    font-weight: 900;
+}
+
+.promotion-table,
+.promotion-items-table {
+    color: #d6d6d6;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.promotion-table thead th,
+.promotion-items-table thead th {
+    background: #000;
+    color: #fff;
+    border-color: #2d3033;
+    padding: 13px;
+    font-size: 10pt;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.promotion-table tbody td,
+.promotion-items-table tbody td {
+    border-color: #2d3033;
+    padding: 13px;
+    vertical-align: middle;
+}
+
+.promotion-table tbody tr,
+.promotion-items-table tbody tr {
+    background: #17191b;
+}
+
+.promotion-table tbody tr:nth-child(even),
+.promotion-items-table tbody tr:nth-child(even) {
+    background: #1b1d20;
+}
+
+.promotion-table tbody tr:hover,
+.promotion-items-table tbody tr:hover {
+    background: #2c3440 !important;
+}
+
+.promotion-row-new {
+    box-shadow: inset 4px 0 0 #ff9800;
+}
+
+.promotion-new-row-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 21px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #ff6d00;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .4px;
+}
+
+.btn-view-promotion-items {
+    background: #0d47ff;
+    color: #fff;
+    border: 1px solid #4e74ff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 800;
+}
+
+.btn-view-promotion-items:hover,
+.btn-view-promotion-items:focus {
+    background: #2c5cff;
+    color: #fff;
+    border-color: #7893ff;
+}
+
+.btn-view-promotion-items:disabled {
+    opacity: .65;
+}
+
+.promotion-items-title {
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.promotion-items-code {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #0d47ff;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.promotion-items-name {
+    color: #ffb74d;
+    font-weight: 800;
+}
+
+.promotion-extra-amount {
+    color: #ffb74d;
+    font-weight: 800;
+}
+
+.promotion-final-amount {
+    color: #66bb6a;
+    font-weight: 900;
+}
+
+.promotion-empty-row,
+.promotion-items-loading {
+    padding: 24px !important;
+    text-align: center;
+    color: #b5b5b5;
+}
+
+@media (max-width: 768px) {
+    .agent-promotion-alert {
+        width: fit-content;
+        margin: 5px 0;
+    }
+
+    .agent-promotions-page {
+        padding: 12px;
+    }
+}
+
+@keyframes promotionSoftPulse {
+    0%, 100% {
+        background-color: #dc3545;
+        box-shadow: 0 0 0 rgba(220, 53, 69, 0);
+    }
+
+    50% {
+        background-color: #fd7e14;
+        box-shadow: 0 0 10px rgba(253, 126, 20, 0.45);
+    }
+}
+
+.agent-promotion-notification.has-new {
+    background-color: #dc3545;
+    animation: promotionSoftPulse 2.2s ease-in-out infinite;
+}

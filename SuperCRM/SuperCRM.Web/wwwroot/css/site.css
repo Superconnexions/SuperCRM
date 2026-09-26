@@ -92,3 +92,101 @@ body.supercrm-body {
 .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem #191b1d, 0 0 0 0.25rem #0d47ff;
 }
+
+
+/* =========================================================
+   Agent Active Promotion Notification
+   ========================================================= */
+
+.agent-promotion-alert {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px !important;
+    margin-right: 5px;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none !important;
+    background: linear-gradient( 135deg, #ff9800 0%, #ff6d00 45%, #ff3d00 100% );
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 18px;
+    box-shadow: 0 0 8px rgba(255, 111, 0, 0.45);
+    transition: transform .20s ease, box-shadow .20s ease;
+}
+
+
+    .agent-promotion-alert:hover {
+        color: #ffffff !important;
+        transform: translateY(-1px);
+        box-shadow: 0 0 15px rgba(255, 111, 0, 0.85);
+    }
+
+
+/* Promotion icon */
+
+.promotion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+}
+
+
+/* Text */
+
+.promotion-label {
+    white-space: nowrap;
+}
+
+
+/* Notification counter */
+
+.promotion-notification-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 23px;
+    height: 23px;
+    padding: 0 6px;
+    background: #0d47ff;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+
+/* Soft notification pulse only when promotions exist */
+
+.agent-promotion-alert.has-active-promotion {
+    animation: promotionNotificationPulse 2.3s infinite;
+}
+
+
+@keyframes promotionNotificationPulse {
+
+    0%, 100% {
+        box-shadow: 0 0 7px rgba(255, 111, 0, 0.45);
+    }
+
+    50% {
+        box-shadow: 0 0 18px rgba(255, 111, 0, 0.95), 0 0 28px rgba(255, 152, 0, 0.35);
+    }
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .agent-promotion-alert {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        margin-right: 0;
+        width: fit-content;
+    }
+}

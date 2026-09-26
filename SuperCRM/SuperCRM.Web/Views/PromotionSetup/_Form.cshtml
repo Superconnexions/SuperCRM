@@ -1,0 +1,451 @@
+@model SuperCRM.Web.ViewModels.PromotionSetup.PromotionCreateEditViewModel
+@using SuperCRM.Domain.Enums
+
+<style>
+    .promotion-setup-page .promotion-summary {
+        min-height: 70px !important;
+        height: 70px;
+        resize: vertical;
+    }
+
+    .promotion-setup-page .promotion-notification-message {
+        min-height: 95px !important;
+        height: 95px;
+        resize: vertical;
+    }
+
+    .promotion-setup-page .promotion-remarks {
+        min-height: 42px !important;
+        height: 42px;
+        resize: vertical;
+    }
+
+    .promotion-setup-page .promotion-products-table {
+        color: #ffffff !important;
+        border-color: #5b6168 !important;
+        margin-bottom: 0;
+        min-width: 1120px;
+    }
+
+    .promotion-setup-page .promotion-products-table thead th {
+        background-color: #17191b !important;
+        color: #ffffff !important;
+        border-color: #5b6168 !important;
+        font-weight: 700;
+        vertical-align: middle;
+        white-space: normal;
+        line-height: 1.25;
+        padding: 12px 10px;
+    }
+
+    .promotion-setup-page .promotion-products-table tbody td {
+        background-color: #242628 !important;
+        color: #ffffff !important;
+        border-color: #4a4f55 !important;
+        vertical-align: middle;
+    }
+
+    .promotion-setup-page .promotion-products-table .form-control,
+    .promotion-setup-page .promotion-products-table .form-select {
+        min-height: 38px;
+    }
+
+    .promotion-setup-page .promotion-products-scroll {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-product {
+        min-width: 260px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-standard {
+        min-width: 155px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-type {
+        min-width: 155px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-percent {
+        min-width: 120px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-amount {
+        min-width: 160px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-final {
+        min-width: 160px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-active {
+        min-width: 80px;
+    }
+
+    .promotion-setup-page .promotion-products-table th.col-action {
+        min-width: 95px;
+    }
+</style>
+
+<div asp-validation-summary="ModelOnly"
+     class="text-danger mb-3">
+</div>
+
+<fieldset>
+    <legend>Promotion Information</legend>
+
+    @if (Model.PromotionId.HasValue)
+    {
+        <input asp-for="PromotionId"
+               type="hidden" />
+
+        <div class="mb-3">
+            <label asp-for="PromotionCode"
+                   class="form-label">
+                Promotion Code
+            </label>
+
+            <input asp-for="PromotionCode"
+                   class="form-control"
+                   readonly />
+        </div>
+    }
+
+    <div class="mb-3">
+        <label asp-for="PromotionName"
+               class="form-label">
+            Promotion Name
+            <span class="text-danger">*</span>
+        </label>
+
+        <input asp-for="PromotionName"
+               class="form-control"
+               maxlength="200"
+               readonly="@Model.Cancelled" />
+
+        <span asp-validation-for="PromotionName"
+              class="text-danger">
+        </span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PromotionSummary"
+               class="form-label">
+            Promotion Summary
+        </label>
+
+        <textarea asp-for="PromotionSummary"
+                  class="form-control promotion-summary"
+                  rows="2"
+                  maxlength="500"
+                  readonly="@Model.Cancelled"></textarea>
+
+        <span asp-validation-for="PromotionSummary"
+              class="text-danger">
+        </span>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="PromotionStartDate"
+                   class="form-label">
+                Promotion Start Date
+                <span class="text-danger">*</span>
+            </label>
+
+            <input asp-for="PromotionStartDate"
+                   type="date"
+                   class="form-control"
+                   readonly="@Model.Cancelled" />
+
+            <span asp-validation-for="PromotionStartDate"
+                  class="text-danger">
+            </span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="PromotionEndDate"
+                   class="form-label">
+                Promotion End Date
+                <span class="text-danger">*</span>
+            </label>
+
+            <input asp-for="PromotionEndDate"
+                   type="date"
+                   class="form-control"
+                   readonly="@Model.Cancelled" />
+
+            <span asp-validation-for="PromotionEndDate"
+                  class="text-danger">
+            </span>
+        </div>
+    </div>
+
+    @if (Model.PromotionId.HasValue)
+    {
+        <div class="mb-3">
+            <div class="form-check">
+                <input asp-for="IsActive"
+                       class="form-check-input"
+                       disabled="@Model.Cancelled" />
+
+                <label asp-for="IsActive"
+                       class="form-check-label">
+                    Active
+                </label>
+            </div>
+
+            @if (Model.Cancelled)
+            {
+                <input asp-for="IsActive"
+                       type="hidden" />
+            }
+
+            <small class="text-muted">
+                Uncheck Active and click Update if the entire promotion should be temporarily inactive.
+            </small>
+        </div>
+    }
+
+    <div class="mb-3">
+        <label asp-for="NotificationMessage"
+               class="form-label">
+            Notification Message
+        </label>
+
+        <textarea asp-for="NotificationMessage"
+                  class="form-control promotion-notification-message"
+                  rows="3"
+                  maxlength="2000"
+                  readonly="@Model.Cancelled"></textarea>
+
+        <span asp-validation-for="NotificationMessage"
+              class="text-danger">
+        </span>
+
+        <small class="text-muted">
+            This message will be included in the email notification sent to active agents.
+        </small>
+    </div>
+
+    <div class="mb-0">
+        <label asp-for="Remarks"
+               class="form-label">
+            Remarks
+        </label>
+
+        <textarea asp-for="Remarks"
+                  class="form-control promotion-remarks"
+                  rows="1"
+                  maxlength="500"
+                  readonly="@Model.Cancelled"></textarea>
+
+        <span asp-validation-for="Remarks"
+              class="text-danger">
+        </span>
+    </div>
+</fieldset>
+
+<fieldset class="mt-4">
+    <legend>Promotion Products</legend>
+
+    <div class="d-flex justify-content-end mb-3">
+        @if (!Model.Published
+            && !Model.Cancelled)
+        {
+            <button type="button"
+                    id="btnAddPromotionItem"
+                    class="btn btn-success btn-sm px-3">
+                + Add Product
+            </button>
+        }
+    </div>
+
+    <div class="promotion-products-scroll">
+        <table class="table table-bordered align-middle promotion-products-table"
+               id="promotionItemsTable">
+
+            <thead>
+                <tr>
+                    <th class="col-product">
+                        Product
+                    </th>
+
+                    <th class="text-end col-standard">
+                        Standard<br />Commission
+                    </th>
+
+                    <th class="col-type">
+                        Promotion Type
+                    </th>
+
+                    <th class="text-end col-percent">
+                        Percentage
+                    </th>
+
+                    <th class="text-end col-amount">
+                        Promotion<br />Amount
+                    </th>
+
+                    <th class="text-end col-final">
+                        Final<br />Commission
+                    </th>
+
+                    <th class="text-center col-active">
+                        Active
+                    </th>
+
+                    <th class="text-center col-action">
+                        Action
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody id="promotionItemsBody">
+                @for (var i = 0;
+                      i < Model.Items.Count;
+                      i++)
+                {
+                    <tr class="promotion-item-row">
+
+                        <td>
+                            <input asp-for="Items[i].PromotionItemId"
+                                   type="hidden" />
+
+                            <input asp-for="Items[i].ProductBaseCommissionId"
+                                   type="hidden"
+                                   class="base-id" />
+
+                            <select asp-for="Items[i].ProductId"
+                                    class="form-select product-select"
+                                    disabled="@(Model.Published || Model.Cancelled)">
+
+                                <option value="">
+                                    -- Select Product --
+                                </option>
+
+                                @foreach (var option
+                                    in Model.ProductOptions)
+                                {
+                                    <option value="@option.ProductId"
+                                            data-base-id="@option.ProductBaseCommissionId"
+                                            data-standard="@option.StandardCommission">
+
+                                        @option.ProductCode
+                                        -
+                                        @option.ProductName
+                                        |
+                                        Base:
+                                        @option.StandardCommission.ToString("N2")
+
+                                    </option>
+                                }
+                            </select>
+
+                            @if (Model.Published
+                                || Model.Cancelled)
+                            {
+                                <input asp-for="Items[i].ProductId"
+                                       type="hidden" />
+                            }
+                        </td>
+
+                        <td>
+                            <input asp-for="Items[i].StandardCommission"
+                                   class="form-control text-end standard"
+                                   readonly />
+                        </td>
+
+                        <td>
+                            <select asp-for="Items[i].PromotionType"
+                                    asp-items="Html.GetEnumSelectList<PromotionType>()"
+                                    class="form-select promo-type"
+                                    disabled="@(Model.Published || Model.Cancelled)">
+                            </select>
+
+                            @if (Model.Published
+                                || Model.Cancelled)
+                            {
+                                <input asp-for="Items[i].PromotionType"
+                                       type="hidden" />
+                            }
+                        </td>
+
+                        <td>
+                            <input asp-for="Items[i].PromotionPercentage"
+                                   class="form-control text-end percent"
+                                   readonly="@(Model.Published || Model.Cancelled)" />
+                        </td>
+
+                        <td>
+                            <input asp-for="Items[i].PromotionAmount"
+                                   class="form-control text-end promo-amount"
+                                   readonly="@(Model.Published || Model.Cancelled)" />
+                        </td>
+
+                        <td>
+                            <input asp-for="Items[i].FinalCommissionAmount"
+                                   class="form-control text-end final"
+                                   readonly />
+                        </td>
+
+                        <td class="text-center">
+                            <!--
+                                IMPORTANT:
+                                PromotionItem Active remains editable
+                                after Publish. This allows Admin to
+                                deactivate one product without
+                                cancelling the whole promotion.
+                            -->
+                            <input asp-for="Items[i].IsActive"
+                                   class="form-check-input"
+                                   disabled="@Model.Cancelled" />
+
+                            @if (Model.Cancelled)
+                            {
+                                <input asp-for="Items[i].IsActive"
+                                       type="hidden" />
+                            }
+                        </td>
+
+                        <td class="text-center">
+                            @if (!Model.Published
+                                && !Model.Cancelled)
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm remove-row">
+                                    Remove
+                                </button>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+</fieldset>
+
+<select id="promotionProductTemplate"
+        class="d-none">
+
+    @foreach (var option
+        in Model.ProductOptions)
+    {
+        <option value="@option.ProductId"
+                data-base-id="@option.ProductBaseCommissionId"
+                data-standard="@option.StandardCommission">
+
+            @option.ProductCode
+            -
+            @option.ProductName
+            |
+            Base:
+            @option.StandardCommission.ToString("N2")
+
+        </option>
+    }
+
+</select>

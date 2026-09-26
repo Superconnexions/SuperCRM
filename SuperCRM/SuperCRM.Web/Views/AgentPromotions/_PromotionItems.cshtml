@@ -1,0 +1,39 @@
+@model SuperCRM.Application.DTOs.PromotionSetup.AgentPromotionDetailsDto
+
+<div class="promotion-items-panel">
+    <div class="promotion-items-panel-header">
+        <div>
+            <span class="promotion-items-title">Promotion Items</span>
+            <span class="promotion-items-code">@Model.PromotionCode</span>
+        </div>
+        <div class="promotion-items-name">@Model.PromotionName</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table promotion-items-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Promotion Code</th>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th class="text-end">Standard Commission</th>
+                    <th class="text-end">Promotion Amount</th>
+                    <th class="text-end">Final Commission Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="text-nowrap fw-bold">@item.PromotionCode</td>
+                        <td class="text-nowrap">@item.ProductCode</td>
+                        <td>@item.ProductName</td>
+                        <td class="text-end text-nowrap">BDT @item.StandardCommission.ToString("N2")</td>
+                        <td class="text-end text-nowrap promotion-extra-amount">BDT @item.PromotionAmount.ToString("N2")</td>
+                        <td class="text-end text-nowrap promotion-final-amount">BDT @item.FinalCommissionAmount.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SuperCRM.Domain.Entities;
@@ -69,6 +69,11 @@ namespace SuperCRM.Persistence.DbContexts
         public DbSet<InstallmentSchedule> InstallmentSchedules { get; set; }
         public DbSet<SalesOrderStatusHistory> SalesOrderStatusHistories { get; set; }
         public DbSet<ProductVariantCommissionOverride> ProductVariantCommissionOverrides { get; set; }
+
+        // Promotion Setup
+        public DbSet<PromotionSetup> PromotionSetups => Set<PromotionSetup>();
+        public DbSet<PromotionItem> PromotionItems => Set<PromotionItem>();
+        public DbSet<AgentPromotionView> AgentPromotionViews => Set<AgentPromotionView>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -1006,6 +1011,37 @@ namespace SuperCRM.Persistence.DbContexts
                     .WithOne(x => x.SaleLine)
                     .HasForeignKey(x => x.SaleLineId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                // -----------------------------------------------------
+                // PROMOTION AUDIT
+                // -----------------------------------------------------
+
+                entity.Property(x => x.IsPromotionApplied)
+                    .IsRequired()
+                    .HasDefaultValue(false);
+
+                entity.HasOne(x => x.PromotionSetup)
+                    .WithMany()
+                    .HasForeignKey(x => x.PromotionId)
+                    .HasConstraintName("FK_SaleLines_PromotionSetup")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.PromotionItem)
+                    .WithMany()
+                    .HasForeignKey(x => x.PromotionItemId)
+                    .HasConstraintName("FK_SaleLines_PromotionItem")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => x.PromotionId)
+                    .HasDatabaseName("IX_SaleLines_PromotionId");
+
+                entity.HasIndex(x => x.PromotionItemId)
+                    .HasDatabaseName("IX_SaleLines_PromotionItemId");
+
+                entity.HasIndex(x => x.IsPromotionApplied)
+                    .HasDatabaseName("IX_SaleLines_IsPromotionApplied");
+
+
             });
 
             builder.Entity<InstallmentSchedule>(entity =>
@@ -1094,6 +1130,76 @@ namespace SuperCRM.Persistence.DbContexts
                 })
                 .HasDatabaseName("IX_ProductVariantCommissionOverrides_ProductVariant");
             });
+
+            // Date: 31AUG2026
+
+            builder.Entity<PromotionSetup>(entity =>
+            {
+                entity.ToTable("PromotionSetup"); entity.HasKey(x => x.PromotionId); entity.Property(x => x.PromotionId).ValueGeneratedNever();
+                entity.Property(x => x.PromotionCode).HasMaxLength(10).IsUnicode(false).IsRequired(); entity.HasIndex(x => x.PromotionCode).IsUnique();
+                entity.Property(x => x.PromotionName).HasMaxLength(200).IsRequired(); entity.Property(x => x.PromotionSummary).HasMaxLength(500);
+                entity.Property(x => x.NotificationMessage).HasMaxLength(2000); entity.Property(x => x.Remarks).HasMaxLength(500);
+                entity.Property(x => x.PromotionStartDate).HasColumnType("date"); entity.Property(x => x.PromotionEndDate).HasColumnType("date");
+                entity.Property(x => x.CancelledAt).HasColumnType("datetime2");
+                entity.Property(x => x.SubmittedAt).HasColumnType("datetime2"); 
+                entity.Property(x => x.UpdatedAt).HasColumnType("datetime2"); entity.Property(x => x.LastEmailNotificationAt).HasColumnType("datetime2");
+                entity.HasMany(x => x.Items).WithOne(x => x.PromotionSetup).HasForeignKey(x => x.PromotionId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.SubmittedByUserId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.UpdatedByUserId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.LastEmailNotificationByUserId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.CancelledByUserId).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<PromotionItem>(entity =>
+            {
+                entity.ToTable("PromotionItem"); entity.HasKey(x => x.PromotionItemId); entity.Property(x => x.PromotionItemId).ValueGeneratedNever();
+                entity.Property(x => x.PromotionCode).HasMaxLength(10).IsUnicode(false).IsRequired(); entity.Property(x => x.PromotionType).HasConversion<byte>();
+                entity.Property(x => x.StandardCommission).HasColumnType("decimal(18,2)"); entity.Property(x => x.PromotionPercentage).HasColumnType("decimal(9,4)"); entity.Property(x => x.PromotionAmount).HasColumnType("decimal(18,2)"); entity.Property(x => x.FinalCommissionAmount).HasColumnType("decimal(18,2)");
+                entity.HasOne(x => x.ProductBaseCommission).WithMany().HasForeignKey(x => x.ProductBaseCommissionId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.UpdatedByUserId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.PromotionId, x.ProductId }).IsUnique();
+            });
+
+
+
+            builder.Entity<AgentPromotionView>(entity =>
+            {
+                entity.ToTable("AgentPromotionViews");
+
+                entity.HasKey(x => x.AgentPromotionViewId);
+
+                entity.Property(x => x.AgentPromotionViewId)
+                    .ValueGeneratedNever();
+
+                entity.Property(x => x.ViewedAt)
+                    .HasColumnType("datetime2")
+                    .IsRequired();
+
+                entity.HasOne(x => x.PromotionSetup)
+                    .WithMany()
+                    .HasForeignKey(x => x.PromotionId)
+                    .HasConstraintName("FK_AgentPromotionViews_PromotionSetup")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(x => x.AgentUserId)
+                    .HasConstraintName("FK_AgentPromotionViews_AspNetUsers")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new
+                    {
+                        x.AgentUserId,
+                        x.PromotionId
+                    })
+                    .IsUnique()
+                    .HasDatabaseName("UQ_AgentPromotionViews_AgentUser_Promotion");
+
+                entity.HasIndex(x => x.PromotionId)
+                    .HasDatabaseName("IX_AgentPromotionViews_PromotionId");
+            });
+
             /// END ALL
 
 
