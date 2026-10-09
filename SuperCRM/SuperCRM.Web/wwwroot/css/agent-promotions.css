@@ -296,3 +296,26 @@
     background-color: #dc3545;
     animation: promotionSoftPulse 2.2s ease-in-out infinite;
 }
+
+/* Header promotions modal */
+#activePromotionsModal .modal-dialog { max-width: min(1500px, 96vw); }
+#activePromotionsModal .modal-content { background: #222426; color: #d6d6d6; border: 1px solid #45494d; }
+#activePromotionsModal .modal-header,
+#activePromotionsModal .modal-footer { border-color: #45494d; }
+#activePromotionsModal .modal-body { padding: 0; }
+#activePromotionsModal .agent-promotions-page { min-height: 0; }
+
+/* Keep the promotion whose items are displayed visibly selected. */
+.promotion-table tbody tr.promotion-row-selected > td {
+    background-color: #153d65 !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+.promotion-table tbody tr.promotion-row-selected > td:first-child {
+    border-left: 4px solid #60baff;
+}
+.promotion-row-selected .btn-view-promotion-items {
+    background-color: #fff;
+    border-color: #fff;
+    color: #153d65;
+}

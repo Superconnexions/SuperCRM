@@ -63,6 +63,26 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/calander.js" asp-append-version="true"></script>
 
+    @if (User.IsInRole(SuperCRM.Shared.AppRoles.Agent))
+    {
+        <div class="modal fade" id="activePromotionsModal" tabindex="-1"
+             aria-labelledby="activePromotionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="activePromotionsModalLabel">Active Promotions</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="activePromotionsModalBody" data-items-url="@Url.Action("PromotionItems", "AgentPromotions")" aria-live="polite"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="~/js/agent-promotions-modal.js" asp-append-version="true"></script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

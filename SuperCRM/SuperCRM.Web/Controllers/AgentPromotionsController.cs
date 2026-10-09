@@ -22,7 +22,8 @@ namespace SuperCRM.Web.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool modal = false)
         {
             var userId = GetCurrentUserId();
 
@@ -37,7 +38,9 @@ namespace SuperCRM.Web.Controllers
                     DateTime.Today,
                     cancellationToken);
 
-            return View(model);
+            return modal
+                ? PartialView("_ActivePromotions", model)
+                : View(model);
         }
 
         /// <summary>

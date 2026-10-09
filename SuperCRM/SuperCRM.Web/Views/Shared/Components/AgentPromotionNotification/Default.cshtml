@@ -13,7 +13,10 @@
        asp-action="Index"
        id="agentPromotionAlert"
        class="nav-link agent-promotion-alert @stateClass"
-       title="View Active Promotions">
+       title="View Active Promotions"
+       data-modal-url="@Url.Action("Index", "AgentPromotions", new { modal = true })"
+       aria-haspopup="dialog"
+       aria-controls="activePromotionsModal">
 
         <span class="promotion-icon" aria-hidden="true">📣</span>
 
