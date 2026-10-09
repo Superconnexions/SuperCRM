@@ -176,9 +176,9 @@ function validateSalesOrderSelection() {
         const totalPrice =
             parseFloat(salePriceInput?.value || '0') || 0;
 
-        if (totalPrice <= 0) {
+        if (totalPrice < 0) {
 
-            alert('Total Price must be greater than zero for ' + productName);
+            alert('Total Price cannot be negative for ' + productName);
             return false;
         }
 

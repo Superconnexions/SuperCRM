@@ -78,7 +78,8 @@ namespace SuperCRM.Application.Services
 
                 var quantity = line.Quantity <= 0 ? 1 : line.Quantity;
                 var basePrice = ResolveBasePrice(product, variant);
-                var salePrice = line.SalePrice > 0 ? line.SalePrice : basePrice;
+                // Zero is a valid sale price for free products.
+                var salePrice = line.SalePrice >= 0 ? line.SalePrice : basePrice;
 
                 draft.DraftLines.Add(new SalesOrderDraftLine
                 {
