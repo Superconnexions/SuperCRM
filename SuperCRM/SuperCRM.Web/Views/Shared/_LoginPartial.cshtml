@@ -129,6 +129,11 @@
                     <li>
                         <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
                     </li>
+                    @if (User.IsInRole(AppRoles.SuperAdmin))
+                    {
+                        <li><a class="dropdown-item" asp-controller="UserPasswordReset" asp-action="Index">User Password Reset</a></li>
+                    }
+
 
                     <li>
                         <a class="dropdown-item" asp-controller="SalesOrder" asp-action="AgentsKPI">Agents KPI</a>

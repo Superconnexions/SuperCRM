@@ -6,6 +6,9 @@ using SuperCRM.Shared;
 using SuperCRM.Web.Models;
 using SuperCRM.Web.ViewModels.Account;
 using System.Diagnostics;
+using System.Text.Encodings.Web;
+using SuperCRM.Application.DTOs.EmailSettings;
+using SuperCRM.Application.Interfaces.Services;
 
 namespace SuperCRM.Web.Controllers
 {
@@ -14,13 +17,18 @@ namespace SuperCRM.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSenderService _emailSender;
 
         public HomeController(
             SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IEmailSenderService emailSender,
+            ILogger<HomeController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _emailSender = emailSender;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -107,7 +115,10 @@ namespace SuperCRM.Web.Controllers
         [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
-            return View(new ForgotPasswordViewModel());
+            return View(new ForgotPasswordViewModel
+            {
+                Email = TempData["PasswordResetEmail"] as string ?? string.Empty
+            });
         }
 
         [HttpPost]
@@ -118,24 +129,66 @@ namespace SuperCRM.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            const string confirmation = "Please check your email and click the Reset Password link to reset your password. If you do not see the email, please check your spam or junk folder.";
+            var user = await _userManager.FindByEmailAsync(model.Email.Trim());
 
-            // Always show same response for security
-            if (user == null || !user.IsActive)
+            if (user == null || !user.IsActive || string.IsNullOrWhiteSpace(user.Email)
+                || !await CanResetPasswordAsync(user))
             {
-                TempData["SuccessMessage"] = "If the email exists in the system, a password reset option has been prepared.";
-                return RedirectToAction(nameof(ForgotPassword));
+                ModelState.AddModelError(string.Empty,
+                    "This email address is not linked to an active account eligible for password reset. Please check the email address or contact support.");
+                return View(model);
             }
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            // TEMPORARY DEV MODE:
-            // Until email sending is implemented, redirect directly to reset page with token.
-            return RedirectToAction(nameof(ResetPassword), new
+            if (user != null)
             {
-                email = user.Email,
-                token = token
-            });
+                try
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var resetUrl = Url.Action(
+                        nameof(ResetPassword),
+                        "Home",
+                        new { email = user.Email, token },
+                        protocol: Request.Scheme);
+
+                    if (string.IsNullOrWhiteSpace(resetUrl))
+                        throw new InvalidOperationException("Unable to generate password reset link.");
+
+                    // Do not store the reset token in the email log.
+                    var result = await _emailSender.SendWithoutCreatingLogAsync(new SendEmailRequestDto
+                    {
+                        ToEmail = user.Email,
+                        Subject = "SuperCRM - Reset your password",
+                        Body = "<p>A password reset was requested for your SuperCRM account.</p>"
+                            + "<p><a href=\"" + HtmlEncoder.Default.Encode(resetUrl)
+                            + "\">Reset Password</a></p>"
+                            + "<p>Click the link to choose and confirm your new password.</p>"
+                            + "<p>If you did not request this, you can ignore this email.</p>",
+                        IsHtml = true,
+                        SourceModule = "PasswordReset"
+                    }, HttpContext.RequestAborted);
+
+                    if (!result.Success)
+                    {
+                        _logger.LogWarning("Password reset email delivery failed.");
+                        ModelState.AddModelError(string.Empty,
+                            "Your account is active, but we could not send the password reset email. Please try again later or contact support.");
+                        return View(model);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Do not log the reset URL or token.
+                    _logger.LogWarning("Unable to complete password reset email delivery.");
+                    ModelState.AddModelError(string.Empty,
+                        "Your account is active, but we could not send the password reset email. Please try again later or contact support.");
+                    return View(model);
+                }
+            }
+
+            TempData["PasswordResetLinkMessage"] = confirmation;
+            TempData["PasswordResetEmail"] = model.Email.Trim();
+            return RedirectToAction(nameof(ForgotPassword));
         }
 
         [AllowAnonymous]
@@ -162,7 +215,7 @@ namespace SuperCRM.Web.Controllers
                 return View(model);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            if (user == null || !user.IsActive || !await CanResetPasswordAsync(user))
             {
                 ModelState.AddModelError(string.Empty, "Invalid reset request.");
                 return View(model);
@@ -181,6 +234,12 @@ namespace SuperCRM.Web.Controllers
 
             TempData["SuccessMessage"] = "Password has been reset successfully. Please login.";
             return RedirectToAction(nameof(Index));
+        }
+        private async Task<bool> CanResetPasswordAsync(ApplicationUser user)
+        {
+            return await _userManager.IsInRoleAsync(user, AppRoles.SuperAdmin)
+                || await _userManager.IsInRoleAsync(user, AppRoles.SuperCRMAdmin)
+                || await _userManager.IsInRoleAsync(user, AppRoles.Agent);
         }
     }
 }

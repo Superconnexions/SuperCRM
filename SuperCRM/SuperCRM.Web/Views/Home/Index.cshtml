@@ -168,6 +168,11 @@
 
             <hr class="login-divider" />
 
+            @if (TempData["SuccessMessage"] is string successMessage)
+            {
+                <div class="alert alert-success" role="status">@successMessage</div>
+            }
+
             <form asp-action="Login" method="post">
                 <div asp-validation-summary="All" class="text-danger"></div>
 
