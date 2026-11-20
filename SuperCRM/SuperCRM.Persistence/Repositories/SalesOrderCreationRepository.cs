@@ -219,10 +219,7 @@ namespace SuperCRM.Persistence.Repositories
             //        (!salesOrderStatus.HasValue || s.SalesOrderStatus == salesOrderStatus.Value));
 
 
-            var salesQuery =
-                _dbContext.Sales
-                .AsNoTracking()
-                .AsQueryable();
+            var salesQuery = _dbContext.Sales.AsNoTracking().AsQueryable();
 
 
             //===================================================
