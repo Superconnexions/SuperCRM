@@ -640,8 +640,33 @@ namespace SuperCRM.Application.Services
                     salesOrderNo,
                     page,
                     pageSize,
-                    cancellationToken);
+                    cancellationToken
+                    );
             }
+
+       public Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderManageAsync(
+       Guid? soldByUserId,
+       DateTime? orderDateFrom,
+       DateTime? orderDateTo,
+       byte? salesOrderStatus,
+       string? salesOrderNo,
+       int page,
+       int pageSize,
+       string? AgentCode,
+       CancellationToken cancellationToken = default)
+        {
+            return _repository.GetSalesOrderManageAsync(
+                soldByUserId,
+                orderDateFrom,
+                orderDateTo,
+                salesOrderStatus,
+                salesOrderNo,
+                page,
+                pageSize,
+                AgentCode,
+                cancellationToken
+                );
+        }
 
         public Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
         Guid saleId,

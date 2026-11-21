@@ -30,7 +30,20 @@ namespace SuperCRM.Application.Interfaces.Services
         string? salesOrderNo,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+        );
+
+        Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderManageAsync(
+        Guid? soldByUserId,
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        string? salesOrderNo,
+        int page,
+        int pageSize,
+        string? AgentCode,
+        CancellationToken cancellationToken = default
+        );
 
         Task<SalesOrderManagementDetailDto?> GetSalesOrderManagementDetailAsync(
         Guid saleId,

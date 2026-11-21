@@ -204,7 +204,8 @@ namespace SuperCRM.Persistence.Repositories
         string? salesOrderNo,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+        )
             {
                 page = page <= 0 ? 1 : page;
                 pageSize = pageSize <= 0 ? 20 : pageSize;
@@ -265,6 +266,7 @@ namespace SuperCRM.Persistence.Repositories
 
                         (!salesOrderStatus.HasValue ||
                             s.SalesOrderStatus == salesOrderStatus.Value)
+
                     );
             }
 
@@ -338,6 +340,158 @@ namespace SuperCRM.Persistence.Repositories
 
                 return (items, totalRecords);
             }
+
+
+        public async Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderManageAsync(
+        Guid? soldByUserId,
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        string? salesOrderNo,
+        int page,
+        int pageSize,
+        string? AgentCode,
+        CancellationToken cancellationToken = default
+        )
+        {
+            page = page <= 0 ? 1 : page;
+            pageSize = pageSize <= 0 ? 20 : pageSize;
+
+
+            //var salesQuery = _dbContext.Sales
+            //    .AsNoTracking()
+            //    .Where(s =>
+            //        (!soldByUserId.HasValue || s.SoldByUserId == soldByUserId.Value) &&
+            //        (!orderDateFrom.HasValue || s.OrderDate.Date >= orderDateFrom.Value.Date) &&
+            //        (!orderDateTo.HasValue || s.OrderDate.Date <= orderDateTo.Value.Date) &&
+            //        (!salesOrderStatus.HasValue || s.SalesOrderStatus == salesOrderStatus.Value));
+
+
+            var salesQuery = _dbContext.Sales.AsNoTracking().AsQueryable();
+
+
+            //===================================================
+            // Agent security filter
+            // Agent can only see his/her own sales orders
+            //===================================================
+
+            if (soldByUserId.HasValue)
+            {
+                salesQuery =
+                    salesQuery.Where(s =>
+                        s.SoldByUserId == soldByUserId.Value);
+            }
+
+
+            //===================================================
+            // Search by Sales Order No
+            // Ignore date/status filters, but DO NOT ignore agent filter
+            //===================================================
+
+            if (!string.IsNullOrWhiteSpace(salesOrderNo))
+            {
+                salesOrderNo = salesOrderNo.Trim();
+
+                salesQuery =
+                    salesQuery.Where(s =>
+                        s.OrderNo.Contains(salesOrderNo));
+            }
+            else
+            {
+                salesQuery =
+                    salesQuery.Where(s =>
+
+                        (!orderDateFrom.HasValue ||
+                            s.OrderDate.Date >= orderDateFrom.Value.Date)
+
+                        &&
+
+                        (!orderDateTo.HasValue ||
+                            s.OrderDate.Date <= orderDateTo.Value.Date)
+
+                        &&
+
+                        (!salesOrderStatus.HasValue ||
+                            s.SalesOrderStatus == salesOrderStatus.Value)
+                            &&
+
+                        (string.IsNullOrEmpty(AgentCode) ||
+                            s.SoldByAgentCode == AgentCode)
+                    );
+            }
+
+            var totalRecords = await salesQuery.CountAsync(cancellationToken);
+
+            var query =
+                from s in salesQuery
+                join c in _dbContext.Customers.AsNoTracking()
+                    on s.CustomerId equals c.CustomerId
+                join p in _dbContext.Providers.AsNoTracking()
+                    on s.ProviderId equals p.ProviderId into providers
+                from provider in providers.DefaultIfEmpty()
+                join sl in _dbContext.SaleLines.AsNoTracking()
+                    on s.SaleId equals sl.SaleId into saleLines
+                orderby s.OrderDate descending
+                select new SalesOrderHistoryDto
+                {
+                    SaleId = s.SaleId,
+                    OrderNo = s.OrderNo,
+                    OrderDate = s.OrderDate,
+
+                    CustomerId = c.CustomerId,
+                    CustomerCode = c.CustomerCode ?? "",
+                    CustomerName = c.DisplayName
+                        ?? ((c.FirstName ?? "") + " " + (c.LastName ?? "")).Trim(),
+                    CustomerEmail = c.Email,
+                    CustomerMobile = c.Mobile,
+
+                    ProviderId = s.ProviderId,
+                    ProviderName = provider != null ? provider.ProviderName : "SuperCRM",
+
+                    SalesOrderStatus = s.SalesOrderStatus,
+                    SalesOrderStatusText = ((SalesOrderStatus)s.SalesOrderStatus).ToString(),
+
+                    IsCommissionApplicable = s.IsCommissionApplicable,
+
+                    CommissionFinalizedText =
+                        !saleLines.Any()
+                            ? "No"
+                            : saleLines.All(l => l.IsCommissionFinalized)
+                                ? "Yes"
+                                : saleLines.All(l => !l.IsCommissionFinalized)
+                                    ? "No"
+                                    : "Partial",
+
+                    ServiceStartDate = s.ServiceStartDate,
+                    NextRenewDate = s.NextRenewDate,
+                    NoOfRenew = s.NoOfRenew,
+
+                    OrderTotal = saleLines.Sum(l => l.LineTotalAmount),
+                    AgentCommissionAmount = s.AgentCommissionAmount,
+
+                    TotalLines = saleLines.Count(),
+                    CompletedLines = saleLines.Count(l => l.Completed),
+                    CancelledOrRejectedLines = saleLines.Count(l => l.CancelledOrRejected),
+
+                    HasSpecialNotes = saleLines.Any(l => !string.IsNullOrWhiteSpace(l.SpecialNotes)),
+
+                    SoldByUserId = s.SoldByUserId,
+                    SoldByAgentId = s.SoldByAgentId,
+                    SoldByAgentCode = s.SoldByAgentCode,
+
+                    EmailSentToCustomer = s.EmailSentToCustomer,
+                    EmailSentToProvider = s.EmailSentToProvider
+                };
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, totalRecords);
+        }
+
+
 
         public Task<Sale?> GetSaleForUpdateAsync(
         Guid saleId,

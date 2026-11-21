@@ -42,7 +42,20 @@ namespace SuperCRM.Application.Interfaces.Persistence
         string? salesOrderNo,
         int page,
         int pageSize,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+        );
+
+        Task<(List<SalesOrderHistoryDto> Items, int TotalRecords)> GetSalesOrderManageAsync(
+        Guid? soldByUserId,
+        DateTime? orderDateFrom,
+        DateTime? orderDateTo,
+        byte? salesOrderStatus,
+        string? salesOrderNo,
+        int page,
+        int pageSize,
+        string? AgentCode,
+        CancellationToken cancellationToken = default
+        );
 
         Task<Sale?> GetSaleForUpdateAsync(Guid saleId, CancellationToken cancellationToken = default);
 

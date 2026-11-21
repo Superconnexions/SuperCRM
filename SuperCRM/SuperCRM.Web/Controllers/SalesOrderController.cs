@@ -1007,6 +1007,7 @@ namespace SuperCRM.Web.Controllers
         DateTime? orderDateTo,
         byte? salesOrderStatus,
         string? salesOrderNo,
+        string? AgentCode,
         int page = 1,
         int pageSize = 20,
         CancellationToken cancellationToken = default)
@@ -1024,7 +1025,7 @@ namespace SuperCRM.Web.Controllers
             }
 
 
-            var result = await _salesOrderCreationService.GetSalesOrderHistoryAsync(
+            var result = await _salesOrderCreationService.GetSalesOrderManageAsync(
                 soldByUserId: null,
                 orderDateFrom,
                 orderDateTo,
@@ -1032,7 +1033,9 @@ namespace SuperCRM.Web.Controllers
                 salesOrderNo,
                 page,
                 pageSize,
-                cancellationToken);
+                AgentCode,
+                cancellationToken
+                 );
 
             var model = new SalesOrderHistoryViewModel
             {
@@ -1053,7 +1056,15 @@ namespace SuperCRM.Web.Controllers
                         Value = ((byte)x).ToString(),
                         Text = x.ToString()
                     })
-                    .ToList()
+                    .ToList(),
+
+                AgentCode = AgentCode
+
+                //Agents = result.Agents.Select(x => new SelectListItem
+                //{
+                //    Value = x.AgentId.ToString(),
+                //    Text = $"{x.AgentCode} - {x.FullName}"
+                //}).ToList(),
             };
 
             return View(model);
