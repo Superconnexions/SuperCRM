@@ -711,7 +711,7 @@ namespace SuperCRM.Application.Services
 
                 line.FinalAgentCommission = inputLine.FinalAgentCommission;
                 line.IsCommissionFinalized = true;
-                line.UpdatedAt = DateTime.UtcNow;
+                line.FinalAgentCommissionUpdatedAt = DateTime.UtcNow;
                 line.UpdatedByUserId = request.UpdatedByUserId;
             }
 

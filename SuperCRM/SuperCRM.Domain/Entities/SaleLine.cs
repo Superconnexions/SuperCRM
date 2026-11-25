@@ -60,5 +60,6 @@ namespace SuperCRM.Domain.Entities
         public PromotionSetup? PromotionSetup { get; set; }
         public PromotionItem? PromotionItem { get; set; }
         public ICollection<InstallmentSchedule> InstallmentSchedules { get; set; } = new List<InstallmentSchedule>();
+        public DateTime? FinalAgentCommissionUpdatedAt { get; set; }
     }
 }
